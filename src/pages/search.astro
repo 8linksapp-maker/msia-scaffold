@@ -19,23 +19,26 @@ const results = q
 ---
 
 <BaseLayout title={q ? `Busca: ${q}` : 'Buscar'} description={`Resultados pra ${q}`}>
-  <div class="container-x py-10 md:py-14">
-    <div class="mb-10">
-      <div class="cat-pill mb-3">busca</div>
-      <h1 class="font-display text-4xl md:text-5xl font-bold tracking-tight text-ink mb-2">
+  <section class="border-b border-rule">
+    <div class="container-x pt-16 md:pt-20 pb-10">
+      <p class="mono uppercase text-ink-faint mb-5">busca</p>
+      <h1 class="font-display text-4xl md:text-5xl font-extrabold tracking-tight text-ink leading-[1.05] mb-3 max-w-3xl">
         {q ? `Resultados pra "${q}"` : 'O que você quer buscar?'}
       </h1>
-      <p class="text-ink-muted">
+      <p class="mono text-ink-muted">
         {q
-          ? `${results.length} ${results.length === 1 ? 'resultado encontrado' : 'resultados encontrados'}`
-          : 'Use a busca no menu pra encontrar artigos.'}
+          ? `${results.length} ${results.length === 1 ? 'resultado' : 'resultados'}`
+          : 'use a busca no menu'}
       </p>
     </div>
+  </section>
 
-    <div class="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-10">
-      <div class="space-y-6">
+  <div class="container-x py-12 md:py-16">
+    <div class="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-12 lg:gap-20">
+      <main>
         {q && results.length === 0 && (
-          <div class="bg-surface rounded-md p-12 text-center shadow-card">
+          <div class="py-16 border-t border-rule">
+            <p class="mono uppercase text-ink-faint mb-3">vazio</p>
             <p class="text-ink-muted text-lg">Nada encontrado pra <strong class="text-ink">"{q}"</strong>.</p>
             <p class="text-sm text-ink-faint mt-3">Tenta uma palavra diferente.</p>
           </div>
@@ -43,10 +46,8 @@ const results = q
         {results.map((post: any, i: number) => (
           <PostCard post={post} index={i} />
         ))}
-      </div>
-      <div>
-        <Sidebar />
-      </div>
+      </main>
+      <Sidebar />
     </div>
   </div>
 </BaseLayout>

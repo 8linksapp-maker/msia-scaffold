@@ -7,25 +7,27 @@ const privacy = readData('privacy.json', {});
 ---
 
 <BaseLayout title="Política de Privacidade" description={`Política de privacidade do ${siteConfig.name}`}>
-  <div class="container-x py-14 md:py-20">
-    <div class="max-w-prose-lg mx-auto">
-      <div class="cat-pill mb-4">legal</div>
-      <h1 class="font-display text-4xl md:text-5xl font-bold tracking-tight text-ink mb-3">
+  <section class="border-b border-rule">
+    <div class="container-x pt-16 md:pt-20 pb-10">
+      <p class="mono uppercase text-ink-faint mb-5">legal</p>
+      <h1 class="font-display text-4xl md:text-5xl font-extrabold tracking-tight text-ink leading-[1.05] mb-3">
         Política de Privacidade
       </h1>
       {siteConfig.legal?.privacy_last_updated && (
-        <p class="text-xs uppercase tracking-wider text-ink-faint mb-10">
-          Última atualização: {siteConfig.legal.privacy_last_updated}
+        <p class="mono text-ink-faint">
+          atualizado em {siteConfig.legal.privacy_last_updated}
         </p>
       )}
+    </div>
+  </section>
 
-      <div class="prose-msia">
-        {(privacy as any).content ? (
-          <Fragment set:html={(privacy as any).content} />
-        ) : (
-          <p>Edite essa página no painel admin em <a href="/admin/legal" class="text-primary underline">/admin/legal</a>.</p>
-        )}
-      </div>
+  <div class="container-x py-14 md:py-20">
+    <div class="prose-msia">
+      {(privacy as any).content ? (
+        <Fragment set:html={(privacy as any).content} />
+      ) : (
+        <p>Edite essa página no painel admin em <a href="/admin/legal" class="text-primary underline underline-offset-4">/admin/legal</a>.</p>
+      )}
     </div>
   </div>
 </BaseLayout>

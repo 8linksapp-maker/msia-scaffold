@@ -7,26 +7,28 @@ const siteConfig = readData('siteConfig.json');
 ---
 
 <BaseLayout title="Sobre" description={`Conheça ${siteConfig.name}`}>
-  <div class="container-x py-14 md:py-20">
-    <div class="max-w-prose-lg mx-auto">
-      <div class="cat-pill mb-4">sobre</div>
-      <h1 class="font-display text-4xl md:text-5xl font-bold tracking-tight text-ink mb-6">
+  <section class="border-b border-rule">
+    <div class="container-x pt-16 md:pt-20 pb-12">
+      <p class="mono uppercase text-ink-faint mb-5">sobre</p>
+      <h1 class="font-display text-5xl md:text-6xl font-extrabold tracking-tight text-ink leading-[1.02] mb-6 max-w-3xl">
         {(sobreData as any).title || `Conheça ${siteConfig.name}`}
       </h1>
 
       {(sobreData as any).subtitle && (
-        <p class="text-xl text-ink-muted font-display italic mb-8 leading-relaxed">
+        <p class="text-xl text-ink-muted leading-relaxed max-w-2xl">
           {(sobreData as any).subtitle}
         </p>
       )}
+    </div>
+  </section>
 
-      <div class="prose-msia">
-        {(sobreData as any).content ? (
-          <Fragment set:html={(sobreData as any).content} />
-        ) : (
-          <p>Edite essa página no painel admin em <a href="/admin/sobre" class="text-primary underline">/admin/sobre</a>.</p>
-        )}
-      </div>
+  <div class="container-x py-14 md:py-20">
+    <div class="prose-msia">
+      {(sobreData as any).content ? (
+        <Fragment set:html={(sobreData as any).content} />
+      ) : (
+        <p>Edite essa página no painel admin em <a href="/admin/sobre" class="text-primary underline underline-offset-4">/admin/sobre</a>.</p>
+      )}
     </div>
   </div>
 </BaseLayout>

@@ -1,18 +1,15 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostCard from '../../components/ui/PostCard.astro';
-import Sidebar from '../../components/sidebar/Sidebar.astro';
 import { getCollection } from 'astro:content';
-import { readData } from '../../lib/readData';
-
-const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+import { colorForCategory } from '../../lib/categoryColors';
+import { slugify } from '../../lib/slugify';
 
 export async function getStaticPaths() {
   const allPosts = await getCollection('blog');
-  const slugifyLocal = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   const cats = [...new Set(allPosts.map((p: any) => p.data.category).filter(Boolean))];
   return cats.map((cat: string) => ({
-    params: { categoria: slugifyLocal(cat) },
+    params: { categoria: slugify(cat) },
     props: { categoryName: cat },
   }));
 }
@@ -26,31 +23,38 @@ const posts = allPosts
     const db = new Date(b.data.pubDate || b.data.date || 0).getTime();
     return db - da;
   });
+
+const catColor = colorForCategory(categoryName);
 ---
 
 <BaseLayout title={categoryName} description={`Artigos sobre ${categoryName}`}>
-  <div class="container-x py-10 md:py-14">
-    <div class="mb-10">
-      <div class="cat-pill mb-3">categoria</div>
-      <h1 class="font-display text-4xl md:text-5xl font-bold tracking-tight text-ink mb-2">{categoryName}</h1>
-      <p class="text-ink-muted">{posts.length} {posts.length === 1 ? 'artigo encontrado' : 'artigos encontrados'}</p>
+  <section class={`bg-cat-${catColor} relative overflow-hidden isolate`}>
+    <span class="color-block-num" style="bottom:-3rem;right:-1rem;font-size:clamp(14rem,32vw,26rem)">
+      ·
+    </span>
+    <div class="container-x relative z-10 pt-16 md:pt-24 pb-16 md:pb-20">
+      <p class="mono uppercase opacity-75 mb-5 text-white">tópico</p>
+      <h1 class="font-display text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight leading-[0.92] mb-4 text-white">
+        {categoryName}
+      </h1>
+      <p class="mono text-white/80">
+        {posts.length} {posts.length === 1 ? 'artigo' : 'artigos'}
+      </p>
     </div>
+  </section>
 
-    <div class="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-10">
-      <div class="space-y-6">
-        {posts.length === 0 ? (
-          <div class="bg-surface rounded-md p-12 text-center shadow-card">
-            <p class="text-ink-muted">Nenhum artigo nesta categoria ainda.</p>
-          </div>
-        ) : (
-          posts.map((post: any, i: number) => (
-            <PostCard post={post} index={i} />
-          ))
-        )}
+  <div class="container-x py-10 md:py-14">
+    {posts.length === 0 ? (
+      <div class="py-20 border-t border-rule">
+        <p class="mono uppercase text-ink-faint mb-3">vazio</p>
+        <p class="text-ink-muted">Nenhum artigo nesta categoria ainda.</p>
       </div>
-      <div>
-        <Sidebar />
+    ) : (
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+        {posts.map((post: any, i: number) => (
+          <PostCard post={post} index={i} />
+        ))}
       </div>
-    </div>
+    )}
   </div>
 </BaseLayout>

@@ -1,40 +1,7 @@
 {
-    "sectionTitles": {
-        "editorsPick": "Escolha dos Editores",
-        "trending": "Em Alta",
-        "inspiration": "Inspiração",
-        "latestPosts": "Posts Recentes",
-        "popularTab": "Popular",
-        "recentTab": "Recente"
-    },
-    "editorsPick": {
-        "mainSlug": "toquio-roteiro-7-dias",
-        "sideSlugs": [
-            "lisboa-encantou-o-mundo",
-            "dicas-viagem-mochilao-europa",
-            "nova-york-primeira-viagem",
-            "santorini-grecia-guia-completo"
-        ]
-    },
-    "trending": {
-        "slugs": [
-            "",
-            "",
-            "",
-            ""
-        ]
-    },
-    "inspiration": {
-        "slugs": [
-            "",
-            "",
-            "",
-            ""
-        ]
-    },
-    "latestPosts": {
-        "limit": 6,
-        "btnText": "Ver Todos os Posts",
-        "btnLink": "/blog"
-    }
+  "hero": {
+    "eyebrow": "scaffold msia",
+    "title": "Seu blog começa aqui.",
+    "lead": "Cinco passos pra deixar este scaffold seu. Cada bloco é um capítulo do manual."
+  }
 }

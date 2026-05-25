@@ -1,15 +1,15 @@
 {
   "name": "Meu Blog",
-  "description": "Inspire-se. Leia. Cresça. Conteúdo editorial sobre o que importa.",
+  "description": "Conteúdo direto sobre o que importa. Sem ornamento, sem ruído.",
   "url": "https://meublog.com.br",
   "author": "Equipe do Blog",
   "language": "pt-BR",
   "logo": "",
   "theme": {
-    "primary": "#1e73be",
-    "dark": "#141416",
-    "fontDisplay": "Fraunces",
-    "fontBody": "Outfit"
+    "primary": "#1c64c8",
+    "dark": "#0e1420",
+    "fontDisplay": "Switzer",
+    "fontBody": "Switzer"
   },
   "social": {
     "instagram": "",

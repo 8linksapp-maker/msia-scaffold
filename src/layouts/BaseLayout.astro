@@ -10,45 +10,31 @@ const siteConfig = readData('siteConfig.json');
 const pluginsConfig = readData('pluginsConfig.json', {});
 const gscVerificationTag = (pluginsConfig as any)?.searchConsole?.verificationTag?.trim() || '';
 
-// CMS pode customizar cores e fontes via siteConfig.theme — passamos como CSS vars no <html>
-const primaryHex = siteConfig.theme?.primary || '#1e73be';
-const primaryDarkHex = siteConfig.theme?.primaryDark || '';
-const navHex = siteConfig.theme?.dark || '#141416';
-const fontDisplay = siteConfig.theme?.fontDisplay || 'Fraunces';
-const fontBody = siteConfig.theme?.fontBody || 'Outfit';
+const primaryHex = siteConfig.theme?.primary || '#1c64c8';
+const fontDisplay = siteConfig.theme?.fontDisplay || 'Switzer';
+const fontBody = siteConfig.theme?.fontBody || 'Switzer';
 
 function hexToRgbTriplet(hex: string): string {
   const h = hex.replace('#', '').trim();
-  if (h.length !== 6) return '30 115 190';
+  if (h.length !== 6) return '28 100 200';
   const r = parseInt(h.substring(0, 2), 16);
   const g = parseInt(h.substring(2, 4), 16);
   const b = parseInt(h.substring(4, 6), 16);
   return `${r} ${g} ${b}`;
 }
-function darken(hex: string, amount = 0.15): string {
-  const h = hex.replace('#', '').trim();
-  if (h.length !== 6) return hex;
-  const r = Math.round(parseInt(h.substring(0, 2), 16) * (1 - amount));
-  const g = Math.round(parseInt(h.substring(2, 4), 16) * (1 - amount));
-  const b = Math.round(parseInt(h.substring(4, 6), 16) * (1 - amount));
-  return `${r} ${g} ${b}`;
-}
 function soften(hex: string): string {
-  // mistura com branco pra criar tom soft (highlight box)
   const h = hex.replace('#', '').trim();
-  if (h.length !== 6) return '226 240 251';
-  const r = Math.round(parseInt(h.substring(0, 2), 16) * 0.12 + 255 * 0.88);
-  const g = Math.round(parseInt(h.substring(2, 4), 16) * 0.12 + 255 * 0.88);
-  const b = Math.round(parseInt(h.substring(4, 6), 16) * 0.12 + 255 * 0.88);
+  if (h.length !== 6) return '228 235 247';
+  const r = Math.round(parseInt(h.substring(0, 2), 16) * 0.1 + 255 * 0.9);
+  const g = Math.round(parseInt(h.substring(2, 4), 16) * 0.1 + 255 * 0.9);
+  const b = Math.round(parseInt(h.substring(4, 6), 16) * 0.1 + 255 * 0.9);
   return `${r} ${g} ${b}`;
 }
 
 const cssVars = `
   --c-primary: ${hexToRgbTriplet(primaryHex)};
-  --c-primary-dark: ${primaryDarkHex ? hexToRgbTriplet(primaryDarkHex) : darken(primaryHex, 0.15)};
   --c-primary-soft: ${soften(primaryHex)};
-  --c-nav: ${hexToRgbTriplet(navHex)};
-  --font-display: '${fontDisplay}', Georgia, serif;
+  --font-display: '${fontDisplay}', system-ui, -apple-system, sans-serif;
   --font-body: '${fontBody}', system-ui, -apple-system, sans-serif;
 `;
 
@@ -103,9 +89,13 @@ const socialImage = image?.startsWith('http') ? image : image ? new URL(image, s
 </head>
 
 <body class={bodyClass}>
+  <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:bg-ink focus:text-bg focus:px-4 focus:py-2 focus:rounded focus:mono">
+    pular pro conteúdo
+  </a>
+
   <Header />
 
-  <main>
+  <main id="main">
     <slot />
   </main>
 

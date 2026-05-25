@@ -1,5 +1,6 @@
 ---
 import { readData } from '../../lib/readData';
+import { slugify } from '../../lib/slugify';
 import { getCollection } from 'astro:content';
 
 const siteConfig = readData('siteConfig.json');
@@ -11,70 +12,70 @@ const categoriesData = readData('categories.json', []);
 const finalCategoriesData = Array.isArray(categoriesData) ? categoriesData : [];
 const allCategories = (finalCategoriesData.length > 0 ? finalCategoriesData : categoriesFromPosts).slice(0, 6);
 
-const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 const year = new Date().getFullYear();
+
+const socials: Array<[string, string, string]> = [
+  ['instagram', 'instagram', siteConfig.social?.instagram],
+  ['twitter', 'twitter / x', siteConfig.social?.twitter],
+  ['facebook', 'facebook', siteConfig.social?.facebook],
+  ['youtube', 'youtube', siteConfig.social?.youtube],
+].filter(([_, __, href]: any) => href) as any;
 ---
 
-<footer class="bg-nav text-white/70 mt-24">
-  <div class="container-x py-16">
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-10">
-      <div class="md:col-span-2">
-        <h3 class="font-display text-2xl text-white mb-3">{siteConfig.name}</h3>
-        <p class="text-sm leading-relaxed text-white/60 max-w-md">
+<footer class="border-t border-rule mt-24">
+  <div class="container-x py-14 md:py-20">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-10 mb-14">
+      <div class="md:col-span-5">
+        <a href="/" class="font-display text-2xl font-bold text-ink tracking-tight no-underline inline-block mb-3">
+          {siteConfig.name}
+        </a>
+        <p class="text-sm text-ink-muted leading-relaxed max-w-sm">
           {siteConfig.description}
         </p>
-        {siteConfig.social && (
-          <div class="flex gap-3 mt-6">
-            {siteConfig.social.instagram && (
-              <a href={siteConfig.social.instagram} target="_blank" rel="noopener" class="w-9 h-9 rounded-md border border-white/15 flex items-center justify-center text-white/70 hover:text-white hover:border-white/40 transition-colors" aria-label="Instagram">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-              </a>
-            )}
-            {siteConfig.social.twitter && (
-              <a href={siteConfig.social.twitter} target="_blank" rel="noopener" class="w-9 h-9 rounded-md border border-white/15 flex items-center justify-center text-white/70 hover:text-white hover:border-white/40 transition-colors" aria-label="Twitter">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/></svg>
-              </a>
-            )}
-            {siteConfig.social.facebook && (
-              <a href={siteConfig.social.facebook} target="_blank" rel="noopener" class="w-9 h-9 rounded-md border border-white/15 flex items-center justify-center text-white/70 hover:text-white hover:border-white/40 transition-colors" aria-label="Facebook">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
-              </a>
-            )}
-            {siteConfig.social.youtube && (
-              <a href={siteConfig.social.youtube} target="_blank" rel="noopener" class="w-9 h-9 rounded-md border border-white/15 flex items-center justify-center text-white/70 hover:text-white hover:border-white/40 transition-colors" aria-label="YouTube">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M22.54 6.42a2.78 2.78 0 00-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 00-1.94 2A29 29 0 001 11.75a29 29 0 00.46 5.33A2.78 2.78 0 003.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 001.94-2 29 29 0 00.46-5.25 29 29 0 00-.46-5.33z"/><path d="M9.75 15.02l5.75-3.27-5.75-3.27v6.54z" fill="rgb(20,20,22)"/></svg>
-              </a>
-            )}
-          </div>
-        )}
       </div>
 
-      <div>
-        <div class="widget-title text-white/50 mb-4">Navegação</div>
-        <ul class="space-y-2 text-sm">
+      <div class="md:col-span-3">
+        <div class="mono uppercase text-ink-faint mb-4 pb-3 border-b border-rule">navegação</div>
+        <ul class="space-y-2.5 text-sm">
           {menuItems.map((item: any) => (
-            <li><a href={item.href} class="text-white/70 hover:text-white">{item.label}</a></li>
+            <li><a href={item.href} class="text-ink-muted hover:text-ink transition-colors">{item.label}</a></li>
           ))}
         </ul>
       </div>
 
       {allCategories.length > 0 && (
-        <div>
-          <div class="widget-title text-white/50 mb-4">Categorias</div>
-          <ul class="space-y-2 text-sm">
+        <div class="md:col-span-2">
+          <div class="mono uppercase text-ink-faint mb-4 pb-3 border-b border-rule">tópicos</div>
+          <ul class="space-y-2.5 text-sm">
             {allCategories.map((cat: string) => (
-              <li><a href={`/categoria/${slugify(cat)}`} class="text-white/70 hover:text-white">{cat}</a></li>
+              <li><a href={`/categoria/${slugify(cat)}`} class="text-ink-muted hover:text-ink transition-colors">{cat}</a></li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {socials.length > 0 && (
+        <div class="md:col-span-2">
+          <div class="mono uppercase text-ink-faint mb-4 pb-3 border-b border-rule">social</div>
+          <ul class="space-y-2.5 text-sm">
+            {socials.map(([_, label, href]: any) => (
+              <li>
+                <a href={href} target="_blank" rel="noopener" class="text-ink-muted hover:text-ink transition-colors inline-flex items-center gap-1.5">
+                  {label}
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+                </a>
+              </li>
             ))}
           </ul>
         </div>
       )}
     </div>
 
-    <div class="border-t border-white/10 mt-12 pt-6 flex items-center justify-between flex-wrap gap-3 text-xs text-white/50">
-      <span>© {year} {siteConfig.name}. Todos os direitos reservados.</span>
-      <div class="flex gap-4">
-        <a href="/privacidade" class="hover:text-white">Privacidade</a>
-        <a href="/termos" class="hover:text-white">Termos</a>
+    <div class="border-t border-rule pt-6 flex items-center justify-between flex-wrap gap-3 text-xs">
+      <span class="mono text-ink-faint">© {year} {siteConfig.name}</span>
+      <div class="flex gap-5">
+        <a href="/privacidade" class="text-ink-faint hover:text-ink transition-colors">privacidade</a>
+        <a href="/termos" class="text-ink-faint hover:text-ink transition-colors">termos</a>
       </div>
     </div>
   </div>

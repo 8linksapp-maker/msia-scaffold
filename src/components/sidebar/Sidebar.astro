@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import { readData } from '../../lib/readData';
+import { slugify } from '../../lib/slugify';
 
 const siteConfig = readData('siteConfig.json');
 const homeData = readData('home.json', {});
@@ -12,61 +13,79 @@ const recentPosts = allPosts
     const db = new Date(b.data.pubDate || b.data.date || 0).getTime();
     return db - da;
   })
-  .slice(0, 4);
+  .slice(0, 5);
 
-const highlight = (homeData as any)?.sidebar?.highlight || {
-  label: 'Em destaque',
-  title: 'Newsletter semanal',
-  description: 'Receba uma curadoria do que rolou de mais importante esta semana. Sem spam, só conteúdo.',
-  cta: 'Quero receber',
-  href: '#newsletter',
-};
+const categoriesData = readData('categories.json', []);
+const finalCategoriesData = Array.isArray(categoriesData) ? categoriesData : [];
+const categoriesFromPosts = [...new Set(allPosts.map((p: any) => p.data.category).filter(Boolean))];
+const allCategories: string[] = finalCategoriesData.length > 0 ? finalCategoriesData : categoriesFromPosts;
 
-const palette = ['#2d8c4f', '#6c3eb6', '#1e73be', '#d97706', '#0d9488', '#be185d', '#475569'];
+const highlight = (homeData as any)?.sidebar?.highlight;
+
+function fmtDate(d: any): string {
+  if (!d) return '';
+  const dt = new Date(d);
+  if (isNaN(dt.getTime())) return '';
+  return dt.toLocaleDateString('pt-BR', { month: 'short', day: '2-digit' }).replace('.', '');
+}
 ---
 
-<aside class="space-y-6 sticky top-24">
-  <div class="widget widget-highlight">
-    <div class="widget-title">{highlight.label || 'Em destaque'}</div>
-    <h3 class="text-2xl font-display font-semibold leading-tight mb-3 text-white">
-      {highlight.title}
-    </h3>
-    <p class="text-sm leading-relaxed text-white/85 mb-5">
-      {highlight.description}
-    </p>
-    <a href={highlight.href || '#'} class="btn btn-primary !bg-nav hover:!bg-black no-underline">
-      {highlight.cta || 'Saiba mais'}
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-    </a>
-  </div>
-
-  <div class="widget">
-    <div class="widget-title">Posts recentes</div>
-    <ul class="space-y-4">
+<aside class="lg:sticky lg:top-24 space-y-12">
+  <div class="side-section">
+    <div class="side-section-label uppercase">recente</div>
+    <ol class="space-y-5">
       {recentPosts.map((post: any, i: number) => {
         const data = post.data;
         const slug = post.slug ?? post.id;
-        const cover = data.cover || data.coverImage || data.image;
-        const colorBg = palette[i % palette.length];
+        const date = data.pubDate || data.date;
+        const num = String(i + 1).padStart(2, '0');
         return (
           <li>
-            <a href={`/${slug}`} class="flex items-start gap-3 no-underline group">
-              {cover ? (
-                <img src={cover} alt={data.title} class="w-14 h-14 rounded object-cover flex-shrink-0" loading="lazy" />
-              ) : (
-                <div class="w-14 h-14 rounded flex items-center justify-center flex-shrink-0 text-white" style={`background: ${colorBg}`}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-                </div>
-              )}
-              <div class="min-w-0">
-                <h4 class="text-sm font-semibold leading-snug text-primary group-hover:text-primary-dark line-clamp-2 font-sans">
-                  {data.title}
-                </h4>
+            <a href={`/${slug}`} class="group block">
+              <div class="flex items-baseline gap-3 mb-1">
+                <span class="mono text-ink-faint">{num}</span>
+                {date && <span class="mono text-ink-faint">{fmtDate(date)}</span>}
               </div>
+              <h4 class="font-display text-[15px] font-medium leading-snug text-ink group-hover:text-primary transition-colors line-clamp-2">
+                {data.title}
+              </h4>
             </a>
           </li>
         );
       })}
-    </ul>
+    </ol>
   </div>
+
+  {allCategories.length > 0 && (
+    <div class="side-section">
+      <div class="side-section-label uppercase">tópicos</div>
+      <ul class="flex flex-wrap gap-x-3 gap-y-2">
+        {allCategories.map((cat: string) => (
+          <li>
+            <a href={`/categoria/${slugify(cat)}`} class="mono text-ink-muted hover:text-ink transition-colors">
+              {cat.toLowerCase()}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )}
+
+  {highlight && highlight.title && highlight.href && (
+    <div class="side-section">
+      <div class="side-section-label uppercase">{highlight.label || 'destaque'}</div>
+      <h3 class="font-display text-lg font-semibold text-ink leading-snug mb-2">
+        {highlight.title}
+      </h3>
+      {highlight.description && (
+        <p class="text-sm text-ink-muted leading-relaxed mb-3">
+          {highlight.description}
+        </p>
+      )}
+      <a href={highlight.href} class="mono text-ink hover:text-primary transition-colors inline-flex items-center gap-1.5 border-b border-ink hover:border-primary pb-0.5">
+        {highlight.cta || 'continuar'}
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+    </div>
+  )}
 </aside>
