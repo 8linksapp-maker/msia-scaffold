@@ -1,33 +1,30 @@
 {
-  "name": "Mundo Afora",
-  "description": "Inspire-se a explorar o mundo. Roteiros, dicas e histórias de quem viaja de verdade.",
-  "url": "https://mundoafora.com.br",
-  "author": "Equipe Mundo Afora",
+  "name": "Meu Blog",
+  "description": "Inspire-se. Leia. Cresça. Conteúdo editorial sobre o que importa.",
+  "url": "https://meublog.com.br",
+  "author": "Equipe do Blog",
   "language": "pt-BR",
   "logo": "",
   "theme": {
-    "primary": "#FE4F70",
-    "accent": "#FFA387",
-    "font": "poppins",
-    "dark": "#203656"
+    "primary": "#1e73be",
+    "dark": "#141416",
+    "fontDisplay": "Fraunces",
+    "fontBody": "Outfit"
   },
   "social": {
-    "instagram": "https://instagram.com/mundoafora",
-    "twitter": "https://twitter.com/mundoafora",
-    "facebook": "https://facebook.com/mundoafora",
-    "pinterest": "https://pinterest.com/mundoafora",
-    "youtube": "https://youtube.com/@mundoafora"
+    "instagram": "",
+    "twitter": "",
+    "facebook": "",
+    "youtube": ""
   },
   "contact": {
-    "email": "contato@mundoafora.com.br",
-    "phone": "+55 11 97777-9934",
-    "address": "Rua das Viagens, 42 — São Paulo, SP",
-    "name": "Mundo Afora Comunicação Digital"
+    "email": "contato@meublog.com.br",
+    "phone": "",
+    "address": "",
+    "name": ""
   },
   "legal": {
-    "terms_last_updated": "24 de Março de 2026",
-    "privacy_last_updated": "24 de Março de 2026"
-  },
-  "phone": "21995211289",
-  "address": "Rua abraham medina, 355"
+    "terms_last_updated": "",
+    "privacy_last_updated": ""
+  }
 }

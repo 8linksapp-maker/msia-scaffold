@@ -1,59 +1,31 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Sidebar from '../components/Sidebar.astro';
 import { readData } from '../lib/readData';
+
 const siteConfig = readData('siteConfig.json');
-const privacyData = readData('privacy.json');
+const privacy = readData('privacy.json', {});
 ---
 
-<BaseLayout title={privacyData.title} description={`Leia nossa ${privacyData.title.toLowerCase()} e proteção de dados.`}>
+<BaseLayout title="Política de Privacidade" description={`Política de privacidade do ${siteConfig.name}`}>
+  <div class="container-x py-14 md:py-20">
+    <div class="max-w-prose-lg mx-auto">
+      <div class="cat-pill mb-4">legal</div>
+      <h1 class="font-display text-4xl md:text-5xl font-bold tracking-tight text-ink mb-3">
+        Política de Privacidade
+      </h1>
+      {siteConfig.legal?.privacy_last_updated && (
+        <p class="text-xs uppercase tracking-wider text-ink-faint mb-10">
+          Última atualização: {siteConfig.legal.privacy_last_updated}
+        </p>
+      )}
 
-  <!-- page header -->
-  <section class="page-header">
-    <div class="container-xl">
-      <div class="text-center">
-        <h1 class="mt-0 mb-2">{privacyData.title}</h1>
-        <nav aria-label="breadcrumb">
-          <ol class="breadcrumb justify-content-center mb-0">
-            <li class="breadcrumb-item"><a href="/">Home</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{privacyData.title}</li>
-          </ol>
-        </nav>
+      <div class="prose-msia">
+        {(privacy as any).content ? (
+          <Fragment set:html={(privacy as any).content} />
+        ) : (
+          <p>Edite essa página no painel admin em <a href="/admin/legal" class="text-primary underline">/admin/legal</a>.</p>
+        )}
       </div>
     </div>
-  </section>
-
-  <!-- section main content -->
-  <section class="main-content">
-    <div class="container-xl">
-      <div class="row gy-4">
-
-        <div class="col-lg-8">
-          <div class="page-content bordered rounded padding-30">
-
-            {privacyData.lastUpdated && (
-              <p class="mb-4" style="color:#8F9BAD;font-size:0.9rem;">Última atualização: {privacyData.lastUpdated}</p>
-            )}
-
-            {privacyData.content?.map(section => (
-              <>
-                <h4>{section.title}</h4>
-                <p>{section.text}</p>
-              </>
-            ))}
-
-            <hr class="my-4" />
-            <p>Para dúvidas sobre esta política, entre em <a href="/contato">contato conosco</a>.</p>
-
-          </div>
-        </div>
-
-        <div class="col-lg-4">
-          <Sidebar />
-        </div>
-
-      </div>
-    </div>
-  </section>
-
+  </div>
 </BaseLayout>

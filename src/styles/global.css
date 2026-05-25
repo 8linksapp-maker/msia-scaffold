@@ -1,32 +1,287 @@
+/* ===========================================================
+   MSIA Scaffold — Design tokens + base
+   Inspired by Marketer (GeneratePress), elevated to editorial-modern
+   =========================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,400;1,9..144,500&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    /* Cores definidas dinamicamente pelo BaseLayout.astro via define:vars */
-    --color-primary: 254 79 112;
-    --color-primary-dark: 32 54 86;
-    --color-accent: 255 163 135;
+    /* ===== Design tokens (RGB triplets pra Tailwind opacity) ===== */
+    --c-primary:       30 115 190;     /* #1e73be — azul Marketer */
+    --c-primary-dark:  20  90 155;
+    --c-primary-soft: 226 240 251;     /* highlight box bg suave */
+    --c-accent:       247 197  72;     /* dourado para highlight ocasional */
+
+    --c-ink:           20  28  44;     /* preto azulado, headlines */
+    --c-ink-muted:     78  92 112;     /* body text */
+    --c-ink-faint:    145 158 178;     /* meta, captions */
+
+    --c-bg:          250 249 246;      /* off-white quente */
+    --c-surface:     255 255 255;
+    --c-border:      232 230 224;
+    --c-nav:           20  20  22;     /* preto do header */
+
+    --font-display: 'Fraunces', Georgia, serif;
+    --font-body:    'Outfit', system-ui, -apple-system, sans-serif;
   }
 
-  html {
-    scroll-behavior: smooth;
-  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; text-size-adjust: 100%; }
 
   body {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: 1.0625rem;
+    line-height: 1.7;
+    color: rgb(var(--c-ink-muted));
+    background: rgb(var(--c-bg));
     -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: 'ss01', 'cv11';
   }
 
-  ::selection {
-    background-color: rgb(var(--color-primary) / 0.15);
-    color: rgb(var(--color-primary-dark));
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    color: rgb(var(--c-ink));
+    letter-spacing: -0.015em;
+    font-weight: 600;
+    margin: 0;
   }
+  h1 { font-size: 3rem;    line-height: 1.1;  font-weight: 700; }
+  h2 { font-size: 2.25rem; line-height: 1.15; }
+  h3 { font-size: 1.5rem;  line-height: 1.3;  }
+  h4 { font-size: 1.25rem; line-height: 1.4;  }
+
+  a {
+    color: rgb(var(--c-primary));
+    text-decoration: none;
+    transition: opacity 0.15s ease, color 0.15s ease;
+  }
+  a:hover { opacity: 0.75; }
+
+  img, svg, video { max-width: 100%; height: auto; display: block; }
+
+  ::selection {
+    background: rgb(var(--c-primary) / 0.18);
+    color: rgb(var(--c-ink));
+  }
+
+  ::-webkit-scrollbar { width: 12px; height: 12px; }
+  ::-webkit-scrollbar-track { background: rgb(var(--c-bg)); }
+  ::-webkit-scrollbar-thumb {
+    background: rgb(var(--c-border));
+    border: 3px solid rgb(var(--c-bg));
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: rgb(var(--c-ink-faint)); }
 }
 
 @layer components {
-  .walker-section-border {
-    @apply border-b border-gray-200;
+  /* ===== Container ===== */
+  .container-x {
+    max-width: 1200px;
+    margin-inline: auto;
+    padding-inline: 1.5rem;
+  }
+  @media (min-width: 768px) {
+    .container-x { padding-inline: 2rem; }
+  }
+
+  /* ===== Card de post (Marketer-style elevado) ===== */
+  .post-card {
+    position: relative;
+    background: rgb(var(--c-surface));
+    border-radius: 6px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04);
+    transition: box-shadow 0.25s ease, transform 0.25s ease;
+    overflow: hidden;
+  }
+  .post-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06), 0 12px 32px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
+  }
+
+  /* Numeração editorial gigante (diferencial visual) */
+  .post-card-num {
+    position: absolute;
+    top: -0.5rem;
+    right: 1.25rem;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 7rem;
+    line-height: 1;
+    color: rgb(var(--c-primary-soft));
+    pointer-events: none;
+    user-select: none;
+    z-index: 0;
+  }
+
+  /* Thumbnail colorido fallback (estilo Marketer) */
+  .post-thumb-color {
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .post-thumb-color svg { width: 40%; height: 40%; }
+
+  /* ===== Sidebar widgets ===== */
+  .widget {
+    background: rgb(var(--c-surface));
+    border-radius: 6px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04);
+    padding: 1.75rem;
+    position: relative;
+  }
+  .widget::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: rgb(var(--c-primary));
+    border-radius: 6px 6px 0 0;
+  }
+  .widget-highlight {
+    background: rgb(var(--c-primary));
+    color: white;
+    padding: 2rem;
+  }
+  .widget-highlight::before { display: none; }
+  .widget-highlight h3 { color: white; }
+
+  .widget-title {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgb(var(--c-ink-muted));
+    margin-bottom: 1.25rem;
+  }
+  .widget-highlight .widget-title { color: rgba(255, 255, 255, 0.7); }
+
+  /* ===== Category pill ===== */
+  .cat-pill {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--font-body);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.25rem 0.625rem;
+    background: rgb(var(--c-primary-soft));
+    color: rgb(var(--c-primary-dark));
+    border-radius: 999px;
+  }
+
+  /* ===== Botões ===== */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.6875rem 1.5rem;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 0.875rem;
+    border-radius: 4px;
+    transition: all 0.15s ease;
+    cursor: pointer;
+    border: none;
+  }
+  .btn-primary { background: rgb(var(--c-nav)); color: white; }
+  .btn-primary:hover { background: rgb(var(--c-primary)); opacity: 1; }
+  .btn-ghost {
+    background: transparent;
+    color: rgb(var(--c-ink));
+    border: 1px solid rgb(var(--c-border));
+  }
+  .btn-ghost:hover { background: rgb(var(--c-bg)); opacity: 1; }
+
+  /* ===== Prose (post content) ===== */
+  .prose-msia {
+    font-size: 1.125rem;
+    line-height: 1.8;
+    color: rgb(var(--c-ink));
+  }
+  .prose-msia h2 { margin: 2.5rem 0 1rem;    font-size: 1.875rem; }
+  .prose-msia h3 { margin: 2rem 0 0.75rem;   font-size: 1.5rem;   }
+  .prose-msia p  { margin-bottom: 1.25rem; }
+  .prose-msia a  {
+    color: rgb(var(--c-primary));
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+  .prose-msia blockquote {
+    border-left: 3px solid rgb(var(--c-primary));
+    padding: 0.5rem 0 0.5rem 1.5rem;
+    margin: 2rem 0;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.375rem;
+    line-height: 1.5;
+    color: rgb(var(--c-ink));
+  }
+  .prose-msia code {
+    font-family: var(--font-mono);
+    font-size: 0.875em;
+    padding: 0.125em 0.375em;
+    background: rgb(var(--c-primary-soft));
+    color: rgb(var(--c-primary-dark));
+    border-radius: 3px;
+  }
+  .prose-msia pre {
+    background: rgb(var(--c-nav));
+    color: rgb(220 222 230);
+    padding: 1.25rem;
+    border-radius: 6px;
+    overflow-x: auto;
+    margin: 1.5rem 0;
+  }
+  .prose-msia pre code { background: transparent; color: inherit; padding: 0; }
+  .prose-msia img { border-radius: 6px; margin: 2rem auto; }
+  .prose-msia ul, .prose-msia ol { padding-left: 1.5rem; margin: 1rem 0; }
+  .prose-msia li { margin-bottom: 0.5rem; }
+}
+
+@layer utilities {
+  .stagger-1 { animation-delay: 0.05s; }
+  .stagger-2 { animation-delay: 0.1s;  }
+  .stagger-3 { animation-delay: 0.15s; }
+  .stagger-4 { animation-delay: 0.2s;  }
+  .stagger-5 { animation-delay: 0.25s; }
+  .stagger-6 { animation-delay: 0.3s;  }
+
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

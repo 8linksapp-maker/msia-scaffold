@@ -1,7 +1,8 @@
 {
-    "name": "walker",
+    "name": "msia-scaffold",
+    "description": "MSIA Scaffold — base completa pra criar blogs com IA (Astro + admin + 14 plugins + tema moderno Marketer-inspired)",
     "type": "module",
-    "version": "1.0.0",
+    "version": "0.1.0",
     "scripts": {
         "dev": "astro dev",
         "build": "astro build",
@@ -13,6 +14,7 @@
         "@astrojs/sitemap": "^3.0.0",
         "@astrojs/tailwind": "^6.0.2",
         "@astrojs/vercel": "^8.0.0",
+        "@tailwindcss/typography": "^0.5.15",
         "astro": "^5.1.0",
         "fast-xml-parser": "^5.5.9",
         "lucide-react": "^0.468.0",
