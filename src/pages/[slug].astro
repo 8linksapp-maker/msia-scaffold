@@ -6,6 +6,9 @@ import { colorForCategory } from '../lib/categoryColors';
 import { slugify } from '../lib/slugify';
 
 export async function getStaticPaths() {
+  const siteConfig = readData('siteConfig.json', {}) as any;
+  // Quando aluno escolheu prefixo /blog, esta rota nao gera (evita duplicacao com /blog/[slug]).
+  if (siteConfig?.postUrlPrefix === 'blog') return [];
   const posts = await getCollection('blog');
   return posts.map((post: any) => ({
     params: { slug: post.slug ?? post.id },
