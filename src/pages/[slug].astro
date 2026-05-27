@@ -3,7 +3,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 import { readData } from '../lib/readData';
 import { colorForCategory } from '../lib/categoryColors';
-import { slugify } from '../lib/slugify';
+import { normalizeCategories, getCategorySlug } from '../lib/categorySlug';
+
+const allCategories = normalizeCategories(readData('categories.json', []));
 
 export async function getStaticPaths() {
   const siteConfig = readData('siteConfig.json', {}) as any;
@@ -64,7 +66,7 @@ const related = otherPosts.slice(0, 3);
           <span class="mx-2 opacity-60">/</span>
           {data.category && (
             <>
-              <a href={`/categoria/${slugify(data.category)}`} class="hover:opacity-100 transition-opacity uppercase">
+              <a href={`/categoria/${getCategorySlug(data.category, allCategories)}`} class="hover:opacity-100 transition-opacity uppercase">
                 {data.category}
               </a>
               <span class="mx-2 opacity-60">/</span>
