@@ -1,9 +1,12 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import PostVideo from '../components/ui/PostVideo.astro';
 import { getCollection } from 'astro:content';
 import { readData } from '../lib/readData';
 import { colorForCategory } from '../lib/categoryColors';
 import { normalizeCategories, getCategorySlug } from '../lib/categorySlug';
+import { parseVideoUrl } from '../lib/videoEmbed';
+import { renderShortcodes, hasShortcodes } from '../lib/shortcodes';
 
 const allCategories = normalizeCategories(readData('categories.json', []));
 
@@ -45,6 +48,17 @@ const readingMinutes = (() => {
 const allPosts = await getCollection('blog');
 const otherPosts = allPosts.filter((p: any) => (p.slug ?? p.id) !== (post.slug ?? post.id));
 const related = otherPosts.slice(0, 3);
+
+const videoUrl = data.videoUrl || '';
+const videoInfo = videoUrl ? parseVideoUrl(videoUrl) : null;
+const hasValidVideo = videoInfo && videoInfo.provider !== 'unknown';
+const videoPosition = data.videoPosition || 'after-hero';
+
+// Processa shortcodes [[video:URL]] no body (e quaisquer outros suportados).
+// Só roda quando body já é HTML (Quill output); pra .md puro o Astro Content cuida.
+const rawBody = (post.body || '') as string;
+const isHtmlBody = /^\s*</.test(rawBody.trim());
+const processedHtml = isHtmlBody && hasShortcodes(rawBody) ? renderShortcodes(rawBody) : null;
 ---
 
 <BaseLayout
@@ -94,7 +108,19 @@ const related = otherPosts.slice(0, 3);
       </div>
     </header>
 
-    {(data.heroImage || data.cover || data.coverImage) && (
+    {hasValidVideo && videoPosition === 'hero' ? (
+      <div class="border-b border-rule">
+        <div class="container-x py-8">
+          <PostVideo
+            url={videoUrl}
+            title={data.title}
+            description={data.description}
+            uploadDate={(data.pubDate || data.date) instanceof Date ? (data.pubDate || data.date).toISOString() : String(data.pubDate || data.date || '')}
+            lite={true}
+          />
+        </div>
+      </div>
+    ) : (data.heroImage || data.cover || data.coverImage) ? (
       <div class="border-b border-rule">
         <div class="container-x py-8">
           <img
@@ -105,6 +131,20 @@ const related = otherPosts.slice(0, 3);
           />
         </div>
       </div>
+    ) : null}
+
+    {hasValidVideo && videoPosition === 'after-hero' && (
+      <div class="border-b border-rule">
+        <div class="container-x py-8">
+          <PostVideo
+            url={videoUrl}
+            title={data.title}
+            description={data.description}
+            uploadDate={(data.pubDate || data.date) instanceof Date ? (data.pubDate || data.date).toISOString() : String(data.pubDate || data.date || '')}
+            lite={true}
+          />
+        </div>
+      </div>
     )}
 
     <!-- CONTEÚDO DO POST -->
@@ -112,7 +152,11 @@ const related = otherPosts.slice(0, 3);
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16">
         <div class="lg:col-span-8 lg:col-start-2">
           <div class="prose-msia max-w-none">
-            <Content />
+            {processedHtml ? (
+              <Fragment set:html={processedHtml} />
+            ) : (
+              <Content />
+            )}
           </div>
         </div>
       </div>
