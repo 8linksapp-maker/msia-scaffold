@@ -135,7 +135,7 @@ export default function MenuEditor() {
                     disabled={saving}
                     className="flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm font-bold rounded-md hover:bg-primary disabled:opacity-60 transition-all shadow-sm"
                 >
-                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" aria-hidden="true" />}
                     {saving ? 'Salvando...' : 'Salvar'}
                 </button>
             </div>
@@ -200,14 +200,14 @@ export default function MenuEditor() {
                                     disabled={i === 0}
                                     className="w-7 h-7 rounded-lg flex items-center justify-center text-ink-faint hover:text-ink hover:bg-elev disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                                 >
-                                    <ChevronUp className="w-4 h-4" />
+                                    <ChevronUp className="w-4 h-4" aria-hidden="true" />
                                 </button>
                                 <button
                                     onClick={() => moveDown(i)}
                                     disabled={i === items.length - 1}
                                     className="w-7 h-7 rounded-lg flex items-center justify-center text-ink-faint hover:text-ink hover:bg-elev disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                                 >
-                                    <ChevronDown className="w-4 h-4" />
+                                    <ChevronDown className="w-4 h-4" aria-hidden="true" />
                                 </button>
                             </div>
 
@@ -245,7 +245,7 @@ export default function MenuEditor() {
                                 className="mt-5 w-8 h-8 rounded-md flex items-center justify-center text-ink-faint hover:text-red-500 hover:bg-red-50 transition-all shrink-0"
                                 title="Remover item"
                             >
-                                <Trash2 className="w-4 h-4" />
+                                <Trash2 className="w-4 h-4" aria-hidden="true" />
                             </button>
                         </div>
 
@@ -275,13 +275,13 @@ export default function MenuEditor() {
                 onClick={addItem}
                 className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-border rounded-lg text-sm font-medium text-ink-muted hover:text-primary hover:border-primary/40 hover:bg-primary-soft transition-all"
             >
-                <Plus className="w-4 h-4" />
+                <Plus className="w-4 h-4" aria-hidden="true" />
                 Adicionar item
             </button>
 
             {/* Preview link */}
             <div className="flex items-center gap-2 text-xs text-ink-faint">
-                <ExternalLink className="w-3 h-3" />
+                <ExternalLink className="w-3 h-3" aria-hidden="true" />
                 <span>As mudanças aparecem no site após salvar e recarregar a página.</span>
             </div>
         </div>

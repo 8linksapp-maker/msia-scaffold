@@ -29,7 +29,7 @@ const { title = 'Admin', activeSection = '' } = Astro.props;
         <!-- Sidebar -->
         <AdminNav client:load activeSection={activeSection} />
         <!-- Main Content -->
-        <main class="flex-1 min-w-0 ml-64">
+        <main id="main-content" class="flex-1 min-w-0 ml-64" tabindex="-1">
             <div class="p-8">
                 <DeployManager client:load />
                 <slot />

@@ -100,7 +100,7 @@ export default function ConfigEditor() {
                     <p className="text-xs text-ink-muted mt-0.5">Edita o arquivo <code className="bg-elev px-1 rounded">src/data/siteConfig.json</code></p>
                 </div>
                 <button type="submit" disabled={saving} className="bg-primary hover:bg-primary disabled:bg-slate-300 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-lg font-bold flex items-center gap-2 shadow-sm shadow-none/20 transition-all">
-                    {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
+                    {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" aria-hidden="true" />}
                     {saving ? 'Salvando...' : 'Salvar Alterações'}
                 </button>
             </div>

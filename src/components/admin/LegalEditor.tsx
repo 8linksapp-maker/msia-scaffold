@@ -132,9 +132,9 @@ export default function LegalEditor() {
                                         className="text-sm font-bold text-ink bg-transparent border-none focus:ring-0 w-full md:w-96 focus:outline-none" placeholder="Título da Seção" />
                                 </div>
                                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button onClick={() => moveSection(activeTab, idx, 'up')} disabled={idx === 0} className="p-2 text-ink-faint hover:text-primary hover:bg-primary-soft rounded transition-colors disabled:opacity-30"><ChevronUp className="w-4 h-4" /></button>
-                                    <button onClick={() => moveSection(activeTab, idx, 'down')} disabled={idx === currentData.content.length - 1} className="p-2 text-ink-faint hover:text-primary hover:bg-primary-soft rounded transition-colors disabled:opacity-30"><ChevronDown className="w-4 h-4" /></button>
-                                    <button onClick={() => removeSection(activeTab, idx)} className="p-2 text-ink-faint hover:text-red-600 hover:bg-red-50 rounded ml-2 transition-colors"><Trash2 className="w-4 h-4" /></button>
+                                    <button onClick={() => moveSection(activeTab, idx, 'up')} disabled={idx === 0} className="p-2 min-h-[44px] min-w-[44px] text-ink-faint hover:text-primary hover:bg-primary-soft rounded transition-colors disabled:opacity-30"><ChevronUp className="w-4 h-4" aria-hidden="true" /></button>
+                                    <button onClick={() => moveSection(activeTab, idx, 'down')} disabled={idx === currentData.content.length - 1} className="p-2 min-h-[44px] min-w-[44px] text-ink-faint hover:text-primary hover:bg-primary-soft rounded transition-colors disabled:opacity-30"><ChevronDown className="w-4 h-4" aria-hidden="true" /></button>
+                                    <button onClick={() => removeSection(activeTab, idx)} className="p-2 min-h-[44px] min-w-[44px] text-ink-faint hover:text-red-600 hover:bg-red-50 rounded ml-2 transition-colors"><Trash2 className="w-4 h-4" aria-hidden="true" /></button>
                                 </div>
                             </div>
                             <textarea value={section.text} onChange={(e) => updateSection(activeTab, idx, 'text', e.target.value)} rows={6}

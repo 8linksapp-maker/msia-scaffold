@@ -211,13 +211,13 @@ export default function PostsManager() {
                 </a>
             </div>
 
-            {error && <div className="p-5 bg-red-100/50 text-red-700 rounded-lg font-bold border border-red-200"><AlertCircle className="w-5 h-5 inline mr-2 -mt-1" /> {error}</div>}
+            {error && <div role="alert" className="p-5 bg-red-100/50 text-red-700 rounded-lg font-bold border border-red-200"><AlertCircle className="w-5 h-5 inline mr-2 -mt-1" aria-hidden="true" /> {error}</div>}
 
             {/* Filters */}
             <div className="bg-surface p-4 rounded-lg border border-border shadow-sm flex flex-wrap gap-3 items-center">
                 <div className="relative flex-1 min-w-[200px]">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-faint" />
-                    <input type="text" placeholder="Buscar artigos..." value={search} onChange={e => setSearch(e.target.value)} className="w-full pl-9 pr-4 py-2.5 bg-elev border border-border rounded-md text-sm focus:outline-none focus:border-primary/80 focus:ring-1 focus:ring-primary/20" />
+                    <input type="text" aria-label="Buscar artigos" placeholder="Buscar artigos..." value={search} onChange={e => setSearch(e.target.value)} className="w-full pl-9 pr-4 py-2.5 bg-elev border border-border rounded-md text-sm focus:outline-none focus:border-primary/80 focus:ring-1 focus:ring-primary/20" />
                 </div>
                 <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="bg-elev border border-border rounded-md px-3 py-2.5 text-sm text-ink focus:outline-none focus:border-primary/80">
                     <option value="all">Todos</option>
@@ -245,20 +245,20 @@ export default function PostsManager() {
                         <table className="w-full text-left">
                             <thead className="border-b border-border bg-elev">
                                 <tr>
-                                    <th className="py-4 px-4 w-8"><input type="checkbox" className="rounded" onChange={e => setSelectedPosts(e.target.checked ? paginated.map(p => p.sha) : [])} checked={selectedPosts.length === paginated.length && paginated.length > 0} /></th>
-                                    <th className="py-4 px-4 text-xs font-bold text-ink-muted uppercase tracking-wider cursor-pointer hover:text-ink" onClick={() => toggleSort('title')}>Título <SortIcon field="title" /></th>
-                                    <th className="py-4 px-4 text-xs font-bold text-ink-muted uppercase tracking-wider hidden sm:table-cell">Categoria</th>
-                                    <th className="py-4 px-4 text-xs font-bold text-ink-muted uppercase tracking-wider hidden md:table-cell">Autor</th>
-                                    <th className="py-4 px-4 text-xs font-bold text-ink-muted uppercase tracking-wider cursor-pointer hover:text-ink hidden md:table-cell" onClick={() => toggleSort('pubDate')}>Data <SortIcon field="pubDate" /></th>
-                                    <th className="py-4 px-4 text-xs font-bold text-ink-muted uppercase tracking-wider">Status</th>
-                                    <th className="py-4 px-4 text-xs font-bold text-ink-muted uppercase tracking-wider text-right">Ações</th>
+                                    <th scope="col" className="py-4 px-4 w-8"><input type="checkbox" aria-label="Selecionar todos os artigos da página" className="rounded" onChange={e => setSelectedPosts(e.target.checked ? paginated.map(p => p.sha) : [])} checked={selectedPosts.length === paginated.length && paginated.length > 0} /></th>
+                                    <th scope="col" aria-sort={sortField === 'title' ? (sortOrder === 'asc' ? 'ascending' : 'descending') : 'none'} className="py-4 px-4 text-xs font-bold text-ink-muted uppercase tracking-wider cursor-pointer hover:text-ink" onClick={() => toggleSort('title')}>Título <SortIcon field="title" /></th>
+                                    <th scope="col" className="py-4 px-4 text-xs font-bold text-ink-muted uppercase tracking-wider hidden sm:table-cell">Categoria</th>
+                                    <th scope="col" className="py-4 px-4 text-xs font-bold text-ink-muted uppercase tracking-wider hidden md:table-cell">Autor</th>
+                                    <th scope="col" aria-sort={sortField === 'pubDate' ? (sortOrder === 'asc' ? 'ascending' : 'descending') : 'none'} className="py-4 px-4 text-xs font-bold text-ink-muted uppercase tracking-wider cursor-pointer hover:text-ink hidden md:table-cell" onClick={() => toggleSort('pubDate')}>Data <SortIcon field="pubDate" /></th>
+                                    <th scope="col" className="py-4 px-4 text-xs font-bold text-ink-muted uppercase tracking-wider">Status</th>
+                                    <th scope="col" className="py-4 px-4 text-xs font-bold text-ink-muted uppercase tracking-wider text-right">Ações</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100">
+                            <tbody className="divide-y divide-border">
                                 {paginated.map(post => (
                                     <React.Fragment key={post.sha}>
                                         <tr className="hover:bg-elev transition-colors">
-                                            <td className="py-4 px-4"><input type="checkbox" className="rounded" checked={selectedPosts.includes(post.sha)} onChange={e => setSelectedPosts(e.target.checked ? [...selectedPosts, post.sha] : selectedPosts.filter(s => s !== post.sha))} /></td>
+                                            <td className="py-4 px-4"><input type="checkbox" aria-label={`Selecionar artigo: ${post.title}`} className="rounded" checked={selectedPosts.includes(post.sha)} onChange={e => setSelectedPosts(e.target.checked ? [...selectedPosts, post.sha] : selectedPosts.filter(s => s !== post.sha))} /></td>
                                             <td className="py-4 px-4">
                                                 <p className="font-bold text-ink text-sm line-clamp-1">{post.title}</p>
                                                 <p className="text-xs text-ink-faint font-mono mt-0.5">/{post.slug}</p>
@@ -275,9 +275,9 @@ export default function PostsManager() {
                                             </td>
                                             <td className="py-4 px-4 text-right">
                                                 <div className="flex items-center justify-end gap-2">
-                                                    <button onClick={() => handleQuickAction(post)} title="Edição Rápida" className="p-2 text-ink-faint hover:text-primary hover:bg-primary-soft rounded-lg transition-colors"><Edit3 className="w-4 h-4" /></button>
-                                                    <a href={`/admin/posts/edit?file=${encodeURIComponent(post.path)}`} title="Editar Completo" className="p-2 text-ink-faint hover:text-ink-muted hover:bg-elev rounded-lg transition-colors"><FileText className="w-4 h-4" /></a>
-                                                    <button onClick={() => handleDelete(post.path, post.sha, post.title)} title="Excluir" className="p-2 text-ink-faint hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"><Trash2 className="w-4 h-4" /></button>
+                                                    <button onClick={() => handleQuickAction(post)} aria-label={`Edição rápida: ${post.title}`} aria-expanded={editingSha === post.sha} className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-ink-faint hover:text-primary hover:bg-primary-soft rounded transition-colors"><Edit3 className="w-4 h-4" aria-hidden="true" /></button>
+                                                    <a href={`/admin/posts/edit?file=${encodeURIComponent(post.path)}`} aria-label={`Editar artigo completo: ${post.title}`} className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-ink-faint hover:text-ink-muted hover:bg-elev rounded transition-colors"><FileText className="w-4 h-4" aria-hidden="true" /></a>
+                                                    <button onClick={() => handleDelete(post.path, post.sha, post.title)} aria-label={`Excluir artigo: ${post.title}`} className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-ink-faint hover:text-red-600 hover:bg-red-50 rounded transition-colors"><Trash2 className="w-4 h-4" aria-hidden="true" /></button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -338,7 +338,7 @@ export default function PostsManager() {
             {totalPages > 1 && (
                 <div className="flex items-center justify-center gap-2">
                     {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
-                        <button key={p} onClick={() => setCurrentPage(p)} className={`w-9 h-9 rounded-lg text-sm font-bold transition-all ${currentPage === p ? 'bg-primary text-white' : 'bg-surface border border-border text-ink-muted hover:border-primary/40'}`}>{p}</button>
+                        <button key={p} onClick={() => setCurrentPage(p)} aria-label={`Página ${p}`} aria-current={currentPage === p ? 'page' : undefined} className={`w-11 h-11 rounded text-sm font-semibold transition-all ${currentPage === p ? 'bg-primary text-surface' : 'bg-surface border border-border text-ink-muted hover:border-primary/40'}`}>{p}</button>
                     ))}
                 </div>
             )}

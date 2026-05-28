@@ -263,7 +263,7 @@ export default function DeployManager() {
                     onClick={triggerDeploy}
                     className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold px-4 py-2 rounded-lg shadow-sm transition-colors"
                 >
-                    <Rocket className="w-4 h-4" />
+                    <Rocket className="w-4 h-4" aria-hidden="true" />
                     Fazer Deploy
                 </button>
             </div>

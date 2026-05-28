@@ -170,7 +170,7 @@ export default function BackupManager({ siteName }: { siteName: string }) {
             disabled={exporting}
             className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 text-white font-bold py-3 rounded-md flex items-center justify-center gap-2 transition-colors"
           >
-            {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+            {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" aria-hidden="true" />}
             {exporting ? 'Empacotando…' : 'Baixar export.zip'}
           </button>
           <div className="mt-4 p-3 bg-elev border border-border rounded-lg text-[11px] text-ink-muted leading-relaxed">
@@ -202,7 +202,7 @@ export default function BackupManager({ siteName }: { siteName: string }) {
               onClick={() => fileRef.current?.click()}
               className="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-md flex items-center justify-center gap-2 transition-colors"
             >
-              <Upload className="w-4 h-4" />
+              <Upload className="w-4 h-4" aria-hidden="true" />
               Selecionar .zip
             </button>
           ) : (
@@ -213,7 +213,7 @@ export default function BackupManager({ siteName }: { siteName: string }) {
                 <span className="text-[10px] text-ink-faint shrink-0">({fmtBytes(selectedFile.size)})</span>
               </div>
               <button onClick={reset} className="text-ink-faint hover:text-red-600 shrink-0">
-                <X className="w-4 h-4" />
+                <X className="w-4 h-4" aria-hidden="true" />
               </button>
             </div>
           )}
@@ -260,7 +260,7 @@ export default function BackupManager({ siteName }: { siteName: string }) {
                       <div className="flex gap-2 flex-wrap">
                         <button
                           onClick={() => setConflictPolicy('skip')}
-                          className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors ${
+                          className={`px-3 py-2.5 min-h-[44px] text-xs font-bold rounded-lg transition-colors ${
                             conflictPolicy === 'skip'
                               ? 'bg-amber-700 text-white'
                               : 'bg-surface text-ink border border-border hover:border-amber-300'
@@ -270,7 +270,7 @@ export default function BackupManager({ siteName }: { siteName: string }) {
                         </button>
                         <button
                           onClick={() => setConflictPolicy('overwrite')}
-                          className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors ${
+                          className={`px-3 py-2.5 min-h-[44px] text-xs font-bold rounded-lg transition-colors ${
                             conflictPolicy === 'overwrite'
                               ? 'bg-red-700 text-white'
                               : 'bg-surface text-ink border border-border hover:border-red-300'
@@ -292,7 +292,7 @@ export default function BackupManager({ siteName }: { siteName: string }) {
 
               {!preview.applied && (
                 <div className="mt-6 flex items-center justify-end gap-3">
-                  <button onClick={reset} className="px-4 py-2 text-sm font-bold text-ink-muted hover:text-ink">
+                  <button onClick={reset} className="px-4 py-2.5 min-h-[44px] text-sm font-bold text-ink-muted hover:text-ink">
                     Cancelar
                   </button>
                   <button
@@ -300,7 +300,7 @@ export default function BackupManager({ siteName }: { siteName: string }) {
                     disabled={importing}
                     className="bg-amber-600 hover:bg-amber-700 disabled:bg-slate-300 text-white font-bold px-6 py-2.5 rounded-md flex items-center gap-2"
                   >
-                    {importing ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
+                    {importing ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" aria-hidden="true" />}
                     {importing ? 'Importando…' : 'Aplicar import'}
                   </button>
                 </div>
@@ -323,14 +323,14 @@ function FileTable({ title, icon: Icon, items }: { title: string; icon: React.El
   }
   return (
     <div className="bg-elev border border-border rounded-md overflow-hidden">
-      <div className="px-4 py-2 bg-elev border-b border-border flex items-center gap-2">
+      <div className="px-4 py-2.5 min-h-[44px] bg-elev border-b border-border flex items-center gap-2">
         <Icon className="w-3.5 h-3.5 text-ink-muted" />
         <span className="text-xs font-bold text-ink uppercase tracking-wider">{title}</span>
         <span className="text-xs text-ink-faint ml-auto">{items.length}</span>
       </div>
       <ul className="max-h-72 overflow-y-auto divide-y divide-slate-200">
         {items.map((item) => (
-          <li key={item.name} className="px-4 py-2 text-xs flex items-center gap-2">
+          <li key={item.name} className="px-4 py-2.5 min-h-[44px] text-xs flex items-center gap-2">
             <StatusBadge item={item} />
             <span className="font-mono text-ink truncate flex-1" title={item.name}>{item.name}</span>
             <span className="text-ink-faint shrink-0 text-[10px]">{fmtBytes(item.size)}</span>

@@ -95,7 +95,7 @@ export default function AuthorsEditor() {
                     {saving && <div className="flex items-center gap-2 text-amber-600 bg-elev px-4 py-2 rounded-lg text-sm font-bold mr-2"><Loader2 className="w-4 h-4 animate-spin" /> Sincronizando...</div>}
                     <button onClick={() => { setTempAuthor({ id: `author-${Date.now()}`, name: '', role: '', avatar: '', bio: '', social: { twitter: '', instagram: '', linkedin: '', website: '' } }); setEditingIndex(null); setIsModalOpen(true); }} disabled={saving}
                         className="w-full sm:w-auto bg-elev0 hover:bg-amber-600 disabled:bg-slate-300 disabled:cursor-not-allowed text-white px-6 py-3 rounded-md font-bold flex items-center justify-center gap-2 shadow-lg shadow-amber-500/25 hover:-translate-y-0.5 transition-all">
-                        <UserPlus className="w-5 h-5" /> Adicionar Perfil
+                        <UserPlus className="w-5 h-5" aria-hidden="true" /> Adicionar Perfil
                     </button>
                 </div>
             </div>
@@ -109,7 +109,7 @@ export default function AuthorsEditor() {
                     <p className="text-ink-muted max-w-sm mx-auto mb-6">Adicione membros da equipe para que eles possam assinar os artigos do blog.</p>
                     <button onClick={() => { setTempAuthor({ id: `author-${Date.now()}`, name: '', role: '', avatar: '', bio: '', social: { twitter: '', instagram: '', linkedin: '', website: '' } }); setEditingIndex(null); setIsModalOpen(true); }}
                         className="bg-elev0 text-white font-bold px-8 py-3 rounded-md shadow-md hover:bg-amber-600 transition-colors inline-flex items-center gap-2">
-                        <Plus className="w-5 h-5" /> Adicionar Primeiro Autor
+                        <Plus className="w-5 h-5" aria-hidden="true" /> Adicionar Primeiro Autor
                     </button>
                 </div>
             ) : (
@@ -143,11 +143,11 @@ export default function AuthorsEditor() {
                                             <div className="flex items-center justify-end gap-2">
                                                 <button onClick={() => { setTempAuthor({ ...author }); setEditingIndex(idx); setIsModalOpen(true); }}
                                                     className="w-8 h-8 bg-elev text-ink-muted rounded-lg inline-flex items-center justify-center hover:bg-elev hover:text-ink transition-colors">
-                                                    <Edit2 className="w-4 h-4" />
+                                                    <Edit2 className="w-4 h-4" aria-hidden="true" />
                                                 </button>
                                                 <button onClick={() => removeAuthor(idx)}
                                                     className="w-8 h-8 bg-red-50 text-red-500 rounded-lg inline-flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors">
-                                                    <Trash2 className="w-4 h-4" />
+                                                    <Trash2 className="w-4 h-4" aria-hidden="true" />
                                                 </button>
                                             </div>
                                         </td>
@@ -164,7 +164,7 @@ export default function AuthorsEditor() {
                     <div className="bg-surface rounded-3xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col">
                         <div className="flex items-center justify-between p-6 border-b border-border bg-elev/50">
                             <h3 className="text-lg font-bold text-ink">{editingIndex !== null ? 'Editar Autor' : 'Novo Autor'}</h3>
-                            <button onClick={() => setIsModalOpen(false)} className="w-8 h-8 bg-elev hover:bg-elev text-ink-muted rounded-full flex items-center justify-center"><X className="w-4 h-4" /></button>
+                            <button onClick={() => setIsModalOpen(false)} className="w-8 h-8 bg-elev hover:bg-elev text-ink-muted rounded-full flex items-center justify-center"><X className="w-4 h-4" aria-hidden="true" /></button>
                         </div>
                         <div className="p-6 overflow-y-auto max-h-[70vh] flex flex-col gap-6">
                             <label className="w-28 h-28 rounded-full overflow-hidden border-4 border-slate-50 shadow-inner bg-elev flex flex-col items-center justify-center mx-auto relative group cursor-pointer">
@@ -229,7 +229,7 @@ export default function AuthorsEditor() {
                         <div className="p-6 border-t border-border bg-elev flex gap-3 justify-end rounded-b-3xl">
                             <button onClick={() => setIsModalOpen(false)} className="px-5 py-2.5 text-sm font-bold text-ink-muted hover:bg-elev rounded-md transition-colors">Cancelar</button>
                             <button onClick={saveModalAuthor} className="px-6 py-2.5 text-sm font-bold bg-elev0 hover:bg-amber-600 text-white rounded-md shadow-md hover:shadow-lg transition-all flex items-center gap-2">
-                                <Save className="w-4 h-4" /> Confirmar
+                                <Save className="w-4 h-4" aria-hidden="true" /> Confirmar
                             </button>
                         </div>
                     </div>

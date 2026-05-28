@@ -188,7 +188,7 @@ export default function CategoriesEditor() {
                     {saving && <div className="flex items-center gap-2 text-ink-muted bg-elev px-4 py-2 rounded-lg text-sm font-bold mr-2"><Loader2 className="w-4 h-4 animate-spin" /> Sincronizando...</div>}
                     <button onClick={openCreate} disabled={saving}
                         className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white px-6 py-3 rounded-md font-bold flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/25 hover:-translate-y-0.5 transition-all">
-                        <Plus className="w-5 h-5" /> Nova Categoria
+                        <Plus className="w-5 h-5" aria-hidden="true" /> Nova Categoria
                     </button>
                 </div>
             </div>
@@ -209,15 +209,15 @@ export default function CategoriesEditor() {
                     <div key={idx} className="bg-surface p-5 rounded-lg border border-border shadow-sm hover:shadow-md transition-all group">
                         <div className="flex items-start justify-between gap-3 mb-2">
                             <div className="flex items-center gap-3 min-w-0">
-                                <div className="w-10 h-10 rounded-md bg-elev text-ink-muted flex items-center justify-center font-bold shrink-0"><Tag className="w-5 h-5" /></div>
+                                <div className="w-10 h-10 rounded-md bg-elev text-ink-muted flex items-center justify-center font-bold shrink-0"><Tag className="w-5 h-5" aria-hidden="true" /></div>
                                 <div className="min-w-0">
                                     <p className="font-bold text-ink truncate">{cat.name}</p>
                                     <p className="text-[11px] font-mono text-ink-faint truncate">/categoria/{cat.slug}</p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-                                <button onClick={() => openEdit(idx)} className="p-2 text-ink-faint hover:text-ink-muted hover:bg-elev rounded-lg transition-colors"><Edit2 className="w-4 h-4" /></button>
-                                <button onClick={() => removeCategory(idx)} className="p-2 text-ink-faint hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"><Trash2 className="w-4 h-4" /></button>
+                                <button onClick={() => openEdit(idx)} className="p-2 min-h-[44px] min-w-[44px] text-ink-faint hover:text-ink-muted hover:bg-elev rounded-lg transition-colors"><Edit2 className="w-4 h-4" aria-hidden="true" /></button>
+                                <button onClick={() => removeCategory(idx)} className="p-2 min-h-[44px] min-w-[44px] text-ink-faint hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"><Trash2 className="w-4 h-4" aria-hidden="true" /></button>
                             </div>
                         </div>
                         {cat.description && (
@@ -232,7 +232,7 @@ export default function CategoriesEditor() {
                     <div className="bg-surface rounded-3xl shadow-2xl w-full max-w-md" onClick={e => e.stopPropagation()}>
                         <div className="flex items-center justify-between p-6 border-b border-border">
                             <h3 className="text-lg font-bold text-ink">{editingIndex !== null ? 'Editar Categoria' : 'Nova Categoria'}</h3>
-                            <button onClick={closeModal} className="text-ink-faint hover:text-ink-muted"><X className="w-5 h-5" /></button>
+                            <button onClick={closeModal} className="text-ink-faint hover:text-ink-muted"><X className="w-5 h-5" aria-hidden="true" /></button>
                         </div>
                         <div className="p-6 space-y-4">
                             <div>
