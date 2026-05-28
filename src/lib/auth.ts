@@ -1,10 +1,14 @@
 /**
  * Auth por senha HMAC-SHA256 sem deps externas.
- * Cookie: admin_session (httpOnly, Secure, SameSite=Lax, 7 dias)
+ * Cookie: admin_session (httpOnly, Secure em prod, SameSite=Lax, 7 dias)
+ * Cookie: login_attempts (brute force protection assinada, 15min)
  */
 
 const COOKIE_NAME = 'admin_session';
+const ATTEMPTS_COOKIE = 'login_attempts';
 const EXPIRES_MS = 7 * 24 * 60 * 60 * 1000; // 7 dias
+const ATTEMPTS_EXPIRES_SEC = 15 * 60; // 15 min
+export const MAX_LOGIN_ATTEMPTS = 5;
 
 async function hmac(secret: string, data: string): Promise<string> {
     const enc = new TextEncoder();
@@ -58,4 +62,38 @@ export async function validateSession(cookieValue: string | undefined): Promise<
     return timingSafeEqual(expected, sig);
 }
 
+// ── Brute-force protection via cookie assinado ───────────────────────────
+// Persiste entre cold starts do serverless (ao contrário de um Map in-memory),
+// porque o estado viaja no próprio cookie, assinado com ADMIN_SECRET.
+export interface AttemptsPayload { count: number; since: number }
+
+/** Cria cookie de tentativas assinado. */
+export async function signAttempts(count: number, since: number): Promise<string> {
+    const secret = import.meta.env.ADMIN_SECRET || 'fallback';
+    const payload = `${count}:${since}`;
+    const sig = await hmac(secret, payload);
+    return `${payload}.${sig}`;
+}
+
+/** Lê e valida cookie de tentativas. Retorna null se inválido ou expirado (15min). */
+export async function readAttempts(cookieValue: string | undefined): Promise<AttemptsPayload | null> {
+    if (!cookieValue) return null;
+    const secret = import.meta.env.ADMIN_SECRET || 'fallback';
+    const dotIdx = cookieValue.lastIndexOf('.');
+    if (dotIdx === -1) return null;
+    const payload = cookieValue.slice(0, dotIdx);
+    const sig = cookieValue.slice(dotIdx + 1);
+    const expected = await hmac(secret, payload);
+    if (!timingSafeEqual(expected, sig)) return null;
+    const parts = payload.split(':');
+    if (parts.length !== 2) return null;
+    const count = parseInt(parts[0], 10);
+    const since = parseInt(parts[1], 10);
+    if (isNaN(count) || isNaN(since)) return null;
+    if (Date.now() - since > ATTEMPTS_EXPIRES_SEC * 1000) return null;
+    return { count, since };
+}
+
 export const COOKIE_NAME_EXPORT = COOKIE_NAME;
+export const ATTEMPTS_COOKIE_EXPORT = ATTEMPTS_COOKIE;
+export const ATTEMPTS_EXPIRES_SEC_EXPORT = ATTEMPTS_EXPIRES_SEC;
