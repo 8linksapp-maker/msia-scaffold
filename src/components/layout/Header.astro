@@ -104,18 +104,34 @@ const isActive = (href: string) => href === '/' ? pathname === '/' : pathname.st
     const close  = document.getElementById('search-close');
     const popup  = document.getElementById('search-popup');
     if (toggle && close && popup) {
-      toggle.addEventListener('click', () => {
+      const openPopup = () => {
         popup.classList.remove('hidden');
         popup.classList.add('flex');
         popup.querySelector('input')?.focus();
-      });
+      };
       const closePopup = () => {
         popup.classList.add('hidden');
         popup.classList.remove('flex');
+        toggle.focus();
       };
+
+      toggle.addEventListener('click', openPopup);
       close.addEventListener('click', closePopup);
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && !popup.classList.contains('hidden')) closePopup();
+
+      // Focus trap
+      popup.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') { closePopup(); return; }
+        if (e.key !== 'Tab') return;
+        const focusable = Array.from(
+          popup.querySelectorAll('button, input, [href], [tabindex]:not([tabindex="-1"])')
+        ).filter(el => !(el as HTMLElement).hasAttribute('disabled'));
+        const first = focusable[0] as HTMLElement;
+        const last  = focusable[focusable.length - 1] as HTMLElement;
+        if (e.shiftKey) {
+          if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+        } else {
+          if (document.activeElement === last)  { e.preventDefault(); first.focus(); }
+        }
       });
     }
     const menuBtn  = document.getElementById('menu-toggle');

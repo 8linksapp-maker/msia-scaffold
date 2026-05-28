@@ -26,7 +26,7 @@ const ogImage = seo.image || hero.image || '';
 
       <div class="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-16 items-start">
         <div class="md:col-span-7 md:order-1">
-          <h1 class="font-display text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-ink leading-[1.02] mb-8">
+          <h1 class="font-display text-3xl md:text-4xl lg:text-5xl font-normal tracking-tight text-ink leading-[1.1] mb-8">
             {hero.title || `Conheça ${siteConfig.name}`}
           </h1>
 
@@ -71,7 +71,7 @@ const ogImage = seo.image || hero.image || '';
         <div class="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12">
           <div class="md:col-span-4">
             <p class="mono uppercase text-ink-faint mb-4">missão</p>
-            <h2 class="font-display text-3xl md:text-4xl font-bold leading-[1.05] tracking-tight text-ink">
+            <h2 class="font-display text-2xl md:text-3xl font-normal leading-[1.1] tracking-tight text-ink">
               {content.missionTitle || 'Nossa missão'}
             </h2>
           </div>
@@ -93,7 +93,7 @@ const ogImage = seo.image || hero.image || '';
       <div class="container-x py-14 md:py-20">
         <div class="mb-12 md:mb-16">
           <p class="mono uppercase text-ink-faint mb-4">equipe</p>
-          <h2 class="font-display text-3xl md:text-4xl lg:text-5xl font-bold leading-[1.05] tracking-tight text-ink max-w-2xl">
+          <h2 class="font-display text-2xl md:text-3xl lg:text-4xl font-normal leading-[1.1] tracking-tight text-ink max-w-2xl">
             {content.teamTitle || 'Quem escreve por aqui'}
           </h2>
           {content.teamText && (
@@ -115,7 +115,7 @@ const ogImage = seo.image || hero.image || '';
                     <img
                       src={author.avatar}
                       alt={author.name}
-                      class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                      class="w-full h-full object-cover transition-opacity duration-200 group-hover:opacity-90"
                       loading="lazy"
                     />
                   </div>
@@ -134,7 +134,7 @@ const ogImage = seo.image || hero.image || '';
                 )}
 
                 <!-- Nome -->
-                <h3 class="font-display text-xl md:text-2xl font-bold tracking-tight text-ink leading-tight mb-3">
+                <h3 class="font-sans font-semibold text-lg tracking-tight text-ink leading-tight mb-3">
                   {author.name}
                 </h3>
 
