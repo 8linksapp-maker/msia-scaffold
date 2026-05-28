@@ -34,6 +34,7 @@ async function ghFetch(url: string, env: ReturnType<typeof ghEnv>, opts: Request
  * Falha completamente ou tem sucesso completamente — sem estado intermediário.
  */
 export async function atomicCommit(files: AtomicFile[], message: string): Promise<void> {
+  if (files.length === 0) return;
   const env = ghEnv();
 
   // Dev mode: writes individuais no filesystem
