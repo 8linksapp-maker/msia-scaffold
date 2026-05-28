@@ -28,6 +28,7 @@ export default function PostEditor({ filePath }: PostEditorProps) {
     const [showVideoBar, setShowVideoBar] = useState(false);
     const [videoShortcodeUrl, setVideoShortcodeUrl] = useState('');
     const [videoBarError, setVideoBarError] = useState('');
+    const [editingSlug, setEditingSlug] = useState(false);
 
     const insertTextInEditor = (text: string) => {
         const editor = quillRef.current?.getEditor?.();
@@ -246,8 +247,8 @@ export default function PostEditor({ filePath }: PostEditorProps) {
         </div>
     );
 
-    const inputClass = "w-full bg-surface border border-border rounded-md px-4 py-3 text-sm font-medium text-ink focus:outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/20/20 transition-all shadow-sm";
-    const labelClass = "block text-sm font-bold text-ink-muted uppercase tracking-wider mb-2 ml-1";
+    const inputClass = "w-full bg-surface border border-border rounded-md px-4 py-3 text-sm font-medium text-ink focus:outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/20 transition-all shadow-sm";
+    const labelClass = "block text-xs font-semibold text-ink-muted uppercase tracking-widest mb-2";
 
     return (
         <div className="max-w-5xl pb-32">
@@ -256,18 +257,30 @@ export default function PostEditor({ filePath }: PostEditorProps) {
                 <div className="flex items-center gap-3">
                     <a href="/admin/posts" aria-label="Voltar para lista de artigos" className="text-ink-faint hover:text-primary transition-colors p-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-primary-soft"><ArrowLeft className="w-5 h-5" aria-hidden="true" /></a>
                     <div>
-                        <h2 className="text-lg font-bold text-ink">{isEditing ? 'Editar Artigo' : 'Novo Artigo'}</h2>
-                        {post.slug && <p className="text-xs font-mono text-ink-faint">/blog/{post.slug}</p>}
+                        <p className="text-xs font-semibold text-ink-faint uppercase tracking-widest">{isEditing ? 'Editar artigo' : 'Novo artigo'}</p>
+                        <p className="text-sm font-semibold text-ink line-clamp-1 mt-0.5">
+                            {post.title || (isEditing ? 'Sem título' : 'Comece escrevendo um título')}
+                        </p>
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
-                    <button type="button" aria-label={isPreview ? 'Voltar para editor' : 'Ver preview do artigo'} onClick={() => setIsPreview(!isPreview)} className="flex items-center gap-1.5 px-3 py-2.5 min-h-[44px] bg-elev hover:bg-elev text-ink rounded text-sm font-medium transition-colors">
+                    <button
+                        type="button"
+                        aria-label={isPreview ? 'Voltar para editor' : 'Ver preview do artigo'}
+                        onClick={() => setIsPreview(!isPreview)}
+                        className="flex items-center gap-1.5 px-4 py-2.5 min-h-[44px] bg-surface border border-border hover:bg-elev text-ink-muted hover:text-ink rounded text-sm font-medium transition-colors"
+                    >
                         {isPreview ? <Edit3 className="w-4 h-4" aria-hidden="true" /> : <Eye className="w-4 h-4" aria-hidden="true" />}
-                        {isPreview ? 'Editor' : 'Preview'}
+                        {isPreview ? 'Editar' : 'Preview'}
                     </button>
-                    <button onClick={handleSave} disabled={saving} className="bg-primary hover:bg-primary disabled:opacity-50 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all shadow-sm shadow-none/20">
-                        {saving && <Loader2 className="w-4 h-4 animate-spin" />}
-                        {saving ? 'Salvando...' : <><Save className="w-4 h-4" aria-hidden="true" /> {isEditing ? 'Salvar' : 'Publicar'}</>}
+                    <button
+                        onClick={handleSave}
+                        disabled={saving}
+                        className="bg-primary hover:brightness-90 disabled:opacity-50 disabled:cursor-not-allowed text-surface px-5 py-2.5 min-h-[44px] rounded text-sm font-semibold flex items-center gap-2 transition-all"
+                        style={{ boxShadow: '0 2px 8px rgba(80,40,20,0.14)' }}
+                    >
+                        {saving && <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />}
+                        {saving ? 'Salvando...' : <><Save className="w-4 h-4" aria-hidden="true" /> {isEditing ? 'Salvar' : (post.draft ? 'Salvar rascunho' : 'Publicar')}</>}
                     </button>
                 </div>
             </div>
@@ -277,17 +290,70 @@ export default function PostEditor({ filePath }: PostEditorProps) {
             <div className="flex gap-6 items-start">
                 {/* Main Editor Area */}
                 <div className="flex-1 min-w-0 space-y-6">
-                    {/* Title */}
+                    {/* Title + Permalink (estilo WordPress) */}
                     <div className="bg-surface p-6 rounded-lg border border-border shadow-sm">
-                        <label className={labelClass}>Título do Artigo *</label>
-                        <input type="text" value={post.title} onChange={e => handleTitleChange(e.target.value)} className={inputClass} placeholder="Título do artigo..." />
-                        <div className="mt-3">
-                            <label className={labelClass}>Slug (URL) *</label>
-                            <input type="text" value={post.slug} onChange={e => setPost(p => ({ ...p, slug: slugify(e.target.value) }))} className={`${inputClass} font-mono text-xs`} placeholder="url-do-artigo" />
-                        </div>
-                        <div className="mt-3">
-                            <label className={labelClass}>Descrição / Meta Description</label>
-                            <textarea rows={2} value={post.description} onChange={e => setPost(p => ({ ...p, description: e.target.value }))} className={`${inputClass} resize-none`} placeholder="Breve descrição do artigo..." />
+                        {/* Título grande sem label */}
+                        <input
+                            type="text"
+                            value={post.title}
+                            onChange={e => handleTitleChange(e.target.value)}
+                            placeholder="Adicione um título"
+                            aria-label="Título do artigo"
+                            className="w-full bg-transparent border-0 border-b border-transparent hover:border-border focus:border-primary/80 focus:outline-none font-display font-normal text-3xl md:text-4xl text-ink leading-tight tracking-tight pb-3 transition-colors"
+                        />
+
+                        {/* Permalink — estilo WordPress: "Endereço: /slug-do-post  Editar" */}
+                        {post.title && (
+                            <div className="mt-3 flex items-center flex-wrap gap-2 text-sm text-ink-muted">
+                                <span className="font-semibold text-ink-faint uppercase tracking-widest text-xs">Endereço:</span>
+                                {editingSlug ? (
+                                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                                        <span className="font-mono text-ink-faint shrink-0">/</span>
+                                        <input
+                                            type="text"
+                                            value={post.slug}
+                                            onChange={e => setPost(p => ({ ...p, slug: slugify(e.target.value) }))}
+                                            aria-label="URL do artigo"
+                                            className="flex-1 bg-elev border border-border rounded px-2 py-1 text-sm font-mono text-ink focus:outline-none focus:border-primary/80 min-w-0"
+                                            autoFocus
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setEditingSlug(false)}
+                                            className="px-3 py-1 text-xs font-semibold text-primary hover:text-ink transition-colors"
+                                        >
+                                            OK
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <span className="font-mono text-ink truncate">/{post.slug || 'sem-endereco'}</span>
+                                        <button
+                                            type="button"
+                                            onClick={() => setEditingSlug(true)}
+                                            className="px-2 py-1 text-xs font-semibold text-primary hover:text-ink transition-colors"
+                                        >
+                                            Editar
+                                        </button>
+                                    </>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Descrição / Resumo */}
+                        <div className="mt-5 pt-5 border-t border-border">
+                            <label htmlFor="post-description" className={labelClass}>Resumo do artigo</label>
+                            <textarea
+                                id="post-description"
+                                rows={2}
+                                value={post.description}
+                                onChange={e => setPost(p => ({ ...p, description: e.target.value }))}
+                                className={`${inputClass} resize-none`}
+                                placeholder="Frase curta que aparece nas listas e no compartilhamento."
+                            />
+                            <p className="text-xs text-ink-faint mt-1.5">
+                                Aparece nos resultados do Google e no compartilhamento social.
+                            </p>
                         </div>
                     </div>
 
