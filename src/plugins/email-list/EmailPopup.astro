@@ -21,21 +21,21 @@ const showOnce = popupConfig?.showOnce !== false;
 ---
 
 {enabled && (
-<div id="email-popup-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:99999; align-items:center; justify-content:center;">
-    <div id="email-popup-card" style="background:#fff; border-radius:1.25rem; padding:2rem; max-width:420px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.25); position:relative; animation:popupFadeIn 0.35s ease;">
+<div id="email-popup-overlay" style="display:none; position:fixed; inset:0; background:rgba(20,20,24,0.5); z-index:99999; align-items:center; justify-content:center;">
+    <div id="email-popup-card" style="background:rgb(255 254 251); border-radius:1.25rem; padding:2rem; max-width:420px; width:90%; box-shadow:0 20px 60px rgba(80,40,20,0.22); position:relative; animation:popupFadeIn 0.35s ease;">
         <!-- Fechar -->
-        <button id="email-popup-close" type="button" aria-label="Fechar" style="position:absolute; top:1rem; right:1rem; background:none; border:none; cursor:pointer; color:#94a3b8; font-size:1.25rem; line-height:1; padding:0.25rem;">✕</button>
+        <button id="email-popup-close" type="button" aria-label="Fechar" style="position:absolute; top:1rem; right:1rem; background:none; border:none; cursor:pointer; color:rgb(136 130 130); font-size:1.25rem; line-height:1; padding:0.25rem;">✕</button>
 
         <!-- Ícone -->
-        <div style="width:3rem; height:3rem; background:linear-gradient(135deg,#7c3aed,#a855f7); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 1rem;">
+        <div style="width:3rem; height:3rem; background:rgb(139 74 54); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 1rem;">
             <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
         </div>
 
         <!-- Textos -->
-        <h3 style="text-align:center; font-size:1.2rem; font-weight:700; color:#1e293b; margin:0 0 0.5rem;">{headline}</h3>
-        <p style="text-align:center; font-size:0.875rem; color:#64748b; margin:0 0 1.5rem; line-height:1.5;">{subheadline}</p>
+        <h3 style="text-align:center; font-size:1.2rem; font-weight:700; color:rgb(20 20 24); margin:0 0 0.5rem;">{headline}</h3>
+        <p style="text-align:center; font-size:0.875rem; color:rgb(76 74 82); margin:0 0 1.5rem; line-height:1.5;">{subheadline}</p>
 
         <!-- Form -->
         <form id="email-popup-form" style="display:flex; flex-direction:column; gap:0.625rem;">
@@ -44,14 +44,14 @@ const showOnce = popupConfig?.showOnce !== false;
                 type="email"
                 placeholder="Seu melhor e-mail"
                 required
-                style="width:100%; padding:0.75rem 1rem; border:1.5px solid #e2e8f0; border-radius:0.75rem; font-size:0.875rem; outline:none; box-sizing:border-box; transition:border-color 0.2s;"
-                onfocus="this.style.borderColor='#7c3aed'"
-                onblur="this.style.borderColor='#e2e8f0'"
+                style="width:100%; padding:0.75rem 1rem; border:1.5px solid rgb(224 218 206); border-radius:0.75rem; font-size:0.875rem; outline:none; box-sizing:border-box; transition:border-color 0.2s; background:rgb(255 254 251); color:rgb(20 20 24);"
+                onfocus="this.style.borderColor='rgb(139 74 54)'"
+                onblur="this.style.borderColor='rgb(224 218 206)'"
             />
             <button
                 id="email-popup-btn"
                 type="submit"
-                style="width:100%; padding:0.75rem; background:linear-gradient(135deg,#7c3aed,#a855f7); color:#fff; border:none; border-radius:0.75rem; font-size:0.875rem; font-weight:700; cursor:pointer; transition:opacity 0.2s;"
+                style="width:100%; padding:0.75rem; background:rgb(139 74 54); color:rgb(250 248 244); border:none; border-radius:0.75rem; font-size:0.875rem; font-weight:700; cursor:pointer; transition:opacity 0.2s;"
             >
                 Inscrever-se
             </button>

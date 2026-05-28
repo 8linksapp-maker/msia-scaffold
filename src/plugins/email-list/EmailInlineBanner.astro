@@ -17,10 +17,10 @@ const subheadline = inlineConfig?.subheadline || 'Receba artigos como este diret
 ---
 
 {enabled && (
-<div id="email-inline-banner" style="margin: 2rem 0; padding: 1.75rem 2rem; background: #f5f3ff; border: 1.5px solid #ddd6fe; border-radius: 1rem; display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
+<div id="email-inline-banner" style="margin: 2rem 0; padding: 1.75rem 2rem; background: rgb(237 216 207); border: 1.5px solid rgba(139,74,54,0.25); border-radius: 1rem; display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
 
     <!-- Ícone -->
-    <div style="flex-shrink:0; width:3rem; height:3rem; background:linear-gradient(135deg,#7c3aed,#a855f7); border-radius:50%; display:flex; align-items:center; justify-content:center;">
+    <div style="flex-shrink:0; width:3rem; height:3rem; background:rgb(139 74 54); border-radius:50%; display:flex; align-items:center; justify-content:center;">
         <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
         </svg>
@@ -28,8 +28,8 @@ const subheadline = inlineConfig?.subheadline || 'Receba artigos como este diret
 
     <!-- Textos -->
     <div style="flex:1; min-width:180px;">
-        <p style="margin:0 0 0.25rem; font-weight:700; color:#1e1b4b; font-size:1rem;">{headline}</p>
-        <p style="margin:0; font-size:0.85rem; color:#6d28d9; line-height:1.4;">{subheadline}</p>
+        <p style="margin:0 0 0.25rem; font-weight:700; color:rgb(20 20 24); font-size:1rem;">{headline}</p>
+        <p style="margin:0; font-size:0.85rem; color:rgb(139 74 54); line-height:1.4;">{subheadline}</p>
     </div>
 
     <!-- Form -->
@@ -39,14 +39,14 @@ const subheadline = inlineConfig?.subheadline || 'Receba artigos como este diret
             type="email"
             placeholder="Seu melhor e-mail"
             required
-            style="padding:0.625rem 1rem; border:1.5px solid #c4b5fd; border-radius:0.625rem; font-size:0.875rem; outline:none; min-width:200px; transition:border-color 0.2s; background:#fff; box-sizing:border-box;"
-            onfocus="this.style.borderColor='#7c3aed'"
-            onblur="this.style.borderColor='#c4b5fd'"
+            style="padding:0.625rem 1rem; border:1.5px solid rgb(224 218 206); border-radius:0.625rem; font-size:0.875rem; outline:none; min-width:200px; transition:border-color 0.2s; background:rgb(255 254 251); color:rgb(20 20 24); box-sizing:border-box;"
+            onfocus="this.style.borderColor='rgb(139 74 54)'"
+            onblur="this.style.borderColor='rgb(224 218 206)'"
         />
         <button
             id="email-inline-btn"
             type="submit"
-            style="padding:0.625rem 1.25rem; background:linear-gradient(135deg,#7c3aed,#a855f7); color:#fff; border:none; border-radius:0.625rem; font-size:0.875rem; font-weight:700; cursor:pointer; white-space:nowrap; transition:opacity 0.2s;"
+            style="padding:0.625rem 1.25rem; background:rgb(139 74 54); color:rgb(250 248 244); border:none; border-radius:0.625rem; font-size:0.875rem; font-weight:700; cursor:pointer; white-space:nowrap; transition:opacity 0.2s;"
         >
             Inscrever-se
         </button>

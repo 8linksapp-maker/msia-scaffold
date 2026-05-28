@@ -145,7 +145,7 @@ export default function SettingsEmailList() {
         }
     };
 
-    const inputClass = 'w-full bg-surface border border-border rounded-md px-4 py-3 text-sm font-medium text-ink focus:outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/20/20 transition-all shadow-sm';
+    const inputClass = 'w-full bg-surface border border-border rounded-md px-4 py-3 text-sm font-medium text-ink focus:outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/20 transition-all shadow-sm';
     const labelClass = 'block text-sm font-bold text-ink-muted uppercase tracking-wider mb-2 ml-1';
 
     if (loading) return (
@@ -340,7 +340,7 @@ export default function SettingsEmailList() {
                             type="checkbox"
                             checked={showOnce}
                             onChange={e => setShowOnce(e.target.checked)}
-                            className="w-4 h-4 accent-violet-600 rounded"
+                            className="w-4 h-4 accent-primary rounded"
                         />
                         <span className="text-sm font-medium text-ink">
                             Mostrar apenas uma vez por visitante
@@ -353,14 +353,14 @@ export default function SettingsEmailList() {
                     <div className="mt-5 p-4 bg-elev rounded-md border border-border">
                         <p className="text-xs font-bold text-ink-faint uppercase tracking-wider mb-3">Preview</p>
                         <div className="bg-surface rounded-md p-5 shadow-sm max-w-xs mx-auto text-center border border-border">
-                            <div style={{ width: 40, height: 40, background: 'linear-gradient(135deg,#7c3aed,#a855f7)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
+                            <div style={{ width: 40, height: 40, background: 'rgb(139 74 54)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
                                 <Mail className="w-5 h-5 text-white" />
                             </div>
                             <p className="font-bold text-ink text-sm mb-1">{headline || '...'}</p>
                             <p className="text-ink-muted text-xs leading-relaxed mb-3">{subheadline || '...'}</p>
                             <div className="space-y-2">
                                 <div className="w-full h-9 bg-elev rounded-lg" />
-                                <div className="w-full h-9 rounded-lg" style={{ background: 'linear-gradient(135deg,#7c3aed,#a855f7)' }} />
+                                <div className="w-full h-9 rounded-lg" style={{ background: 'rgb(139 74 54)' }} />
                             </div>
                             <p className="text-xs text-ink-faint mt-2">
                                 {triggerType === 'delay'
@@ -421,7 +421,7 @@ export default function SettingsEmailList() {
                             <p className="text-ink-muted text-xs mb-3">{sidebarSubheadline || '...'}</p>
                             <div className="space-y-2">
                                 <div className="w-full h-8 bg-elev rounded-lg" />
-                                <div className="w-full h-8 rounded-lg" style={{ background: 'linear-gradient(135deg,#7c3aed,#a855f7)' }} />
+                                <div className="w-full h-8 rounded-lg" style={{ background: 'rgb(139 74 54)' }} />
                             </div>
                         </div>
                     </div>
@@ -486,7 +486,7 @@ export default function SettingsEmailList() {
                     <div className="mt-5 p-4 bg-elev rounded-md border border-border">
                         <p className="text-xs font-bold text-ink-faint uppercase tracking-wider mb-3">Preview</p>
                         <div className="bg-primary-soft border border-primary/30 rounded-md p-4 flex items-center gap-3">
-                            <div style={{ flexShrink: 0, width: 36, height: 36, background: 'linear-gradient(135deg,#7c3aed,#a855f7)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <div style={{ flexShrink: 0, width: 36, height: 36, background: 'rgb(139 74 54)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 <Mail className="w-4 h-4 text-white" />
                             </div>
                             <div className="flex-1 min-w-0">
@@ -495,7 +495,7 @@ export default function SettingsEmailList() {
                             </div>
                             <div className="flex gap-2 shrink-0">
                                 <div className="h-8 w-28 bg-surface border border-primary/30 rounded-lg" />
-                                <div className="h-8 w-20 rounded-lg" style={{ background: 'linear-gradient(135deg,#7c3aed,#a855f7)' }} />
+                                <div className="h-8 w-20 rounded-lg" style={{ background: 'rgb(139 74 54)' }} />
                             </div>
                         </div>
                     </div>

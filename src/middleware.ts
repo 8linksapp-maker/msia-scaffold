@@ -52,10 +52,10 @@ export const onRequest = defineMiddleware(async (context, next) => {
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head><meta charset="UTF-8"><title>Admin — Configure as Variáveis</title>
-<style>body{font-family:sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;background:#f8fafc;}
-.card{background:white;border:1px solid #e2e8f0;border-radius:16px;padding:48px;max-width:480px;text-align:center;}
-h1{color:#1e293b;font-size:1.5rem;margin-bottom:8px;}p{color:#64748b;line-height:1.6;}
-code{background:#f1f5f9;padding:2px 8px;border-radius:6px;font-size:.875rem;color:#7c3aed;}
+<style>body{font-family:system-ui,-apple-system,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;background:rgb(250 248 244);}
+.card{background:rgb(255 254 251);border:1px solid rgb(224 218 206);border-radius:16px;padding:48px;max-width:480px;text-align:center;}
+h1{color:rgb(20 20 24);font-size:1.5rem;margin-bottom:8px;}p{color:rgb(76 74 82);line-height:1.6;}
+code{background:rgb(244 240 232);padding:2px 8px;border-radius:6px;font-size:.875rem;color:rgb(139 74 54);}
 </style></head>
 <body><div class="card">
 <h1>⚙️ Configure as Variáveis de Ambiente</h1>
