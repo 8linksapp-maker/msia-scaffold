@@ -114,8 +114,8 @@ export default function ConfigEditor() {
                     <div className="md:col-span-2 flex flex-col sm:flex-row gap-8 items-start">
                         <div className="w-full sm:w-1/3">
                             <label className={labelClass}>Logo Principal</label>
-                            <label className="group relative border-2 border-dashed border-border hover:border-primary/80 bg-elev hover:bg-primary-soft/50 rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer transition-all text-center h-48">
-                                <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+                            <label aria-label="Enviar logo do site" className="group relative border-2 border-dashed border-border hover:border-primary/80 bg-elev hover:bg-primary-soft/50 rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer transition-all text-center h-48">
+                                <input type="file" accept="image/*" aria-label="Selecionar arquivo de logo (PNG ou SVG)" className="hidden" onChange={(e) => {
                                     const file = e.target.files?.[0];
                                     if (file) { setPendingLogo(file); setConfig({ ...config, logo: URL.createObjectURL(file) }); }
                                 }} />
@@ -135,13 +135,13 @@ export default function ConfigEditor() {
                                     <span>Tamanho da logo (header)</span>
                                     <span className="font-mono text-primary">{config?.logoHeight ?? 40}px</span>
                                 </label>
-                                <input type="range" min={24} max={120} step={2} value={config?.logoHeight ?? 40} onChange={e => setConfig({ ...config, logoHeight: Number(e.target.value) })} className="w-full accent-violet-500" />
+                                <input type="range" min={24} max={120} step={2} value={config?.logoHeight ?? 40} onChange={e => setConfig({ ...config, logoHeight: Number(e.target.value) })} className="w-full accent-primary" />
                             </div>
                         </div>
                         <div className="w-full sm:w-1/3">
                             <label className={labelClass}>Favicon</label>
-                            <label className="group relative border-2 border-dashed border-border hover:border-primary/80 bg-elev hover:bg-primary-soft/50 rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer transition-all text-center h-48">
-                                <input type="file" accept="image/png,image/svg+xml,image/x-icon,image/ico" className="hidden" onChange={(e) => {
+                            <label aria-label="Enviar favicon do site" className="group relative border-2 border-dashed border-border hover:border-primary/80 bg-elev hover:bg-primary-soft/50 rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer transition-all text-center h-48">
+                                <input type="file" accept="image/png,image/svg+xml,image/x-icon,image/ico" aria-label="Selecionar arquivo de favicon (PNG, SVG ou ICO)" className="hidden" onChange={(e) => {
                                     const file = e.target.files?.[0];
                                     if (file) { setPendingFavicon(file); setConfig({ ...config, favicon: URL.createObjectURL(file) }); }
                                 }} />
@@ -263,7 +263,7 @@ export default function ConfigEditor() {
                         <p className="text-sm font-bold text-ink">Ocultar data de publicação</p>
                         <p className="text-xs text-ink-muted">Esconde a data nos cards e na página dos artigos</p>
                     </div>
-                    <input type="checkbox" checked={!!config?.hidePostDate} onChange={e => setConfig({ ...config, hidePostDate: e.target.checked })} className="w-5 h-5 accent-violet-500" />
+                    <input type="checkbox" checked={!!config?.hidePostDate} onChange={e => setConfig({ ...config, hidePostDate: e.target.checked })} className="w-5 h-5 accent-primary" />
                 </label>
             </div>
 
@@ -404,10 +404,11 @@ export default function ConfigEditor() {
                             type="button"
                             role="switch"
                             aria-checked={!!config?.robots?.noindex}
+                            aria-label="Bloquear indexação pelos buscadores"
                             onClick={() => setConfig({ ...config, robots: { ...(config?.robots || {}), noindex: !config?.robots?.noindex } })}
-                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors flex-shrink-0 ml-4 ${config?.robots?.noindex ? 'bg-red-600' : 'bg-slate-300'}`}
+                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors flex-shrink-0 ml-4 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 ${config?.robots?.noindex ? 'bg-red-600' : 'bg-elev border border-border'}`}
                         >
-                            <span className={`inline-block h-4 w-4 transform rounded-full bg-surface transition-transform ${config?.robots?.noindex ? 'translate-x-6' : 'translate-x-1'}`} />
+                            <span aria-hidden="true" className={`inline-block h-4 w-4 transform rounded-full bg-surface shadow transition-transform ${config?.robots?.noindex ? 'translate-x-6' : 'translate-x-1'}`} />
                         </button>
                     </div>
                     {!config?.robots?.noindex && (

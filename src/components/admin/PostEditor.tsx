@@ -247,14 +247,14 @@ export default function PostEditor({ filePath }: PostEditorProps) {
             {/* Fixed header bar */}
             <div className="flex items-center justify-between bg-surface p-4 px-6 rounded-lg border border-border shadow-sm mb-6">
                 <div className="flex items-center gap-3">
-                    <a href="/admin/posts" className="text-ink-faint hover:text-primary transition-colors p-1.5 rounded-lg hover:bg-primary-soft"><ArrowLeft className="w-5 h-5" aria-hidden="true" /></a>
+                    <a href="/admin/posts" aria-label="Voltar para lista de artigos" className="text-ink-faint hover:text-primary transition-colors p-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded hover:bg-primary-soft"><ArrowLeft className="w-5 h-5" aria-hidden="true" /></a>
                     <div>
                         <h2 className="text-lg font-bold text-ink">{isEditing ? 'Editar Artigo' : 'Novo Artigo'}</h2>
                         {post.slug && <p className="text-xs font-mono text-ink-faint">/blog/{post.slug}</p>}
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
-                    <button type="button" onClick={() => setIsPreview(!isPreview)} className="flex items-center gap-1.5 px-3 py-2 bg-elev hover:bg-elev text-ink rounded-lg text-sm font-medium transition-colors">
+                    <button type="button" aria-label={isPreview ? 'Voltar para editor' : 'Ver preview do artigo'} onClick={() => setIsPreview(!isPreview)} className="flex items-center gap-1.5 px-3 py-2.5 min-h-[44px] bg-elev hover:bg-elev text-ink rounded text-sm font-medium transition-colors">
                         {isPreview ? <Edit3 className="w-4 h-4" aria-hidden="true" /> : <Eye className="w-4 h-4" aria-hidden="true" />}
                         {isPreview ? 'Editor' : 'Preview'}
                     </button>
@@ -265,7 +265,7 @@ export default function PostEditor({ filePath }: PostEditorProps) {
                 </div>
             </div>
 
-            {error && <div className="p-4 bg-red-50 text-red-700 border-l-4 border-red-500 text-sm font-medium mb-6 rounded-r-xl flex gap-2"><AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />{error}</div>}
+            {error && <div role="alert" className="p-4 bg-red-50 text-red-700 border border-red-200 text-sm font-medium mb-6 rounded-lg flex gap-2"><AlertCircle className="w-4 h-4 shrink-0 mt-0.5" aria-hidden="true" />{error}</div>}
 
             <div className="flex gap-6 items-start">
                 {/* Main Editor Area */}
@@ -324,14 +324,22 @@ export default function PostEditor({ filePath }: PostEditorProps) {
 
                     {/* Modal Inserir Vídeo */}
                     {showVideoModal && (
-                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowVideoModal(false)}>
-                            <div className="bg-surface rounded-lg shadow-2xl w-full max-w-md" onClick={e => e.stopPropagation()}>
+                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/60 backdrop-blur-sm" onClick={() => setShowVideoModal(false)} aria-hidden="true">
+                            <div
+                                role="dialog"
+                                aria-modal="true"
+                                aria-labelledby="modal-video-title"
+                                aria-hidden="false"
+                                className="bg-surface rounded-lg w-full max-w-md"
+                                style={{ boxShadow: '0 20px 48px rgba(80,40,20,0.18)' }}
+                                onClick={e => e.stopPropagation()}
+                            >
                                 <div className="flex items-center justify-between p-5 border-b border-border">
-                                    <h3 className="text-sm font-bold text-ink uppercase tracking-wider flex items-center gap-2">
-                                        <Video className="w-4 h-4 text-rose-500" /> Inserir vídeo
+                                    <h3 id="modal-video-title" className="text-sm font-bold text-ink uppercase tracking-wider flex items-center gap-2">
+                                        <Video className="w-4 h-4 text-rose-500" aria-hidden="true" /> Inserir vídeo
                                     </h3>
-                                    <button type="button" onClick={() => setShowVideoModal(false)} className="w-7 h-7 bg-elev hover:bg-elev text-ink-muted rounded-full flex items-center justify-center">
-                                        <span className="text-base leading-none">×</span>
+                                    <button type="button" onClick={() => setShowVideoModal(false)} aria-label="Fechar modal de vídeo" className="w-10 h-10 min-h-[44px] min-w-[44px] flex items-center justify-center text-ink-faint hover:text-ink hover:bg-elev rounded transition-colors">
+                                        <span className="text-base leading-none" aria-hidden="true">×</span>
                                     </button>
                                 </div>
                                 <div className="p-5 space-y-3">

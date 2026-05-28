@@ -129,7 +129,7 @@ export default function ContatoEditor() {
                         <div><label className={labelClass}>Meta Descrição</label><textarea rows={3} value={contato?.seo?.description || ''} onChange={e => updateField('seo', 'description', e.target.value)} className={`${inputClass} resize-y text-xs`} /></div>
                         <div>
                             <label className={labelClass}>Imagem Social (Open Graph)</label>
-                            <input type="file" accept="image/*" onChange={e => handleFileSelect(e, 'seoImg')} className="text-[10px] w-full file:mr-2 file:py-1 file:px-2 file:border-0 file:bg-primary-soft file:text-primary" />
+                            <input type="file" accept="image/*" aria-label="Selecionar imagem para compartilhamento social (Open Graph)" onChange={e => handleFileSelect(e, 'seoImg')} className="text-[10px] w-full file:mr-2 file:py-1 file:px-2 file:border-0 file:bg-primary-soft file:text-primary" />
                             {contato?.seo?.image && <img src={contato?.seo?.image} className="w-full aspect-video object-cover mt-3 rounded" />}
                         </div>
                     </div>

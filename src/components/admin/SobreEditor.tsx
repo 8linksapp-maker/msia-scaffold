@@ -97,7 +97,7 @@ export default function SobreEditor() {
                         <div><label className={labelClass}>Parágrafo Descritivo</label><textarea rows={4} value={sobre?.hero?.desc || ''} onChange={e => updateField('hero', 'desc', e.target.value)} className={`${inputClass} resize-y`} /></div>
                         <div className="bg-elev p-4 border border-border rounded-md">
                             <label className={labelClass}>Foto da Empresa</label>
-                            <input type="file" accept="image/*" className="text-sm file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-primary-soft file:text-primary hover:file:bg-primary-soft cursor-pointer" onChange={e => handleFileSelect(e, 'heroImg')} />
+                            <input type="file" accept="image/*" aria-label="Selecionar foto da empresa ou equipe" className="text-sm file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-primary-soft file:text-primary hover:file:bg-primary-soft cursor-pointer" onChange={e => handleFileSelect(e, 'heroImg')} />
                             {pendingUploads['heroImg'] && <span className="text-[10px] bg-elev text-ink px-2 py-1 rounded font-bold uppercase mt-2 inline-block">Upload Pendente</span>}
                             {sobre?.hero?.image && <div className="mt-4 w-full h-[200px] border border-border rounded overflow-hidden"><img src={sobre?.hero?.image} className="w-full h-full object-cover" /></div>}
                         </div>
@@ -122,7 +122,7 @@ export default function SobreEditor() {
                         <div><label className={labelClass}>Meta Descrição</label><textarea rows={3} value={sobre?.seo?.description || ''} onChange={e => updateField('seo', 'description', e.target.value)} className={`${inputClass} resize-y text-xs`} /></div>
                         <div>
                             <label className={labelClass}>Imagem Social (Open Graph)</label>
-                            <input type="file" accept="image/*" onChange={e => handleFileSelect(e, 'seoImg')} className="text-[10px] w-full file:mr-2 file:py-1 file:px-2 file:border-0 file:bg-primary-soft file:text-primary" />
+                            <input type="file" accept="image/*" aria-label="Selecionar imagem para compartilhamento social (Open Graph)" onChange={e => handleFileSelect(e, 'seoImg')} className="text-[10px] w-full file:mr-2 file:py-1 file:px-2 file:border-0 file:bg-primary-soft file:text-primary" />
                             {sobre?.seo?.image && <img src={sobre?.seo?.image} className="w-full aspect-video object-cover mt-3 rounded" />}
                         </div>
                     </div>

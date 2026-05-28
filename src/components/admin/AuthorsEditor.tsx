@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { Save, AlertCircle, Loader2, Plus, Trash2, UserPlus, Image as ImageIcon, Users, X, Edit2 } from 'lucide-react';
 import { triggerToast } from './CmsToaster';
 import { githubApi } from '../../lib/adminApi';
@@ -12,6 +12,27 @@ export default function AuthorsEditor() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingIndex, setEditingIndex] = useState<number | null>(null);
     const [tempAuthor, setTempAuthor] = useState<any>(null);
+    const modalRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (!isModalOpen) return;
+        const modal = modalRef.current;
+        if (!modal) return;
+        const focusable = Array.from(modal.querySelectorAll<HTMLElement>(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        )).filter(el => !el.hasAttribute('disabled'));
+        focusable[0]?.focus();
+        const handleKey = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') { setIsModalOpen(false); return; }
+            if (e.key !== 'Tab') return;
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+            if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+            else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        };
+        document.addEventListener('keydown', handleKey);
+        return () => document.removeEventListener('keydown', handleKey);
+    }, [isModalOpen]);
 
     useEffect(() => {
         githubApi('read', 'src/data/authors.json')
@@ -76,7 +97,7 @@ export default function AuthorsEditor() {
 
     if (loading) return (
         <div className="flex flex-col items-center justify-center p-20 text-ink-faint bg-surface rounded-lg border border-border">
-            <Loader2 className="w-8 h-8 animate-spin mb-4 text-amber-500" />
+            <Loader2 className="w-8 h-8 animate-spin mb-4 text-primary" />
             <p className="font-medium animate-pulse">Lendo registros de autores...</p>
         </div>
     );
@@ -87,14 +108,14 @@ export default function AuthorsEditor() {
                 <div>
                     <h2 className="text-lg font-bold text-ink">Sincronização de Equipe</h2>
                     <p className="text-xs font-bold text-ink-muted uppercase tracking-widest mt-1 flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full border-2 border-amber-500"></span>
+                        <span className="w-2 h-2 rounded-full border-2 border-primary"></span>
                         {authors.length} Perfis Cadastrados
                     </p>
                 </div>
                 <div className="flex items-center gap-3 w-full sm:w-auto">
-                    {saving && <div className="flex items-center gap-2 text-amber-600 bg-elev px-4 py-2 rounded-lg text-sm font-bold mr-2"><Loader2 className="w-4 h-4 animate-spin" /> Sincronizando...</div>}
+                    {saving && <div className="flex items-center gap-2 text-primary bg-elev px-4 py-2 rounded-lg text-sm font-bold mr-2"><Loader2 className="w-4 h-4 animate-spin" /> Sincronizando...</div>}
                     <button onClick={() => { setTempAuthor({ id: `author-${Date.now()}`, name: '', role: '', avatar: '', bio: '', social: { twitter: '', instagram: '', linkedin: '', website: '' } }); setEditingIndex(null); setIsModalOpen(true); }} disabled={saving}
-                        className="w-full sm:w-auto bg-elev0 hover:bg-amber-600 disabled:bg-slate-300 disabled:cursor-not-allowed text-white px-6 py-3 rounded-md font-bold flex items-center justify-center gap-2 shadow-lg shadow-amber-500/25 hover:-translate-y-0.5 transition-all">
+                        className="w-full sm:w-auto bg-primary hover:bg-primary disabled:bg-slate-300 disabled:cursor-not-allowed text-white px-6 py-3 rounded-md font-bold flex items-center justify-center gap-2 shadow-lg shadow-none hover:-translate-y-0.5 transition-all">
                         <UserPlus className="w-5 h-5" aria-hidden="true" /> Adicionar Perfil
                     </button>
                 </div>
@@ -108,7 +129,7 @@ export default function AuthorsEditor() {
                     <h3 className="text-xl font-bold text-ink mb-2">Sua equipe está vazia!</h3>
                     <p className="text-ink-muted max-w-sm mx-auto mb-6">Adicione membros da equipe para que eles possam assinar os artigos do blog.</p>
                     <button onClick={() => { setTempAuthor({ id: `author-${Date.now()}`, name: '', role: '', avatar: '', bio: '', social: { twitter: '', instagram: '', linkedin: '', website: '' } }); setEditingIndex(null); setIsModalOpen(true); }}
-                        className="bg-elev0 text-white font-bold px-8 py-3 rounded-md shadow-md hover:bg-amber-600 transition-colors inline-flex items-center gap-2">
+                        className="bg-primary text-white font-bold px-8 py-3 rounded-md shadow-md hover:bg-primary transition-colors inline-flex items-center gap-2">
                         <Plus className="w-5 h-5" aria-hidden="true" /> Adicionar Primeiro Autor
                     </button>
                 </div>
@@ -134,7 +155,7 @@ export default function AuthorsEditor() {
                                         </td>
                                         <td className="py-4 px-6 align-middle">
                                             <p className="font-bold text-ink text-sm mb-1">{author.name || 'Sem nome'}</p>
-                                            <p className="text-xs font-bold text-amber-600">{author.role || 'Sem cargo'}</p>
+                                            <p className="text-xs font-bold text-primary">{author.role || 'Sem cargo'}</p>
                                         </td>
                                         <td className="py-4 px-6 align-middle">
                                             <p className="text-sm text-ink-muted line-clamp-2 leading-relaxed">{author.bio || 'Sem biografia cadastrada...'}</p>
@@ -160,15 +181,23 @@ export default function AuthorsEditor() {
             )}
 
             {isModalOpen && tempAuthor && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/60 backdrop-blur-sm">
-                    <div className="bg-surface rounded-lg shadow-2xl w-full max-w-md overflow-hidden flex flex-col">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/60 backdrop-blur-sm" aria-hidden="true">
+                    <div
+                        ref={modalRef}
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="modal-author-title"
+                        aria-hidden="false"
+                        className="bg-surface rounded-lg w-full max-w-md overflow-hidden flex flex-col"
+                        style={{ boxShadow: '0 20px 48px rgba(80,40,20,0.18)' }}
+                    >
                         <div className="flex items-center justify-between p-6 border-b border-border bg-elev/50">
-                            <h3 className="text-lg font-bold text-ink">{editingIndex !== null ? 'Editar Autor' : 'Novo Autor'}</h3>
-                            <button onClick={() => setIsModalOpen(false)} className="w-8 h-8 bg-elev hover:bg-elev text-ink-muted rounded-full flex items-center justify-center"><X className="w-4 h-4" aria-hidden="true" /></button>
+                            <h3 id="modal-author-title" className="text-lg font-bold text-ink">{editingIndex !== null ? 'Editar Autor' : 'Novo Autor'}</h3>
+                            <button onClick={() => setIsModalOpen(false)} aria-label="Fechar modal" className="w-10 h-10 min-h-[44px] min-w-[44px] flex items-center justify-center text-ink-faint hover:text-ink hover:bg-elev rounded transition-colors"><X className="w-4 h-4" aria-hidden="true" /></button>
                         </div>
                         <div className="p-6 overflow-y-auto max-h-[70vh] flex flex-col gap-6">
-                            <label className="w-28 h-28 rounded-full overflow-hidden border-4 border-slate-50 shadow-inner bg-elev flex flex-col items-center justify-center mx-auto relative group cursor-pointer">
-                                <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+                            <label aria-label="Foto do autor — clique para fazer upload" className="w-28 h-28 rounded-full overflow-hidden border-4 border-border shadow-inner bg-elev flex flex-col items-center justify-center mx-auto relative group cursor-pointer">
+                                <input type="file" accept="image/*" className="hidden" aria-label="Selecionar foto do autor" onChange={handleImageUpload} />
                                 {tempAuthor.avatar ? (
                                     <>
                                         <img src={tempAuthor.avatar} alt="Avatar" className="absolute inset-0 w-full h-full object-cover group-hover:opacity-40 transition-opacity" />
@@ -177,7 +206,7 @@ export default function AuthorsEditor() {
                                         </div>
                                     </>
                                 ) : (
-                                    <div className="flex flex-col items-center text-ink-faint group-hover:text-amber-500 transition-colors">
+                                    <div className="flex flex-col items-center text-ink-faint group-hover:text-primary transition-colors">
                                         <ImageIcon className="w-8 h-8 mb-1" />
                                         <span className="text-[9px] font-black uppercase tracking-wider">Upload PNG</span>
                                     </div>
@@ -191,13 +220,13 @@ export default function AuthorsEditor() {
                                     <div key={f.key}>
                                         <label className="block text-xs font-black text-ink-faint mb-1 uppercase tracking-widest text-center">{f.label}</label>
                                         <input type={f.type} placeholder={f.placeholder} value={tempAuthor[f.key] || ''} onChange={e => setTempAuthor({ ...tempAuthor, [f.key]: e.target.value })}
-                                            className="w-full bg-elev border border-border rounded-md px-4 py-3 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-amber-500 font-bold text-center" />
+                                            className="w-full bg-elev border border-border rounded-md px-4 py-3 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-primary/30 font-bold text-center" />
                                     </div>
                                 ))}
                                 <div>
                                     <label className="block text-xs font-black text-ink-faint mb-1 uppercase tracking-widest text-center">Resumo Biográfico</label>
                                     <textarea rows={4} placeholder="Escreva sobre as especialidades do autor..." value={tempAuthor.bio || ''} onChange={e => setTempAuthor({ ...tempAuthor, bio: e.target.value })}
-                                        className="w-full bg-elev border border-border rounded-md px-4 py-3 text-sm text-ink-muted focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none text-center leading-relaxed" />
+                                        className="w-full bg-elev border border-border rounded-md px-4 py-3 text-sm text-ink-muted focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none text-center leading-relaxed" />
                                 </div>
                                 <div className="pt-4 border-t border-border">
                                     <p className="text-xs font-black text-ink-faint mb-3 uppercase tracking-widest text-center">Redes Sociais</p>
@@ -218,7 +247,7 @@ export default function AuthorsEditor() {
                                                         ...tempAuthor,
                                                         social: { ...(tempAuthor.social || {}), [f.key]: e.target.value }
                                                     })}
-                                                    className="w-full bg-elev border border-border rounded-lg px-3 py-2 text-xs text-ink focus:outline-none focus:ring-2 focus:ring-amber-500"
+                                                    className="w-full bg-elev border border-border rounded-lg px-3 py-2 text-xs text-ink focus:outline-none focus:ring-2 focus:ring-primary/30"
                                                 />
                                             </div>
                                         ))}
@@ -226,9 +255,9 @@ export default function AuthorsEditor() {
                                 </div>
                             </div>
                         </div>
-                        <div className="p-6 border-t border-border bg-elev flex gap-3 justify-end rounded-b-3xl">
-                            <button onClick={() => setIsModalOpen(false)} className="px-5 py-2.5 text-sm font-bold text-ink-muted hover:bg-elev rounded-md transition-colors">Cancelar</button>
-                            <button onClick={saveModalAuthor} className="px-6 py-2.5 text-sm font-bold bg-elev0 hover:bg-amber-600 text-white rounded-md shadow-md hover:shadow-lg transition-all flex items-center gap-2">
+                        <div className="p-6 border-t border-border bg-elev flex gap-3 justify-end rounded-b-lg">
+                            <button onClick={() => setIsModalOpen(false)} className="px-5 py-2.5 min-h-[44px] text-sm font-semibold text-ink-muted hover:bg-surface rounded transition-colors">Cancelar</button>
+                            <button onClick={saveModalAuthor} className="px-6 py-2.5 min-h-[44px] text-sm font-semibold bg-primary hover:brightness-90 text-surface rounded flex items-center gap-2 transition-all">
                                 <Save className="w-4 h-4" aria-hidden="true" /> Confirmar
                             </button>
                         </div>
