@@ -25,8 +25,9 @@ export default function PostEditor({ filePath }: PostEditorProps) {
     const [QuillEditor, setQuillEditor] = useState<any>(null);
     const [quillFailed, setQuillFailed] = useState(false);
     const quillRef = React.useRef<any>(null);
-    const [showVideoModal, setShowVideoModal] = useState(false);
+    const [showVideoBar, setShowVideoBar] = useState(false);
     const [videoShortcodeUrl, setVideoShortcodeUrl] = useState('');
+    const [videoBarError, setVideoBarError] = useState('');
 
     const insertTextInEditor = (text: string) => {
         const editor = quillRef.current?.getEditor?.();
@@ -41,12 +42,13 @@ export default function PostEditor({ filePath }: PostEditorProps) {
         const url = videoShortcodeUrl.trim();
         if (!url) return;
         if (parseVideoUrl(url).provider === 'unknown') {
-            alert('URL não reconhecida. Use YouTube, Vimeo, Loom, Wistia ou mp4 direto.');
+            setVideoBarError('URL não reconhecida. Use YouTube, Vimeo, Loom, Wistia ou mp4 direto.');
             return;
         }
         insertTextInEditor(`[[video:${url}]]`);
         setVideoShortcodeUrl('');
-        setShowVideoModal(false);
+        setVideoBarError('');
+        setShowVideoBar(false);
     };
 
     const insertImageInEditor = (file: File) => {
@@ -287,22 +289,68 @@ export default function PostEditor({ filePath }: PostEditorProps) {
                         </div>
                     </div>
 
-                    {/* Content Editor + FAB Vídeo */}
+                    {/* Conteúdo */}
                     <div className="bg-surface p-6 rounded-lg border border-border shadow-sm">
                         <div className="flex items-center justify-between mb-2">
                             <label className={labelClass} style={{ marginBottom: 0 }}>Conteúdo do Artigo</label>
                             {!isPreview && (
                                 <button
                                     type="button"
-                                    onClick={() => { setVideoShortcodeUrl(''); setShowVideoModal(true); }}
-                                    className="inline-flex items-center gap-1.5 px-3 py-2.5 min-h-[44px] bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 rounded-lg text-xs font-bold transition-colors"
-                                    title="Inserir shortcode [[video:URL]] no editor"
+                                    onClick={() => { setShowVideoBar(v => !v); setVideoShortcodeUrl(''); setVideoBarError(''); }}
+                                    aria-expanded={showVideoBar}
+                                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium transition-colors ${showVideoBar ? 'bg-elev text-ink' : 'text-ink-faint hover:text-ink hover:bg-elev'}`}
                                 >
-                                    <Video className="w-3.5 h-3.5" />
+                                    <Video className="w-3.5 h-3.5" aria-hidden="true" />
                                     Inserir vídeo
                                 </button>
                             )}
                         </div>
+
+                        {/* Barra inline de vídeo — aparece abaixo da label, acima do editor */}
+                        {showVideoBar && !isPreview && (
+                            <div className="mb-3 flex items-center gap-2 p-3 bg-elev rounded-md border border-border">
+                                <Video className="w-4 h-4 text-ink-faint shrink-0" aria-hidden="true" />
+                                <div className="flex-1 min-w-0">
+                                    <input
+                                        type="text"
+                                        value={videoShortcodeUrl}
+                                        onChange={e => { setVideoShortcodeUrl(e.target.value); setVideoBarError(''); }}
+                                        onKeyDown={e => {
+                                            if (e.key === 'Enter') { e.preventDefault(); insertVideoShortcode(); }
+                                            if (e.key === 'Escape') { setShowVideoBar(false); setVideoShortcodeUrl(''); setVideoBarError(''); }
+                                        }}
+                                        placeholder="Cole a URL do vídeo (YouTube, Vimeo, Loom…) e pressione Enter"
+                                        className="w-full bg-surface border border-border rounded px-3 py-1.5 text-sm font-mono focus:outline-none focus:border-primary/80 transition-colors"
+                                        autoFocus
+                                        aria-label="URL do vídeo para inserir no artigo"
+                                    />
+                                    {videoBarError && (
+                                        <p className="text-xs text-red-600 mt-1">{videoBarError}</p>
+                                    )}
+                                    {videoShortcodeUrl.trim() && !videoBarError && (() => {
+                                        const info = parseVideoUrl(videoShortcodeUrl);
+                                        if (info.provider === 'unknown') return null;
+                                        return <p className="text-xs text-green-700 mt-1">✓ {info.provider}{info.id ? ` · ${info.id}` : ''}</p>;
+                                    })()}
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={insertVideoShortcode}
+                                    disabled={!videoShortcodeUrl.trim()}
+                                    className="px-3 py-1.5 min-h-[36px] bg-primary text-surface text-xs font-semibold rounded hover:brightness-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all shrink-0"
+                                >
+                                    Inserir
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => { setShowVideoBar(false); setVideoShortcodeUrl(''); setVideoBarError(''); }}
+                                    aria-label="Cancelar inserção de vídeo"
+                                    className="text-ink-faint hover:text-ink transition-colors shrink-0 p-1"
+                                >
+                                    ×
+                                </button>
+                            </div>
+                        )}
                         {isPreview ? (
                             <div className="prose prose-slate max-w-none border border-border rounded-md p-6 min-h-[300px]" dangerouslySetInnerHTML={{ __html: post.content }} />
                         ) : QuillEditor ? (
@@ -334,77 +382,7 @@ export default function PostEditor({ filePath }: PostEditorProps) {
                                 Carregando editor...
                             </div>
                         )}
-                        {!isPreview && (
-                            <p className="mt-2 text-[11px] text-ink-faint">
-                                💡 Você também pode digitar <code className="bg-elev px-1 rounded">[[video:URL]]</code> direto no editor.
-                            </p>
-                        )}
                     </div>
-
-                    {/* Modal Inserir Vídeo */}
-                    {showVideoModal && (
-                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/60 backdrop-blur-sm" onClick={() => setShowVideoModal(false)} aria-hidden="true">
-                            <div
-                                role="dialog"
-                                aria-modal="true"
-                                aria-labelledby="modal-video-title"
-                                aria-hidden="false"
-                                className="bg-surface rounded-lg w-full max-w-md"
-                                style={{ boxShadow: '0 20px 48px rgba(80,40,20,0.18)' }}
-                                onClick={e => e.stopPropagation()}
-                            >
-                                <div className="flex items-center justify-between p-5 border-b border-border">
-                                    <h3 id="modal-video-title" className="text-sm font-bold text-ink uppercase tracking-wider flex items-center gap-2">
-                                        <Video className="w-4 h-4 text-rose-500" aria-hidden="true" /> Inserir vídeo
-                                    </h3>
-                                    <button type="button" onClick={() => setShowVideoModal(false)} aria-label="Fechar modal de vídeo" className="w-10 h-10 min-h-[44px] min-w-[44px] flex items-center justify-center text-ink-faint hover:text-ink hover:bg-elev rounded transition-colors">
-                                        <span className="text-base leading-none" aria-hidden="true">×</span>
-                                    </button>
-                                </div>
-                                <div className="p-5 space-y-3">
-                                    <div>
-                                        <label className="block text-[10px] font-bold text-ink-muted uppercase tracking-wider mb-2">URL do vídeo</label>
-                                        <input
-                                            type="text"
-                                            value={videoShortcodeUrl}
-                                            onChange={e => setVideoShortcodeUrl(e.target.value)}
-                                            onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); insertVideoShortcode(); } }}
-                                            placeholder="https://youtube.com/watch?v=… ou https://vimeo.com/…"
-                                            className="w-full bg-elev border border-border rounded-md px-4 py-3 text-sm font-mono focus:outline-none focus:border-rose-400 focus:ring-2 focus:ring-rose-500/20"
-                                            autoFocus
-                                        />
-                                        {videoShortcodeUrl.trim() && (() => {
-                                            const info = parseVideoUrl(videoShortcodeUrl);
-                                            if (info.provider === 'unknown') return (
-                                                <p className="text-[11px] text-amber-700 mt-2 flex items-center gap-1.5">
-                                                    <AlertTriangle className="w-3 h-3 shrink-0" /> URL não reconhecida
-                                                </p>
-                                            );
-                                            return (
-                                                <p className="text-[11px] text-emerald-700 mt-2">✓ {info.provider}{info.id ? ` · ${info.id}` : ''}</p>
-                                            );
-                                        })()}
-                                        <p className="text-[10px] text-ink-faint mt-2 leading-relaxed">
-                                            Suporta YouTube, Vimeo, Loom, Wistia, Twitch e mp4 self-hosted. Será inserido como <code className="bg-elev px-1 rounded">[[video:URL]]</code> no parágrafo atual.
-                                        </p>
-                                    </div>
-                                </div>
-                                <div className="p-5 border-t border-border flex justify-end gap-2">
-                                    <button type="button" onClick={() => setShowVideoModal(false)} className="px-3 py-2.5 min-h-[44px] text-xs font-bold text-ink-muted hover:bg-elev rounded-lg">
-                                        Cancelar
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={insertVideoShortcode}
-                                        disabled={!videoShortcodeUrl.trim() || parseVideoUrl(videoShortcodeUrl).provider === 'unknown'}
-                                        className="px-4 py-1.5 text-xs font-bold bg-rose-600 hover:bg-rose-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white rounded-lg flex items-center gap-1.5"
-                                    >
-                                        <Video className="w-3 h-3" aria-hidden="true" /> Inserir
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
                 </div>
 
                 {/* Sidebar */}
@@ -479,55 +457,54 @@ export default function PostEditor({ filePath }: PostEditorProps) {
                         {pendingUploads['heroImage'] && <span className="text-[10px] text-amber-600 font-bold block mt-2">Upload pendente — será enviado ao salvar</span>}
                     </div>
 
-                    {/* Video do post */}
+                    {/* Vídeo de destaque */}
                     <div className="bg-surface p-5 rounded-lg border border-border shadow-sm">
-                        <h3 className="font-bold text-ink text-sm border-b border-border pb-3 mb-4 flex items-center gap-2">
-                            <Video className="w-4 h-4 text-rose-500" />
-                            Vídeo do artigo
-                            <span className="text-[10px] font-mono text-ink-faint font-normal ml-auto">opcional</span>
+                        <h3 className="font-semibold text-ink text-sm border-b border-border pb-3 mb-4 flex items-center gap-2">
+                            <Video className="w-4 h-4 text-ink-faint" aria-hidden="true" />
+                            Vídeo de destaque
+                            <span className="text-[10px] text-ink-faint font-normal ml-auto">opcional</span>
                         </h3>
                         <div className="space-y-3">
                             <div>
-                                <label className="block text-[10px] font-bold text-ink-muted uppercase tracking-wider mb-1.5">URL do vídeo</label>
                                 <input
                                     type="text"
                                     value={post.videoUrl}
                                     onChange={e => setPost(p => ({ ...p, videoUrl: e.target.value }))}
-                                    placeholder="https://youtube.com/watch?v=… ou https://vimeo.com/…"
-                                    className="w-full bg-elev border border-border rounded-lg px-3 py-2 text-xs font-mono focus:outline-none focus:border-rose-400"
+                                    placeholder="Cole a URL do vídeo principal do artigo"
+                                    className="w-full bg-elev border border-border rounded px-3 py-2 text-sm font-mono focus:outline-none focus:border-primary/80 transition-colors"
+                                    aria-label="URL do vídeo de destaque do artigo"
                                 />
                                 {(() => {
                                     if (!post.videoUrl?.trim()) return (
-                                        <p className="text-[10px] text-ink-faint mt-1.5">YouTube, Vimeo, Loom, Wistia, mp4 self-hosted.</p>
+                                        <p className="text-[10px] text-ink-faint mt-1.5">YouTube, Vimeo, Loom, Wistia, mp4.</p>
                                     );
                                     const info = parseVideoUrl(post.videoUrl);
                                     if (info.provider === 'unknown') return (
-                                        <p className="text-[10px] text-amber-700 mt-1.5 flex items-center gap-1"><AlertTriangle className="w-3 h-3" aria-hidden="true" /> URL não reconhecida — vídeo não será exibido.</p>
-                                    );
-                                    return (
-                                        <p className="text-[10px] text-emerald-700 mt-1.5">
-                                            ✓ {info.provider}{info.id ? ` · ${info.id}` : ''}
+                                        <p className="text-[10px] text-amber-700 mt-1.5 flex items-center gap-1">
+                                            <AlertTriangle className="w-3 h-3" aria-hidden="true" /> URL não reconhecida
                                         </p>
                                     );
+                                    return <p className="text-[10px] text-green-700 mt-1.5">✓ {info.provider}{info.id ? ` · ${info.id}` : ''}</p>;
                                 })()}
                             </div>
                             {post.videoUrl?.trim() && parseVideoUrl(post.videoUrl).provider !== 'unknown' && (
                                 <div>
-                                    <label className="block text-[10px] font-bold text-ink-muted uppercase tracking-wider mb-1.5">Posição</label>
+                                    <p className="text-[10px] font-semibold text-ink-faint uppercase tracking-widest mb-1.5">Onde exibir</p>
                                     <div className="grid grid-cols-3 gap-1.5">
                                         {[
-                                            { v: 'hero', label: 'Substitui capa' },
-                                            { v: 'after-hero', label: 'Após capa' },
-                                            { v: 'inline', label: 'Só shortcode' },
-                                        ].map((opt) => (
+                                            { v: 'hero',       label: 'No lugar da capa' },
+                                            { v: 'after-hero', label: 'Após a capa' },
+                                            { v: 'inline',     label: 'Só via shortcode' },
+                                        ].map(opt => (
                                             <button
-                                                type="button"
                                                 key={opt.v}
+                                                type="button"
+                                                aria-pressed={post.videoPosition === opt.v}
                                                 onClick={() => setPost(p => ({ ...p, videoPosition: opt.v as any }))}
-                                                className={`px-3 py-2.5 min-h-[44px] text-[10px] font-bold rounded-lg transition-all ${
+                                                className={`px-2 py-2.5 min-h-[44px] text-[10px] font-medium rounded transition-colors ${
                                                     post.videoPosition === opt.v
-                                                        ? 'bg-rose-600 text-white shadow-sm'
-                                                        : 'bg-elev text-ink-muted hover:bg-elev'
+                                                        ? 'bg-primary text-surface font-semibold'
+                                                        : 'bg-elev text-ink-muted hover:bg-elev border border-border'
                                                 }`}
                                             >
                                                 {opt.label}
