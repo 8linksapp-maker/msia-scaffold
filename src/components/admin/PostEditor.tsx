@@ -78,9 +78,11 @@ export default function PostEditor({ filePath }: PostEditorProps) {
     const quillModules = React.useMemo(() => ({
         toolbar: {
             container: [
-                [{ header: [1, 2, 3, false] }],
+                [{ header: [1, 2, 3, 4, false] }],
                 ['bold', 'italic', 'underline', 'strike'],
+                [{ color: [] }, { background: [] }],
                 [{ list: 'ordered' }, { list: 'bullet' }],
+                [{ indent: '-1' }, { indent: '+1' }],
                 ['blockquote', 'code-block'],
                 ['link', 'image'],
                 [{ align: [] }],
@@ -93,7 +95,7 @@ export default function PostEditor({ filePath }: PostEditorProps) {
         clipboard: { matchVisual: false },
     }), []);
 
-    const quillFormats = ['header', 'bold', 'italic', 'underline', 'strike', 'list', 'bullet', 'blockquote', 'code-block', 'link', 'image', 'align'];
+    const quillFormats = ['header', 'bold', 'italic', 'underline', 'strike', 'color', 'background', 'list', 'bullet', 'indent', 'blockquote', 'code-block', 'link', 'image', 'align'];
 
     const formatDateForInput = (dateStr: string) => {
         try {
@@ -352,7 +354,7 @@ export default function PostEditor({ filePath }: PostEditorProps) {
                             </div>
                         )}
                         {isPreview ? (
-                            <div className="prose prose-slate max-w-none border border-border rounded-md p-6 min-h-[300px]" dangerouslySetInnerHTML={{ __html: post.content }} />
+                            <div className="ql-editor border border-border rounded-md" style={{ minHeight: '480px', background: 'rgb(255 254 251)' }} dangerouslySetInnerHTML={{ __html: post.content }} />
                         ) : QuillEditor ? (
                             <QuillEditor
                                 ref={quillRef}
@@ -361,7 +363,7 @@ export default function PostEditor({ filePath }: PostEditorProps) {
                                 onChange={(val: string) => setPost(p => ({ ...p, content: val }))}
                                 modules={quillModules}
                                 formats={quillFormats}
-                                style={{ minHeight: '300px' }}
+                                placeholder="Comece a escrever seu artigo aqui..."
                             />
                         ) : quillFailed ? (
                             <div className="space-y-2">

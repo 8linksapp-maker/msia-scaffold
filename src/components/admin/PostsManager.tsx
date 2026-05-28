@@ -1,5 +1,5 @@
 ﻿import React, { useState, useEffect } from 'react';
-import { FileText, Plus, Search, Loader2, Trash2, Edit3, AlertCircle, Save, ChevronUp, ChevronDown, Check, X, AlertTriangle } from 'lucide-react';
+import { FileText, Plus, Search, Loader2, Trash2, Edit3, AlertCircle, Save, ChevronUp, ChevronDown, Check, X, AlertTriangle, ExternalLink } from 'lucide-react';
 import { triggerToast } from './CmsToaster';
 import { githubApi } from '../../lib/adminApi';
 import { normalizeCategories } from '../../lib/categorySlug';
@@ -331,10 +331,44 @@ export default function PostsManager() {
                                                 )}
                                             </td>
                                             <td className="py-4 px-4 text-right">
-                                                <div className="flex items-center justify-end gap-2">
-                                                    <button onClick={() => handleQuickAction(post)} aria-label={`Edição rápida: ${post.title}`} aria-expanded={editingSha === post.sha} className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-ink-faint hover:text-primary hover:bg-primary-soft rounded transition-colors"><Edit3 className="w-4 h-4" aria-hidden="true" /></button>
-                                                    <a href={`/admin/posts/edit?file=${encodeURIComponent(post.path)}`} aria-label={`Editar artigo completo: ${post.title}`} className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-ink-faint hover:text-ink-muted hover:bg-elev rounded transition-colors"><FileText className="w-4 h-4" aria-hidden="true" /></a>
-                                                    <button onClick={() => handleDelete(post.path, post.sha, post.title)} aria-label={`Excluir artigo: ${post.title}`} className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-ink-faint hover:text-red-600 hover:bg-red-50 rounded transition-colors"><Trash2 className="w-4 h-4" aria-hidden="true" /></button>
+                                                <div className="flex items-center justify-end gap-1">
+                                                    {!post.draft && (
+                                                        <a
+                                                            href={`/${post.slug}`}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            aria-label={`Abrir artigo no site: ${post.title}`}
+                                                            title="Abrir no site"
+                                                            className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-ink-faint hover:text-primary hover:bg-primary-soft rounded transition-colors"
+                                                        >
+                                                            <ExternalLink className="w-4 h-4" aria-hidden="true" />
+                                                        </a>
+                                                    )}
+                                                    <button
+                                                        onClick={() => handleQuickAction(post)}
+                                                        aria-label={`Edição rápida: ${post.title}`}
+                                                        aria-expanded={editingSha === post.sha}
+                                                        title="Edição rápida"
+                                                        className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-ink-faint hover:text-primary hover:bg-primary-soft rounded transition-colors"
+                                                    >
+                                                        <Edit3 className="w-4 h-4" aria-hidden="true" />
+                                                    </button>
+                                                    <a
+                                                        href={`/admin/posts/edit?file=${encodeURIComponent(post.path)}`}
+                                                        aria-label={`Editar artigo completo: ${post.title}`}
+                                                        title="Editar completo"
+                                                        className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-ink-faint hover:text-ink-muted hover:bg-elev rounded transition-colors"
+                                                    >
+                                                        <FileText className="w-4 h-4" aria-hidden="true" />
+                                                    </a>
+                                                    <button
+                                                        onClick={() => handleDelete(post.path, post.sha, post.title)}
+                                                        aria-label={`Excluir artigo: ${post.title}`}
+                                                        title="Excluir"
+                                                        className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-ink-faint hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" aria-hidden="true" />
+                                                    </button>
                                                 </div>
                                             </td>
                                         </tr>
