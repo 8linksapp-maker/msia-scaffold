@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { AlertCircle, Loader2, Plus, Trash2, Tag, X, Edit2 } from 'lucide-react';
 import { triggerToast } from './CmsToaster';
 import { githubApi } from '../../lib/adminApi';
@@ -48,7 +48,29 @@ export default function CategoriesEditor() {
         setEditingIndex(idx);
         setIsModalOpen(true);
     };
+    const modalRef = useRef<HTMLDivElement>(null);
     const closeModal = () => setIsModalOpen(false);
+
+    // Focus trap + ESC para o modal
+    useEffect(() => {
+        if (!isModalOpen) return;
+        const modal = modalRef.current;
+        if (!modal) return;
+        const focusable = Array.from(modal.querySelectorAll<HTMLElement>(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        )).filter(el => !el.hasAttribute('disabled'));
+        focusable[0]?.focus();
+        const handleKey = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') { closeModal(); return; }
+            if (e.key !== 'Tab') return;
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+            if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+            else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        };
+        document.addEventListener('keydown', handleKey);
+        return () => document.removeEventListener('keydown', handleKey);
+    }, [isModalOpen]);
 
     // Auto-slug quando o usuário ainda não tocou no campo de slug
     const handleNameChange = (value: string) => {
@@ -168,8 +190,8 @@ export default function CategoriesEditor() {
     };
 
     if (loading) return (
-        <div className="flex flex-col items-center justify-center p-20 text-ink-faint bg-surface rounded-3xl border border-border">
-            <Loader2 className="w-8 h-8 animate-spin mb-4 text-indigo-500" />
+        <div className="flex flex-col items-center justify-center p-20 text-ink-faint bg-surface rounded-lg border border-border">
+            <Loader2 className="w-8 h-8 animate-spin mb-4 text-primary" />
             <p className="font-medium animate-pulse">Lendo categorias...</p>
         </div>
     );
@@ -180,14 +202,14 @@ export default function CategoriesEditor() {
                 <div>
                     <h2 className="text-lg font-bold text-ink">Gerenciador de Categorias</h2>
                     <p className="text-xs font-bold text-ink-muted uppercase tracking-widest mt-1 flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full border-2 border-indigo-500"></span>
+                        <span className="w-2 h-2 rounded-full border-2 border-primary/40"></span>
                         {categories.length} Categorias Definidas
                     </p>
                 </div>
                 <div className="flex items-center gap-3 w-full sm:w-auto">
                     {saving && <div className="flex items-center gap-2 text-ink-muted bg-elev px-4 py-2 rounded-lg text-sm font-bold mr-2"><Loader2 className="w-4 h-4 animate-spin" /> Sincronizando...</div>}
                     <button onClick={openCreate} disabled={saving}
-                        className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white px-6 py-3 rounded-md font-bold flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/25 hover:-translate-y-0.5 transition-all">
+                        className="w-full sm:w-auto bg-primary hover:bg-primary disabled:opacity-50 disabled:bg-elev disabled:cursor-not-allowed text-white px-6 py-3 rounded-md font-bold flex items-center justify-center gap-2 shadow-lg shadow-none hover:-translate-y-0.5 transition-all">
                         <Plus className="w-5 h-5" aria-hidden="true" /> Nova Categoria
                     </button>
                 </div>
@@ -197,11 +219,11 @@ export default function CategoriesEditor() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {categories.length === 0 ? (
-                    <div className="col-span-full bg-elev border-2 border-dashed border-border rounded-3xl p-16 flex flex-col items-center justify-center text-center">
+                    <div className="col-span-full bg-elev border-2 border-dashed border-border rounded-lg p-16 flex flex-col items-center justify-center text-center">
                         <Tag className="w-12 h-12 text-ink-faint mb-4" />
                         <h3 className="text-xl font-bold text-ink mb-2">Nenhuma categoria!</h3>
                         <p className="text-ink-muted mb-6">Crie categorias para organizar seus artigos do blog.</p>
-                        <button onClick={openCreate} className="bg-indigo-600 text-white font-bold px-8 py-3 rounded-md shadow-md hover:bg-indigo-700 transition-colors">
+                        <button onClick={openCreate} className="bg-primary text-white font-bold px-8 py-3 rounded-md shadow-md hover:bg-primary transition-colors">
                             Criar minha primeira categoria
                         </button>
                     </div>
@@ -216,8 +238,8 @@ export default function CategoriesEditor() {
                                 </div>
                             </div>
                             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-                                <button onClick={() => openEdit(idx)} className="p-2 min-h-[44px] min-w-[44px] text-ink-faint hover:text-ink-muted hover:bg-elev rounded-lg transition-colors"><Edit2 className="w-4 h-4" aria-hidden="true" /></button>
-                                <button onClick={() => removeCategory(idx)} className="p-2 min-h-[44px] min-w-[44px] text-ink-faint hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"><Trash2 className="w-4 h-4" aria-hidden="true" /></button>
+                                <button onClick={() => openEdit(idx)} aria-label={`Editar categoria: ${cat.name}`} className="p-2 min-h-[44px] min-w-[44px] text-ink-faint hover:text-ink-muted hover:bg-elev rounded-lg transition-colors"><Edit2 className="w-4 h-4" aria-hidden="true" /></button>
+                                <button onClick={() => removeCategory(idx)} aria-label={`Excluir categoria: ${cat.name}`} className="p-2 min-h-[44px] min-w-[44px] text-ink-faint hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"><Trash2 className="w-4 h-4" aria-hidden="true" /></button>
                             </div>
                         </div>
                         {cat.description && (
@@ -228,11 +250,20 @@ export default function CategoriesEditor() {
             </div>
 
             {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" onClick={closeModal}>
-                    <div className="bg-surface rounded-3xl shadow-2xl w-full max-w-md" onClick={e => e.stopPropagation()}>
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/60 backdrop-blur-sm" onClick={closeModal} aria-hidden="true">
+                    <div
+                        ref={modalRef}
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="modal-cat-title"
+                        className="bg-surface rounded-lg w-full max-w-md"
+                        style={{ boxShadow: '0 20px 48px rgba(80,40,20,0.18)' }}
+                        onClick={e => e.stopPropagation()}
+                        aria-hidden="false"
+                    >
                         <div className="flex items-center justify-between p-6 border-b border-border">
-                            <h3 className="text-lg font-bold text-ink">{editingIndex !== null ? 'Editar Categoria' : 'Nova Categoria'}</h3>
-                            <button onClick={closeModal} className="text-ink-faint hover:text-ink-muted"><X className="w-5 h-5" aria-hidden="true" /></button>
+                            <h3 id="modal-cat-title" className="text-lg font-bold text-ink">{editingIndex !== null ? 'Editar Categoria' : 'Nova Categoria'}</h3>
+                            <button onClick={closeModal} aria-label="Fechar modal" className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-ink-faint hover:text-ink hover:bg-elev rounded transition-colors"><X className="w-5 h-5" aria-hidden="true" /></button>
                         </div>
                         <div className="p-6 space-y-4">
                             <div>
@@ -241,7 +272,7 @@ export default function CategoriesEditor() {
                                     type="text"
                                     value={tempName}
                                     onChange={e => handleNameChange(e.target.value)}
-                                    className="w-full bg-elev border border-border rounded-md px-4 py-3 text-ink font-bold focus:ring-2 focus:ring-indigo-500 outline-none"
+                                    className="w-full bg-elev border border-border rounded-md px-4 py-3 text-ink font-bold focus:ring-2 focus:ring-primary/30 outline-none"
                                     placeholder="Ex: Tecnologia, Saúde…"
                                     autoFocus
                                 />
@@ -249,9 +280,9 @@ export default function CategoriesEditor() {
                             <div>
                                 <label className="block text-[10px] font-bold text-ink-muted uppercase tracking-widest mb-2 flex items-center gap-2">
                                     Slug da URL
-                                    {!slugTouched && tempName && <span className="font-mono text-[9px] text-indigo-500 normal-case tracking-normal">(auto-gerado)</span>}
+                                    {!slugTouched && tempName && <span className="font-mono text-[9px] text-primary normal-case tracking-normal">(auto-gerado)</span>}
                                 </label>
-                                <div className="flex items-stretch gap-0 bg-elev border border-border rounded-md overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500">
+                                <div className="flex items-stretch gap-0 bg-elev border border-border rounded-md overflow-hidden focus-within:ring-2 focus-within:ring-primary/30">
                                     <span className="px-3 flex items-center font-mono text-xs text-ink-faint bg-elev border-r border-border">/categoria/</span>
                                     <input
                                         type="text"
@@ -271,14 +302,14 @@ export default function CategoriesEditor() {
                                     rows={2}
                                     value={tempDesc}
                                     onChange={e => setTempDesc(e.target.value)}
-                                    className="w-full bg-elev border border-border rounded-md px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none resize-y"
+                                    className="w-full bg-elev border border-border rounded-md px-4 py-3 text-sm focus:ring-2 focus:ring-primary/30 outline-none resize-y"
                                     placeholder="Breve descrição do tópico…"
                                 />
                             </div>
                         </div>
                         <div className="p-6 border-t border-border flex gap-3 justify-end">
                             <button onClick={closeModal} className="px-5 py-2.5 font-bold text-ink-muted hover:bg-elev rounded-md">Cancelar</button>
-                            <button onClick={saveModalCategory} className="px-6 py-2.5 font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-md shadow-md transition-all">Salvar Categoria</button>
+                            <button onClick={saveModalCategory} className="px-6 py-2.5 font-bold bg-primary hover:bg-primary text-white rounded-md shadow-md transition-all">Salvar Categoria</button>
                         </div>
                     </div>
                 </div>

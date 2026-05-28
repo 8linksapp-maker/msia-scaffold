@@ -75,7 +75,7 @@ export default function AuthorsEditor() {
     };
 
     if (loading) return (
-        <div className="flex flex-col items-center justify-center p-20 text-ink-faint bg-surface rounded-3xl border border-border">
+        <div className="flex flex-col items-center justify-center p-20 text-ink-faint bg-surface rounded-lg border border-border">
             <Loader2 className="w-8 h-8 animate-spin mb-4 text-amber-500" />
             <p className="font-medium animate-pulse">Lendo registros de autores...</p>
         </div>
@@ -103,7 +103,7 @@ export default function AuthorsEditor() {
             {error && <div className="p-5 bg-red-100/50 text-red-700 rounded-lg font-bold border border-red-200"><AlertCircle className="w-5 h-5 inline mr-2 -mt-1" /> {error}</div>}
 
             {authors.length === 0 ? (
-                <div className="bg-elev border-2 border-dashed border-border rounded-3xl p-16 flex flex-col items-center justify-center text-center w-full mt-6">
+                <div className="bg-elev border-2 border-dashed border-border rounded-lg p-16 flex flex-col items-center justify-center text-center w-full mt-6">
                     <div className="w-20 h-20 bg-surface rounded-full flex items-center justify-center text-ink-faint mb-4 shadow-sm"><Users className="w-10 h-10" /></div>
                     <h3 className="text-xl font-bold text-ink mb-2">Sua equipe está vazia!</h3>
                     <p className="text-ink-muted max-w-sm mx-auto mb-6">Adicione membros da equipe para que eles possam assinar os artigos do blog.</p>
@@ -160,8 +160,8 @@ export default function AuthorsEditor() {
             )}
 
             {isModalOpen && tempAuthor && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-                    <div className="bg-surface rounded-3xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/60 backdrop-blur-sm">
+                    <div className="bg-surface rounded-lg shadow-2xl w-full max-w-md overflow-hidden flex flex-col">
                         <div className="flex items-center justify-between p-6 border-b border-border bg-elev/50">
                             <h3 className="text-lg font-bold text-ink">{editingIndex !== null ? 'Editar Autor' : 'Novo Autor'}</h3>
                             <button onClick={() => setIsModalOpen(false)} className="w-8 h-8 bg-elev hover:bg-elev text-ink-muted rounded-full flex items-center justify-center"><X className="w-4 h-4" aria-hidden="true" /></button>

@@ -157,12 +157,15 @@ export default function MenuEditor() {
                         </div>
                         <button
                             type="button"
+                            role="switch"
+                            aria-checked={menuHoverEnabled}
+                            aria-label="Abrir submenu ao passar o mouse"
                             onClick={() => setMenuHoverEnabled(v => !v)}
-                            className={`relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none shrink-0 ${
-                                menuHoverEnabled ? 'bg-primary' : 'bg-elev'
+                            className={`relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 shrink-0 ${
+                                menuHoverEnabled ? 'bg-primary' : 'bg-elev border border-border'
                             }`}
                         >
-                            <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-surface rounded-full shadow transition-transform duration-200 ${
+                            <span aria-hidden="true" className={`absolute top-0.5 left-0.5 w-5 h-5 bg-surface rounded-full shadow transition-transform duration-200 ${
                                 menuHoverEnabled ? 'translate-x-5' : 'translate-x-0'
                             }`} />
                         </button>
@@ -171,7 +174,7 @@ export default function MenuEditor() {
             </div>
 
             {/* Info */}
-            <div className="bg-primary-soft border border-violet-100 rounded-md p-4 text-sm text-primary">
+            <div className="bg-primary-soft border border-border rounded-md p-4 text-sm text-primary">
                 <p className="font-semibold mb-1">Dicas</p>
                 <ul className="space-y-0.5 text-primary text-xs">
                     <li>• Itens com <strong>Mostrar categorias</strong> exibem uma lista suspensa com todas as categorias do blog</li>
@@ -197,15 +200,17 @@ export default function MenuEditor() {
                             <div className="flex flex-col gap-0.5 pt-0.5 shrink-0">
                                 <button
                                     onClick={() => moveUp(i)}
+                                    aria-label={`Mover item "${item.label}" para cima`}
                                     disabled={i === 0}
-                                    className="w-7 h-7 rounded-lg flex items-center justify-center text-ink-faint hover:text-ink hover:bg-elev disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                                    className="w-10 h-10 min-h-[44px] min-w-[44px] rounded flex items-center justify-center text-ink-faint hover:text-ink hover:bg-elev disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                                 >
                                     <ChevronUp className="w-4 h-4" aria-hidden="true" />
                                 </button>
                                 <button
                                     onClick={() => moveDown(i)}
+                                    aria-label={`Mover item "${item.label}" para baixo`}
                                     disabled={i === items.length - 1}
-                                    className="w-7 h-7 rounded-lg flex items-center justify-center text-ink-faint hover:text-ink hover:bg-elev disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                                    className="w-10 h-10 min-h-[44px] min-w-[44px] rounded flex items-center justify-center text-ink-faint hover:text-ink hover:bg-elev disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                                 >
                                     <ChevronDown className="w-4 h-4" aria-hidden="true" />
                                 </button>
@@ -242,8 +247,8 @@ export default function MenuEditor() {
                             {/* Delete */}
                             <button
                                 onClick={() => removeItem(i)}
-                                className="mt-5 w-8 h-8 rounded-md flex items-center justify-center text-ink-faint hover:text-red-500 hover:bg-red-50 transition-all shrink-0"
-                                title="Remover item"
+                                aria-label={`Remover item de menu: ${item.label}`}
+                                className="mt-1 w-10 h-10 min-h-[44px] min-w-[44px] rounded flex items-center justify-center text-ink-faint hover:text-red-600 hover:bg-red-50 transition-all shrink-0"
                             >
                                 <Trash2 className="w-4 h-4" aria-hidden="true" />
                             </button>
