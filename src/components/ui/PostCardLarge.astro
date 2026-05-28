@@ -10,37 +10,40 @@ interface Props {
 }
 
 const { title, description, slug, heroImage, category, pubDate } = Astro.props;
+
+const url = `${BLOG_BASE}/${slug}`;
+const date = pubDate.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: '2-digit' }).replace('.', '');
 ---
 
-<article class="group relative rounded-2xl overflow-hidden bg-white shadow-md hover:shadow-xl transition-shadow">
-  <!-- Imagem com overlay -->
-  <a href={`${BLOG_BASE}/${slug}`} class="block relative overflow-hidden aspect-[16/9]">
-    {heroImage ? (
+<article class="group bg-surface border border-border rounded-md overflow-hidden" style="box-shadow: 0 1px 2px 0 rgba(80, 40, 20, 0.04)">
+  {heroImage && (
+    <a href={url} class="block overflow-hidden aspect-[16/9]" tabindex="-1" aria-hidden="true">
       <img
         src={heroImage}
-        alt={title}
-        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        alt=""
+        loading="lazy"
+        class="w-full h-full object-cover transition-opacity duration-200 group-hover:opacity-90"
       />
-    ) : (
-      <div class="w-full h-full bg-gradient-to-br from-primary-100 to-accent-100"></div>
-    )}
-    <!-- Overlay gradient at bottom -->
-    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/20 to-transparent"></div>
+    </a>
+  )}
+  {!heroImage && (
+    <div class="aspect-[16/9] bg-elev"></div>
+  )}
 
-    <!-- Content overlay -->
-    <div class="absolute bottom-0 left-0 right-0 p-6">
-      {category && (
-        <span class="inline-block bg-primary-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-3 uppercase tracking-wider">
-          {category}
-        </span>
-      )}
-      <h2 class="text-white font-bold text-xl leading-snug line-clamp-2 group-hover:text-primary-200 transition-colors">
-        {title}
-      </h2>
-      <p class="text-white/70 text-sm mt-2 line-clamp-2">{description}</p>
-      <p class="text-white/50 text-xs mt-3 post-date">
-        {pubDate.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
-      </p>
+  <div class="p-5 md:p-6">
+    {category && (
+      <p class="mono uppercase text-xs text-ink-faint mb-2">{category}</p>
+    )}
+    <h2 class="font-display font-normal text-xl leading-snug tracking-tight line-clamp-2">
+      <a href={url} class="text-ink hover:text-primary transition-colors">{title}</a>
+    </h2>
+    <p class="text-sm text-ink-muted leading-relaxed line-clamp-3 mt-2">{description}</p>
+    <div class="flex items-center justify-between mt-4 pt-4 border-t border-rule">
+      <span class="mono text-xs text-ink-faint">{date}</span>
+      <a href={url} class="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-ink transition-colors">
+        Ler
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
     </div>
-  </a>
+  </div>
 </article>

@@ -43,7 +43,7 @@ const isActive = (href: string) => href === '/' ? pathname === '/' : pathname.st
               {item.label}
               <svg width="10" height="10" viewBox="0 0 10 10" class="opacity-60" aria-hidden="true"><path d="M1 3l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
             </button>
-            <ul class="absolute top-full left-1/2 -translate-x-1/2 mt-2 min-w-[200px] bg-elev border border-rule rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all py-2 z-50 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.5)]">
+            <ul class="absolute top-full left-1/2 -translate-x-1/2 mt-2 min-w-[200px] bg-elev border border-rule rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all py-2 z-50 shadow-[0_8px_24px_-12px_rgba(80,40,20,0.18)]">
               <li><a href={item.href} class="block px-4 py-2 text-sm text-ink hover:text-primary">Todos os artigos</a></li>
               {allCategories.map((cat) => (
                 <li><a href={`/categoria/${cat.slug}`} class="block px-4 py-2 text-sm text-ink hover:text-primary">{cat.name}</a></li>
