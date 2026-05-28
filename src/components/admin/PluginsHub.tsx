@@ -31,9 +31,9 @@ export default function PluginsHub({ registry }: Props) {
         return (
             <div className="text-center py-16 bg-surface border border-dashed border-border rounded-lg">
                 <Package className="w-10 h-10 text-ink-faint mx-auto mb-3" aria-hidden="true" />
-                <h3 className="text-base font-semibold text-ink mb-1">Nenhuma integração disponível</h3>
+                <h3 className="text-base font-semibold text-ink mb-1">Nenhum plugin disponível</h3>
                 <p className="text-sm text-ink-muted max-w-xs mx-auto">
-                    As integrações aparecerão aqui quando forem configuradas para este site.
+                    Os plugins aparecerão aqui quando forem configurados para este site.
                 </p>
             </div>
         );

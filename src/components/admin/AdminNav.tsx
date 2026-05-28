@@ -130,10 +130,10 @@ export default function AdminNav({ activeSection = '', extraItems = [] }: AdminN
                     ))}
                 </div>
 
-                {/* Integrações + Config */}
+                {/* Plugins + Config */}
                 <div role="group" aria-labelledby="nav-config">
                     <p id="nav-config" className="text-[10px] font-bold text-ink-faint uppercase tracking-widest px-3 mb-1.5">Configurações</p>
-                    <NavLink item={{ label: 'Integrações', href: '/admin/plugins', icon: Package, section: 'plugins' }} active={activeSection === 'plugins'} />
+                    <NavLink item={{ label: 'Plugins', href: '/admin/plugins', icon: Package, section: 'plugins' }} active={activeSection === 'plugins'} />
                     <NavLink item={{ label: 'Configurações', href: '/admin/config', icon: Settings, section: 'config' }} active={activeSection === 'config'} />
                     <NavLink item={{ label: 'Backup', href: '/admin/backup', icon: FileArchive, section: 'backup' }} active={activeSection === 'backup'} />
                 </div>
