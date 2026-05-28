@@ -2,7 +2,7 @@ import React from 'react';
 import {
     FileText, Tag, Users, Info, Phone,
     Shield, Settings, LogOut, ExternalLink, Navigation,
-    Package, FileArchive, PenLine, ChevronRight, Home,
+    Package, FileArchive, PenLine, ChevronRight, Home, Sparkles,
 } from 'lucide-react';
 
 interface NavItem {
@@ -103,6 +103,12 @@ export default function AdminNav({ activeSection = '', extraItems = [] }: AdminN
                             href="/admin/authors"
                             icon={Users}
                             active={activeSection === 'authors'}
+                        />
+                        <SubNavLink
+                            label="Gerar com IA"
+                            href="/admin/ai"
+                            icon={Sparkles}
+                            active={activeSection === 'ai'}
                         />
                         {extraItems.map(item => (
                             <SubNavLink

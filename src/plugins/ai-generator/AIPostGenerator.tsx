@@ -1,154 +1,198 @@
-﻿/**
- * AIPostGenerator.tsx — Plugin AI Generator (Walker)
- *
- * UI React para geração de posts com IA.
- * Adaptado do CNX para o estilo visual do Walker (white/slate/violet).
- */
-
 import { useState, useEffect } from 'react';
-import { Sparkles, Loader2, AlertCircle, ArrowLeft, Plus, Trash2, ChevronUp, ChevronDown, ChevronRight } from 'lucide-react';
+import { Loader2, AlertCircle, Plus, Trash2, ChevronUp, ChevronDown, ChevronRight, Settings, CheckCircle2 } from 'lucide-react';
 import { triggerToast } from '../../components/admin/CmsToaster';
 
-interface Author {
-    slug: string;
-    name: string;
-}
+interface Author   { slug: string; name: string; }
+interface Category { slug: string; name: string; }
 
-interface Category {
-    slug: string;
-    name: string;
-}
-
-interface Outline {
-    level: 'h1' | 'h2' | 'h3' | 'h4';
+interface Section {
     text: string;
-    minWords?: number;
+    size: 'short' | 'medium' | 'long';
 }
 
-interface Product {
-    name: string;
-    imageUrl: string;
-}
+interface CommercialOutline { type: 'outline'; text: string; }
+interface CommercialProduct { type: 'product'; name: string; imageUrl: string; }
+type CommercialItem = CommercialOutline | CommercialProduct;
 
-type CommercialItem =
-    | { type: 'outline'; level: 'h1' | 'h2' | 'h3' | 'h4'; text: string; minWords?: number }
-    | { type: 'product'; name: string; imageUrl: string };
+type PostType        = 'informational' | 'commercial';
+type CommercialSub   = 'guia-melhores' | 'review';
 
-type CommercialSubType = 'guia-melhores' | 'spr';
+// Mapeamento de tamanho → minWords para o back-end
+const SIZE_WORDS: Record<Section['size'], number> = { short: 150, medium: 350, long: 650 };
+
+const SIZE_OPTIONS: { id: Section['size']; label: string; hint: string }[] = [
+    { id: 'short',  label: 'Curto',  hint: '~150 palavras' },
+    { id: 'medium', label: 'Médio',  hint: '~350 palavras' },
+    { id: 'long',   label: 'Longo',  hint: '~650 palavras' },
+];
+
+// Templates de estrutura para post informacional
+const STRUCTURE_TEMPLATES = [
+    {
+        label: 'Tutorial',
+        sections: ['O que é e para que serve', 'O que você precisa antes de começar', 'Passo a passo', 'Erros comuns e como evitar', 'Próximos passos'],
+    },
+    {
+        label: 'Guia completo',
+        sections: ['O que é', 'Por que isso importa', 'Como fazer na prática', 'Exemplos reais', 'Dúvidas frequentes'],
+    },
+    {
+        label: 'Artigo de opinião',
+        sections: ['Contexto e situação atual', 'Por que discordo / concordo', 'Os principais argumentos', 'O que os especialistas dizem', 'Minha conclusão'],
+    },
+];
 
 interface Props {
     authors: Author[];
     categories: Category[];
+    hasApiKey?: boolean;
 }
 
-export default function AIPostGenerator({ authors, categories }: Props) {
-    const [isMounted, setIsMounted] = useState(false);
-    const [postType, setPostType] = useState<'informational' | 'commercial'>('informational');
-    const [commercialSubType, setCommercialSubType] = useState<CommercialSubType>('guia-melhores');
-    const [title, setTitle] = useState('');
-    const [slug, setSlug] = useState('');
-    const [author, setAuthor] = useState('');
-    const [category, setCategory] = useState('');
-    const [outlines, setOutlines] = useState<Outline[]>([]);
+export default function AIPostGenerator({ authors, categories, hasApiKey = true }: Props) {
+    const [isMounted,       setIsMounted]       = useState(false);
+    const [postType,        setPostType]        = useState<PostType>('informational');
+    const [commercialSub,   setCommercialSub]   = useState<CommercialSub>('guia-melhores');
+    const [title,           setTitle]           = useState('');
+    const [slug,            setSlug]            = useState('');
+    const [author,          setAuthor]          = useState('');
+    const [category,        setCategory]        = useState('');
+    const [sections,        setSections]        = useState<Section[]>([]);
     const [commercialItems, setCommercialItems] = useState<CommercialItem[]>([]);
-    const [isGenerating, setIsGenerating] = useState(false);
-    const [progress, setProgress] = useState('');
-    const [progressSection, setProgressSection] = useState<{ current: number; total: number; name: string } | null>(null);
-    const [error, setError] = useState('');
-    const [showAdvancedOutlines, setShowAdvancedOutlines] = useState(false);
+    const [isGenerating,    setIsGenerating]    = useState(false);
+    const [progressMsg,     setProgressMsg]     = useState('');
+    const [progressSec,     setProgressSec]     = useState<{ current: number; total: number; name: string } | null>(null);
+    const [fieldErrors,     setFieldErrors]     = useState<Record<string, string>>({});
+    const [showTemplates,   setShowTemplates]   = useState(false);
+    const [showAdvanced,    setShowAdvanced]    = useState(false);
 
     useEffect(() => { setIsMounted(true); }, []);
 
+    // Auto-slug a partir do título (só enquanto o usuário não editou o slug manualmente)
+    const [slugEdited, setSlugEdited] = useState(false);
     useEffect(() => {
-        if (title && !slug) {
-            setSlug(title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''));
+        if (!slugEdited && title) {
+            setSlug(
+                title.toLowerCase()
+                    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+                    .replace(/[^a-z0-9]+/g, '-')
+                    .replace(/^-+|-+$/g, '')
+            );
         }
-    }, [title, slug]);
+    }, [title, slugEdited]);
 
     if (!isMounted) return (
         <div className="flex items-center justify-center p-20 text-ink-faint">
-            <Loader2 className="w-6 h-6 animate-spin mr-3" />
-            Carregando gerador...
+            <Loader2 className="w-6 h-6 animate-spin mr-3" aria-hidden="true" />
+            Carregando...
         </div>
     );
 
-    const inputClass = 'w-full bg-surface border border-border rounded-md px-4 py-3 text-sm font-medium text-ink focus:outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/20/20 transition-all shadow-sm';
-    const labelClass = 'block text-sm font-bold text-ink-muted uppercase tracking-wider mb-2 ml-1';
+    const inputClass = 'w-full bg-surface border border-border rounded-md px-4 py-3 text-sm text-ink focus:outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/20 transition-all';
+    const labelClass = 'block text-xs font-semibold text-ink-faint uppercase tracking-widest mb-2';
 
-    // Outline management
-    const addOutline = (level: Outline['level']) => setOutlines([...outlines, { level, text: '' }]);
-    const updateOutline = (i: number, updates: Partial<Outline>) => {
-        const next = [...outlines];
-        Object.assign(next[i], updates);
-        setOutlines(next);
+    // ── Seções ─────────────────────────────────────────────────────────────────
+    const addSection = (text = '') =>
+        setSections(s => [...s, { text, size: 'medium' }]);
+
+    const applyTemplate = (tmpl: typeof STRUCTURE_TEMPLATES[number]) => {
+        setSections(tmpl.sections.map(t => ({ text: t, size: 'medium' as const })));
+        setShowTemplates(false);
     };
-    const removeOutline = (i: number) => setOutlines(outlines.filter((_, idx) => idx !== i));
-    const moveOutline = (i: number, dir: 'up' | 'down') => {
-        if (dir === 'up' && i === 0) return;
-        if (dir === 'down' && i === outlines.length - 1) return;
-        const next = [...outlines];
+
+    const updateSection = (i: number, patch: Partial<Section>) =>
+        setSections(s => s.map((x, idx) => idx === i ? { ...x, ...patch } : x));
+
+    const removeSection = (i: number) =>
+        setSections(s => s.filter((_, idx) => idx !== i));
+
+    const moveSection = (i: number, dir: 'up' | 'down') => {
+        const next = [...sections];
         const t = dir === 'up' ? i - 1 : i + 1;
+        if (t < 0 || t >= next.length) return;
         [next[i], next[t]] = [next[t], next[i]];
-        setOutlines(next);
+        setSections(next);
     };
 
-    // Commercial items management
-    const addCommercialItem = (type: 'outline' | 'product', level?: Outline['level']) => {
-        if (type === 'outline' && level) setCommercialItems([...commercialItems, { type: 'outline', level, text: '' }]);
-        else setCommercialItems([...commercialItems, { type: 'product', name: '', imageUrl: '' }]);
-    };
-    const updateCommercialItem = (i: number, updates: any) => {
-        const next = [...commercialItems];
-        Object.assign(next[i], updates);
-        setCommercialItems(next);
-    };
-    const removeCommercialItem = (i: number) => setCommercialItems(commercialItems.filter((_, idx) => idx !== i));
+    // ── Items comerciais ───────────────────────────────────────────────────────
+    const addCommercialSection = () =>
+        setCommercialItems(c => [...c, { type: 'outline', text: '' }]);
+
+    const addCommercialProduct = () =>
+        setCommercialItems(c => [...c, { type: 'product', name: '', imageUrl: '' }]);
+
+    const updateCommercialItem = (i: number, patch: Partial<CommercialItem>) =>
+        setCommercialItems(c => c.map((x, idx) => idx === i ? { ...x, ...patch } as CommercialItem : x));
+
+    const removeCommercialItem = (i: number) =>
+        setCommercialItems(c => c.filter((_, idx) => idx !== i));
+
     const moveCommercialItem = (i: number, dir: 'up' | 'down') => {
-        if (dir === 'up' && i === 0) return;
-        if (dir === 'down' && i === commercialItems.length - 1) return;
         const next = [...commercialItems];
         const t = dir === 'up' ? i - 1 : i + 1;
+        if (t < 0 || t >= next.length) return;
         [next[i], next[t]] = [next[t], next[i]];
         setCommercialItems(next);
     };
 
-    const handleGenerate = async () => {
-        if (!title || !slug) { setError('Título e slug são obrigatórios.'); return; }
-        if (!author) { setError('Selecione um autor.'); return; }
-        if (!category) { setError('Selecione uma categoria.'); return; }
-        if (postType === 'commercial') {
-            const hasValid = commercialItems.some(i => i.type === 'outline' ? i.text?.trim() : i.name?.trim());
-            if (!hasValid) { setError('Adicione pelo menos um produto ou outline.'); return; }
+    // ── Validação ──────────────────────────────────────────────────────────────
+    const validate = (): boolean => {
+        const errs: Record<string, string> = {};
+        if (!title.trim())    errs.title    = 'Digite o título do artigo.';
+        if (!slug.trim())     errs.slug     = 'A URL é obrigatória.';
+        if (!author)          errs.author   = 'Selecione um autor.';
+        if (!category)        errs.category = 'Selecione uma categoria.';
+        if (postType === 'informational') {
+            if (sections.length === 0)
+                errs.sections = 'Adicione pelo menos uma seção antes de gerar.';
+            else if (sections.some(s => !s.text.trim()))
+                errs.sections = 'Preencha o título de todas as seções.';
         } else {
-            if (!outlines.length || outlines.some(o => !o.text.trim())) {
-                setError('Adicione pelo menos uma outline preenchida.'); return;
-            }
+            const hasItem = commercialItems.some(i =>
+                i.type === 'outline' ? (i as CommercialOutline).text?.trim() : (i as CommercialProduct).name?.trim()
+            );
+            if (!hasItem) errs.structure = 'Adicione pelo menos uma seção ou produto.';
         }
+        setFieldErrors(errs);
+        return Object.keys(errs).length === 0;
+    };
 
-        setError('');
+    // ── Geração ────────────────────────────────────────────────────────────────
+    const handleGenerate = async () => {
+        if (!validate()) return;
+
         setIsGenerating(true);
-        setProgress('Gerando artigo... isso pode levar 1–2 minutos.');
-        setProgressSection(null);
+        setProgressMsg('Iniciando geração...');
+        setProgressSec(null);
+
+        // Converte sections para o formato de outline esperado pelo back-end
+        const outlines = sections.map(s => ({
+            level: 'h2' as const,
+            text: s.text,
+            minWords: SIZE_WORDS[s.size],
+        }));
 
         try {
-            const response = await fetch('/api/admin/plugins/ai/generate', {
+            const res = await fetch('/api/admin/plugins/ai/generate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     postType,
-                    commercialSubType: postType === 'commercial' ? commercialSubType : undefined,
-                    title, slug, author, category,
-                    outlines: postType === 'informational' ? outlines : undefined,
-                    commercialItems: postType === 'commercial' ? commercialItems : undefined,
+                    commercialSubType: postType === 'commercial' ? commercialSub : undefined,
+                    title: title.trim(),
+                    slug: slug.trim(),
+                    author,
+                    category,
+                    outlines:         postType === 'informational' ? outlines : undefined,
+                    commercialItems:  postType === 'commercial' ? commercialItems : undefined,
                 }),
             });
 
-            if (!response.ok) {
-                const err = await response.json().catch(() => ({}));
-                throw new Error(err.error || `Erro ${response.status}`);
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                throw new Error(err.error || `Erro ${res.status}`);
             }
 
-            const reader = response.body?.getReader();
+            const reader  = res.body?.getReader();
             const decoder = new TextDecoder();
             let buffer = '';
 
@@ -160,321 +204,521 @@ export default function AIPostGenerator({ authors, categories }: Props) {
                     const lines = buffer.split('\n');
                     buffer = lines.pop() || '';
                     for (const line of lines) {
-                        if (line.startsWith('data: ')) {
-                            try {
-                                const data = JSON.parse(line.slice(6));
-                                if (data.step === 'progress') {
-                                    setProgress(data.message);
-                                    if (data.sectionCurrent && data.sectionTotal && data.sectionName) {
-                                        setProgressSection({ current: data.sectionCurrent, total: data.sectionTotal, name: data.sectionName });
-                                    }
+                        if (!line.startsWith('data: ')) continue;
+                        try {
+                            const data = JSON.parse(line.slice(6));
+                            if (data.step === 'progress') {
+                                setProgressMsg(data.message || '');
+                                if (data.sectionCurrent && data.sectionTotal && data.sectionName) {
+                                    setProgressSec({ current: data.sectionCurrent, total: data.sectionTotal, name: data.sectionName });
                                 }
-                                if (data.step === 'done') {
-                                    setProgress('Post publicado com sucesso!');
-                                    triggerToast(`Post "${data.title}" publicado!`, 'success');
-                                    setTimeout(() => { window.location.href = '/admin/posts'; }, 2000);
-                                    return;
-                                }
-                                if (data.step === 'error') throw new Error(data.error);
-                            } catch (e) {
-                                if (e instanceof Error && e.message !== 'Unexpected end of JSON input') throw e;
                             }
+                            if (data.step === 'done') {
+                                setProgressMsg('Artigo publicado!');
+                                triggerToast(`"${data.title}" publicado com sucesso.`, 'success');
+                                setTimeout(() => { window.location.href = '/admin/posts'; }, 2000);
+                                return;
+                            }
+                            if (data.step === 'error') throw new Error(data.error);
+                        } catch (e) {
+                            if (e instanceof Error && e.message !== 'Unexpected end of JSON input') throw e;
                         }
                     }
                 }
             }
         } catch (err: any) {
-            setError(err.message || 'Erro ao gerar post');
-            setProgress('');
-            setProgressSection(null);
+            setFieldErrors({ _global: err.message || 'Erro ao gerar artigo. Tente novamente.' });
+            setProgressMsg('');
+            setProgressSec(null);
         } finally {
             setIsGenerating(false);
         }
     };
 
-    const levelColors: Record<string, string> = {
-        h1: 'bg-primary-soft text-primary',
-        h2: 'bg-blue-100 text-blue-700',
-        h3: 'bg-green-100 text-green-700',
-        h4: 'bg-amber-100 text-amber-700',
-    };
+    const canGenerate = !isGenerating;
 
-    const canGenerate = title && slug && author && category && (
-        postType === 'informational'
-            ? outlines.length > 0 && outlines.every(o => o.text.trim())
-            : commercialItems.some(i => i.type === 'outline' ? i.text?.trim() : i.name?.trim())
-    );
-
+    // ── Render ─────────────────────────────────────────────────────────────────
     return (
         <div className="max-w-3xl pb-16 space-y-6">
-            {/* Header */}
-            <div className="flex items-center justify-between bg-surface p-4 px-6 rounded-lg border border-border shadow-sm">
-                <div className="flex items-center gap-3">
-                    <a href="/admin/posts" className="text-ink-faint hover:text-primary transition-colors p-1.5 rounded-lg hover:bg-primary-soft">
-                        <ArrowLeft className="w-5 h-5" aria-hidden="true" />
-                    </a>
-                    <div>
-                        <h2 className="text-lg font-bold text-ink">Gerar Post com IA</h2>
-                        <p className="text-xs text-ink-faint">Conteúdo criado automaticamente por inteligência artificial</p>
-                    </div>
-                </div>
-                <Sparkles className="w-6 h-6 text-primary" />
-            </div>
 
-            {/* Tipo de Post */}
-            <div className="bg-surface rounded-lg border border-border shadow-sm p-6">
-                <p className={labelClass}>Tipo de Post</p>
-                <div className="grid grid-cols-2 gap-3">
-                    {[
-                        { id: 'informational', label: 'Post Informacional', desc: 'Artigos educativos e informativos', icon: '📚' },
-                        { id: 'commercial', label: 'Post Comercial', desc: 'Guias e reviews focados em conversão', icon: '💼' },
-                    ].map(t => (
+            {/* Banner: API key não configurada */}
+            {!hasApiKey && (
+                <div role="alert" className="flex items-start gap-3 p-5 bg-amber-50 border border-amber-200 rounded-md">
+                    <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" aria-hidden="true" />
+                    <div>
+                        <p className="font-semibold text-amber-800 text-sm">Configuração necessária</p>
+                        <p className="text-amber-700 text-xs mt-1 leading-relaxed">
+                            Configure a chave da IA antes de gerar artigos.
+                        </p>
                         <button
-                            key={t.id}
                             type="button"
-                            onClick={() => setPostType(t.id as any)}
-                            className={`p-4 rounded-md border-2 text-left transition-all ${postType === t.id ? 'border-primary/80 bg-primary-soft' : 'border-border hover:border-border'}`}
+                            onClick={() => {
+                                // Ativa a aba de configurações
+                                const tab = document.getElementById('tab-settings');
+                                if (tab) (tab as HTMLButtonElement).click();
+                            }}
+                            className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-amber-800 hover:underline"
                         >
-                            <div className="text-2xl mb-1">{t.icon}</div>
-                            <div className="font-bold text-ink text-sm">{t.label}</div>
-                            <div className="text-xs text-ink-muted">{t.desc}</div>
+                            <Settings className="w-3.5 h-3.5" aria-hidden="true" />
+                            Configurar agora
                         </button>
-                    ))}
+                    </div>
                 </div>
+            )}
 
-                {postType === 'commercial' && (
-                    <div className="mt-4 pt-4 border-t border-border">
-                        <p className={labelClass}>Sub-tipo Comercial</p>
-                        <div className="grid grid-cols-2 gap-3">
-                            {[
-                                { id: 'guia-melhores', label: 'Guia dos melhores', desc: 'Listas ranqueadas (ex: Os 10 melhores X)', icon: '📋' },
-                                { id: 'spr', label: 'SPR — Single Product Review', desc: 'Review de um único produto/serviço', icon: '⭐' },
-                            ].map(s => (
-                                <button
-                                    key={s.id}
-                                    type="button"
-                                    onClick={() => setCommercialSubType(s.id as CommercialSubType)}
-                                    className={`p-3 rounded-md border-2 text-left transition-all ${commercialSubType === s.id ? 'border-primary/80 bg-primary-soft' : 'border-border hover:border-border'}`}
-                                >
-                                    <div className="text-xl mb-1">{s.icon}</div>
-                                    <div className="font-bold text-ink text-xs">{s.label}</div>
-                                    <div className="text-xs text-ink-muted">{s.desc}</div>
-                                </button>
-                            ))}
+            {/* 1 ─ Tipo de artigo */}
+            <section aria-labelledby="section-type">
+                <div className="bg-surface rounded-lg border border-border p-6" style={{ boxShadow: '0 1px 2px rgba(80,40,20,0.04)' }}>
+                    <p id="section-type" className={labelClass}>1. Tipo de artigo</p>
+                    <div className="grid grid-cols-2 gap-3 mt-3">
+                        {[
+                            {
+                                id: 'informational' as PostType,
+                                label: 'Artigo informativo',
+                                desc: 'Tutorial, guia, explicação, opinião. Foco em educar e informar.',
+                            },
+                            {
+                                id: 'commercial' as PostType,
+                                label: 'Artigo comercial',
+                                desc: 'Review, comparativo, guia de compra. Foco em recomendar produtos.',
+                            },
+                        ].map(t => (
+                            <button
+                                key={t.id}
+                                type="button"
+                                onClick={() => setPostType(t.id)}
+                                className={`p-4 rounded-md border-2 text-left transition-all ${postType === t.id ? 'border-primary bg-primary-soft' : 'border-border hover:border-primary/40'}`}
+                                aria-pressed={postType === t.id}
+                            >
+                                <p className="font-semibold text-ink text-sm">{t.label}</p>
+                                <p className="text-xs text-ink-muted mt-1 leading-relaxed">{t.desc}</p>
+                            </button>
+                        ))}
+                    </div>
+
+                    {postType === 'commercial' && (
+                        <div className="mt-4 pt-4 border-t border-border">
+                            <p className={labelClass}>Formato</p>
+                            <div className="grid grid-cols-2 gap-3 mt-2">
+                                {[
+                                    { id: 'guia-melhores' as CommercialSub, label: 'Guia dos melhores', desc: 'Lista ranqueada — ex: "Os 7 melhores notebooks de 2025"' },
+                                    { id: 'review' as CommercialSub, label: 'Review de produto', desc: 'Análise completa de um único produto ou serviço' },
+                                ].map(s => (
+                                    <button
+                                        key={s.id}
+                                        type="button"
+                                        onClick={() => setCommercialSub(s.id)}
+                                        className={`p-3 rounded-md border-2 text-left transition-all ${commercialSub === s.id ? 'border-primary bg-primary-soft' : 'border-border hover:border-primary/40'}`}
+                                        aria-pressed={commercialSub === s.id}
+                                    >
+                                        <p className="font-semibold text-ink text-xs">{s.label}</p>
+                                        <p className="text-xs text-ink-faint mt-0.5 leading-relaxed">{s.desc}</p>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </section>
+
+            {/* 2 ─ Informações básicas */}
+            <section aria-labelledby="section-info">
+                <div className="bg-surface rounded-lg border border-border p-6 space-y-4" style={{ boxShadow: '0 1px 2px rgba(80,40,20,0.04)' }}>
+                    <p id="section-info" className={labelClass}>2. Informações do artigo</p>
+
+                    {/* Título */}
+                    <div>
+                        <label htmlFor="ai-title" className="block text-sm font-medium text-ink mb-1.5">
+                            Título <span className="text-red-500" aria-hidden="true">*</span>
+                        </label>
+                        <input
+                            id="ai-title"
+                            type="text"
+                            value={title}
+                            onChange={e => setTitle(e.target.value)}
+                            className={`${inputClass} ${fieldErrors.title ? 'border-red-400' : ''}`}
+                            placeholder="Ex: Como criar um blog do zero em 2025"
+                            aria-describedby={fieldErrors.title ? 'err-title' : undefined}
+                            aria-invalid={!!fieldErrors.title}
+                        />
+                        {fieldErrors.title && <p id="err-title" role="alert" className="text-xs text-red-600 mt-1.5">{fieldErrors.title}</p>}
+                    </div>
+
+                    {/* URL */}
+                    <div>
+                        <label htmlFor="ai-slug" className="block text-sm font-medium text-ink mb-1.5">
+                            URL do artigo <span className="text-red-500" aria-hidden="true">*</span>
+                        </label>
+                        <div className="flex items-stretch gap-0 border border-border rounded-md overflow-hidden focus-within:border-primary/80 transition-colors" style={{ borderColor: fieldErrors.slug ? '#f87171' : undefined }}>
+                            <span className="px-3 flex items-center text-xs text-ink-faint bg-elev border-r border-border font-mono shrink-0">
+                                /
+                            </span>
+                            <input
+                                id="ai-slug"
+                                type="text"
+                                value={slug}
+                                onChange={e => { setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-')); setSlugEdited(true); }}
+                                className="flex-1 bg-transparent px-3 py-3 text-sm text-ink font-mono focus:outline-none"
+                                placeholder="como-criar-um-blog"
+                                aria-describedby="slug-hint"
+                                aria-invalid={!!fieldErrors.slug}
+                            />
+                        </div>
+                        <p id="slug-hint" className="text-xs text-ink-faint mt-1">
+                            Gerado automaticamente — pode editar.
+                        </p>
+                        {fieldErrors.slug && <p role="alert" className="text-xs text-red-600 mt-1">{fieldErrors.slug}</p>}
+                    </div>
+
+                    {/* Autor + Categoria */}
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label htmlFor="ai-author" className="block text-sm font-medium text-ink mb-1.5">
+                                Autor <span className="text-red-500" aria-hidden="true">*</span>
+                            </label>
+                            <select
+                                id="ai-author"
+                                value={author}
+                                onChange={e => setAuthor(e.target.value)}
+                                className={`${inputClass} ${fieldErrors.author ? 'border-red-400' : ''}`}
+                                aria-invalid={!!fieldErrors.author}
+                            >
+                                <option value="">Selecione</option>
+                                {authors.length === 0 && <option disabled>Nenhum autor cadastrado</option>}
+                                {authors.map(a => <option key={a.slug} value={a.slug}>{a.name}</option>)}
+                            </select>
+                            {fieldErrors.author && <p role="alert" className="text-xs text-red-600 mt-1">{fieldErrors.author}</p>}
+                        </div>
+                        <div>
+                            <label htmlFor="ai-category" className="block text-sm font-medium text-ink mb-1.5">
+                                Categoria <span className="text-red-500" aria-hidden="true">*</span>
+                            </label>
+                            <select
+                                id="ai-category"
+                                value={category}
+                                onChange={e => setCategory(e.target.value)}
+                                className={`${inputClass} ${fieldErrors.category ? 'border-red-400' : ''}`}
+                                aria-invalid={!!fieldErrors.category}
+                            >
+                                <option value="">Selecione</option>
+                                {categories.length === 0 && <option disabled>Nenhuma categoria cadastrada</option>}
+                                {categories.map(c => <option key={c.slug} value={c.slug}>{c.name}</option>)}
+                            </select>
+                            {fieldErrors.category && <p role="alert" className="text-xs text-red-600 mt-1">{fieldErrors.category}</p>}
                         </div>
                     </div>
-                )}
-            </div>
+                </div>
+            </section>
 
-            {/* Informações básicas */}
-            <div className="bg-surface rounded-lg border border-border shadow-sm p-6 space-y-4">
-                <p className={labelClass}>Informações Básicas</p>
-                <div>
-                    <label className="block text-sm font-medium text-ink mb-1.5">Título *</label>
-                    <input type="text" value={title} onChange={e => setTitle(e.target.value)} className={inputClass} placeholder="Ex: Como Cuidar da Sua Saúde Mental" />
-                </div>
-                <div>
-                    <label className="block text-sm font-medium text-ink mb-1.5">Slug *</label>
-                    <input type="text" value={slug} onChange={e => setSlug(e.target.value)} className={`${inputClass} font-mono`} placeholder="como-cuidar-da-sua-saude-mental" />
-                    <p className="text-xs text-ink-faint mt-1 ml-1">Gerado automaticamente do título — pode editar.</p>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-sm font-medium text-ink mb-1.5">Autor *</label>
-                        <select value={author} onChange={e => setAuthor(e.target.value)} className={inputClass}>
-                            <option value="">Selecione um autor</option>
-                            {authors.map(a => <option key={a.slug} value={a.slug}>{a.name}</option>)}
-                        </select>
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-ink mb-1.5">Categoria *</label>
-                        <select value={category} onChange={e => setCategory(e.target.value)} className={inputClass}>
-                            <option value="">Selecione uma categoria</option>
-                            {categories.map(c => <option key={c.slug} value={c.slug}>{c.name}</option>)}
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            {/* Estrutura — Informacional */}
+            {/* 3 ─ Estrutura — informacional */}
             {postType === 'informational' && (
-                <div className="bg-surface rounded-lg border border-border shadow-sm p-6">
-                    <div className="flex items-center justify-between mb-4">
-                        <div>
-                            <p className={labelClass}>Seções do artigo</p>
-                            <p className="text-xs text-ink-faint ml-1">Introdução e conclusão são geradas automaticamente.</p>
-                        </div>
-                        <div className="flex flex-col items-end gap-1.5">
-                            <button
-                                type="button"
-                                onClick={() => addOutline('h2')}
-                                className="px-3 py-1.5 rounded-lg text-xs font-bold bg-primary text-white hover:opacity-90 transition-opacity flex items-center gap-1"
-                            >
-                                <Plus className="w-3 h-3" aria-hidden="true" /> Adicionar seção
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setShowAdvancedOutlines(v => !v)}
-                                className="flex items-center gap-0.5 text-xs text-ink-faint hover:text-ink-muted transition-colors"
-                            >
-                                <ChevronRight className={`w-3 h-3 transition-transform ${showAdvancedOutlines ? 'rotate-90' : ''}`} />
-                                Opções avançadas
-                            </button>
-                            {showAdvancedOutlines && (
-                                <div className="flex gap-1.5">
-                                    {(['h1','h3','h4'] as Outline['level'][]).map(l => (
-                                        <button key={l} type="button" onClick={() => addOutline(l)} className={`px-2.5 py-1 rounded-lg text-xs font-bold ${levelColors[l]} hover:opacity-80 transition-opacity`}>
-                                            +{l.toUpperCase()}
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                    {outlines.length > 0 ? (
-                        <div className="space-y-2">
-                            {outlines.map((o, i) => (
-                                <div key={i} className="flex items-center gap-2 p-3 bg-elev rounded-md border border-border">
-                                    <span className={`px-2 py-1 rounded text-xs font-bold shrink-0 ${levelColors[o.level]}`}>{o.level.toUpperCase()}</span>
-                                    <input type="text" value={o.text} onChange={e => updateOutline(i, { text: e.target.value })} className="flex-1 bg-surface border border-border rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-primary/80" placeholder={`Título do ${o.level.toUpperCase()}...`} />
-                                    <input type="number" min={50} max={2000} value={o.minWords ?? ''} onChange={e => { const v = parseInt(e.target.value); updateOutline(i, { minWords: isNaN(v) ? undefined : Math.max(50, Math.min(2000, v)) }); }} className="w-20 bg-surface border border-border rounded-lg px-2 py-1.5 text-xs text-center focus:outline-none focus:border-primary/80" placeholder="100-150" title="Palavras alvo" />
-                                    <div className="flex flex-col gap-0.5">
-                                        <button type="button" onClick={() => moveOutline(i, 'up')} disabled={i === 0} className="text-ink-faint hover:text-ink-muted disabled:opacity-20"><ChevronUp className="w-3.5 h-3.5" /></button>
-                                        <button type="button" onClick={() => moveOutline(i, 'down')} disabled={i === outlines.length - 1} className="text-ink-faint hover:text-ink-muted disabled:opacity-20"><ChevronDown className="w-3.5 h-3.5" /></button>
-                                    </div>
-                                    <button type="button" onClick={() => removeOutline(i)} className="text-red-400 hover:text-red-600 transition-colors"><Trash2 className="w-4 h-4" aria-hidden="true" /></button>
-                                </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="text-center py-8 border-2 border-dashed border-border rounded-md">
-                            <p className="text-ink-faint text-sm mb-1">Nenhuma seção adicionada</p>
-                            <p className="text-ink-faint text-xs">Clique em "Adicionar seção" para estruturar o artigo</p>
-                        </div>
-                    )}
-                </div>
-            )}
-
-            {/* Estrutura — Comercial */}
-            {postType === 'commercial' && (
-                <div className="bg-surface rounded-lg border border-border shadow-sm p-6">
-                    <div className="flex items-center justify-between mb-4">
-                        <div>
-                            <p className={labelClass}>Estrutura do Post</p>
-                            <p className="text-xs text-ink-faint ml-1">Adicione outlines e produtos na ordem desejada.</p>
-                        </div>
-                        <div className="flex gap-1.5 flex-wrap justify-end">
-                            {(['h1','h2','h3','h4'] as Outline['level'][]).map(l => (
-                                <button key={l} type="button" onClick={() => addCommercialItem('outline', l)} className={`px-2.5 py-1 rounded-lg text-xs font-bold ${levelColors[l]} hover:opacity-80 transition-opacity`}>
-                                    +{l.toUpperCase()}
+                <section aria-labelledby="section-structure">
+                    <div className="bg-surface rounded-lg border border-border p-6" style={{ boxShadow: '0 1px 2px rgba(80,40,20,0.04)' }}>
+                        <div className="flex items-start justify-between mb-4 gap-3">
+                            <div>
+                                <p id="section-structure" className={labelClass}>3. Seções do artigo</p>
+                                <p className="text-xs text-ink-faint">Introdução e conclusão são geradas automaticamente — não precisa adicionar.</p>
+                            </div>
+                            <div className="flex flex-col items-end gap-1.5 shrink-0">
+                                <button
+                                    type="button"
+                                    onClick={() => addSection()}
+                                    className="inline-flex items-center gap-1.5 px-3 py-2 min-h-[40px] bg-primary text-surface text-xs font-semibold rounded hover:brightness-90 transition-all"
+                                >
+                                    <Plus className="w-3.5 h-3.5" aria-hidden="true" />
+                                    Adicionar seção
                                 </button>
-                            ))}
-                            <button type="button" onClick={() => addCommercialItem('product')} className="px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-100 text-amber-700 hover:opacity-80 transition-opacity flex items-center gap-1">
-                                <Plus className="w-3 h-3" aria-hidden="true" /> Produto
-                            </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowTemplates(v => !v)}
+                                    className="inline-flex items-center gap-1 text-xs text-ink-faint hover:text-primary transition-colors"
+                                    aria-expanded={showTemplates}
+                                >
+                                    <ChevronRight className={`w-3 h-3 transition-transform ${showTemplates ? 'rotate-90' : ''}`} aria-hidden="true" />
+                                    Usar estrutura pronta
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                    {commercialItems.length > 0 ? (
-                        <div className="space-y-2">
-                            {commercialItems.map((item, i) => (
-                                <div key={i} className="p-3 bg-elev rounded-md border border-border">
-                                    <div className="flex items-center gap-2">
-                                        {item.type === 'outline' ? (
-                                            <>
-                                                <select value={item.level} onChange={e => updateCommercialItem(i, { level: e.target.value })} className="w-16 bg-surface border border-border rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-primary/80 shrink-0">
-                                                    {['h1','h2','h3','h4'].map(l => <option key={l} value={l}>{l.toUpperCase()}</option>)}
-                                                </select>
-                                                <input type="text" value={item.text} onChange={e => updateCommercialItem(i, { text: e.target.value })} className="flex-1 bg-surface border border-border rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-primary/80" placeholder="Título da seção..." />
-                                                <input type="number" min={50} max={2000} value={item.minWords ?? ''} onChange={e => { const v = parseInt(e.target.value); updateCommercialItem(i, { minWords: isNaN(v) ? undefined : Math.max(50, Math.min(2000, v)) }); }} className="w-20 bg-surface border border-border rounded-lg px-2 py-1.5 text-xs text-center focus:outline-none focus:border-primary/80" placeholder="100-150" />
-                                            </>
-                                        ) : (
-                                            <span className="px-2 py-1 rounded text-xs font-bold shrink-0 bg-amber-100 text-amber-700">Produto</span>
-                                        )}
+
+                        {/* Templates de estrutura */}
+                        {showTemplates && (
+                            <div className="mb-4 p-4 bg-elev rounded-md border border-border space-y-2">
+                                <p className="text-xs font-semibold text-ink-muted mb-2">Escolha uma estrutura como ponto de partida:</p>
+                                {STRUCTURE_TEMPLATES.map(tmpl => (
+                                    <button
+                                        key={tmpl.label}
+                                        type="button"
+                                        onClick={() => applyTemplate(tmpl)}
+                                        className="w-full text-left p-3 bg-surface border border-border rounded hover:border-primary/50 hover:bg-primary-soft/50 transition-colors"
+                                    >
+                                        <p className="text-sm font-semibold text-ink">{tmpl.label}</p>
+                                        <p className="text-xs text-ink-faint mt-0.5">
+                                            {tmpl.sections.slice(0, 3).join(' · ')}{tmpl.sections.length > 3 ? ` · +${tmpl.sections.length - 3}` : ''}
+                                        </p>
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Lista de seções */}
+                        {sections.length === 0 ? (
+                            <div className="text-center py-10 border-2 border-dashed border-border rounded-md">
+                                <p className="text-sm text-ink-muted">Nenhuma seção ainda</p>
+                                <p className="text-xs text-ink-faint mt-1">
+                                    Clique em "Adicionar seção" ou escolha uma estrutura pronta.
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="space-y-2" role="list" aria-label="Seções do artigo">
+                                {sections.map((sec, i) => (
+                                    <div
+                                        key={i}
+                                        role="listitem"
+                                        className="flex items-center gap-2 p-3 bg-elev rounded-md border border-border"
+                                    >
+                                        {/* Reorder */}
                                         <div className="flex flex-col gap-0.5 shrink-0">
-                                            <button type="button" onClick={() => moveCommercialItem(i, 'up')} disabled={i === 0} className="text-ink-faint hover:text-ink-muted disabled:opacity-20"><ChevronUp className="w-3.5 h-3.5" /></button>
-                                            <button type="button" onClick={() => moveCommercialItem(i, 'down')} disabled={i === commercialItems.length - 1} className="text-ink-faint hover:text-ink-muted disabled:opacity-20"><ChevronDown className="w-3.5 h-3.5" /></button>
+                                            <button
+                                                type="button"
+                                                onClick={() => moveSection(i, 'up')}
+                                                disabled={i === 0}
+                                                aria-label={`Mover seção "${sec.text || i + 1}" para cima`}
+                                                className="text-ink-faint hover:text-ink disabled:opacity-20 p-0.5"
+                                            >
+                                                <ChevronUp className="w-3.5 h-3.5" aria-hidden="true" />
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => moveSection(i, 'down')}
+                                                disabled={i === sections.length - 1}
+                                                aria-label={`Mover seção "${sec.text || i + 1}" para baixo`}
+                                                className="text-ink-faint hover:text-ink disabled:opacity-20 p-0.5"
+                                            >
+                                                <ChevronDown className="w-3.5 h-3.5" aria-hidden="true" />
+                                            </button>
                                         </div>
-                                        <button type="button" onClick={() => removeCommercialItem(i)} className="text-red-400 hover:text-red-600 transition-colors shrink-0"><Trash2 className="w-4 h-4" aria-hidden="true" /></button>
+
+                                        {/* Número */}
+                                        <span className="w-6 h-6 rounded-full bg-surface text-ink-faint text-xs font-bold flex items-center justify-center shrink-0 font-mono">
+                                            {i + 1}
+                                        </span>
+
+                                        {/* Título da seção */}
+                                        <input
+                                            type="text"
+                                            value={sec.text}
+                                            onChange={e => updateSection(i, { text: e.target.value })}
+                                            aria-label={`Título da seção ${i + 1}`}
+                                            className="flex-1 bg-surface border border-border rounded px-3 py-1.5 text-sm text-ink focus:outline-none focus:border-primary/80 min-w-0"
+                                            placeholder={`Título da seção ${i + 1}...`}
+                                        />
+
+                                        {/* Tamanho */}
+                                        <div className="flex gap-1 shrink-0" role="group" aria-label={`Tamanho da seção ${i + 1}`}>
+                                            {SIZE_OPTIONS.map(opt => (
+                                                <button
+                                                    key={opt.id}
+                                                    type="button"
+                                                    onClick={() => updateSection(i, { size: opt.id })}
+                                                    title={opt.hint}
+                                                    aria-pressed={sec.size === opt.id}
+                                                    className={`px-2 py-1 rounded text-xs font-semibold transition-colors ${
+                                                        sec.size === opt.id
+                                                            ? 'bg-primary text-surface'
+                                                            : 'bg-surface border border-border text-ink-muted hover:border-primary/40'
+                                                    }`}
+                                                >
+                                                    {opt.label}
+                                                </button>
+                                            ))}
+                                        </div>
+
+                                        {/* Remover */}
+                                        <button
+                                            type="button"
+                                            onClick={() => removeSection(i)}
+                                            aria-label={`Remover seção ${i + 1}`}
+                                            className="text-ink-faint hover:text-red-600 transition-colors shrink-0 p-1"
+                                        >
+                                            <Trash2 className="w-4 h-4" aria-hidden="true" />
+                                        </button>
                                     </div>
-                                    {item.type === 'product' && (
-                                        <div className="grid grid-cols-2 gap-3 mt-3">
-                                            <div>
-                                                <label className="block text-xs font-semibold text-ink-muted mb-1">Nome do produto *</label>
-                                                <input type="text" value={item.name} onChange={e => updateCommercialItem(i, { name: e.target.value })} className="w-full bg-surface border border-border rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-primary/80" placeholder="Ex: Produto X Pro" />
-                                            </div>
-                                            <div>
-                                                <label className="block text-xs font-semibold text-ink-muted mb-1">URL da imagem</label>
-                                                <input type="url" value={item.imageUrl} onChange={e => updateCommercialItem(i, { imageUrl: e.target.value })} className="w-full bg-surface border border-border rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-primary/80" placeholder="https://exemplo.com/img.jpg" />
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="text-center py-8 border-2 border-dashed border-border rounded-md">
-                            <p className="text-ink-faint text-sm">Nenhum item adicionado</p>
-                            <p className="text-ink-faint text-xs mt-1">Use os botões acima para adicionar outlines ou produtos</p>
-                        </div>
-                    )}
-                </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {fieldErrors.sections && (
+                            <p role="alert" className="text-xs text-red-600 mt-3">{fieldErrors.sections}</p>
+                        )}
+                    </div>
+                </section>
             )}
 
-            {/* Erro */}
-            {error && (
-                <div className="p-4 bg-red-50 text-red-700 border-l-4 border-red-500 text-sm font-medium rounded-r-xl flex gap-2">
-                    <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />{error}
+            {/* 3 ─ Estrutura — comercial */}
+            {postType === 'commercial' && (
+                <section aria-labelledby="section-commercial">
+                    <div className="bg-surface rounded-lg border border-border p-6" style={{ boxShadow: '0 1px 2px rgba(80,40,20,0.04)' }}>
+                        <div className="flex items-start justify-between mb-4 gap-3">
+                            <div>
+                                <p id="section-commercial" className={labelClass}>3. Estrutura do artigo</p>
+                                <p className="text-xs text-ink-faint">
+                                    {commercialSub === 'guia-melhores'
+                                        ? 'Adicione os produtos que serão avaliados e as seções de texto da lista.'
+                                        : 'Adicione as seções do review e os detalhes do produto.'}
+                                </p>
+                            </div>
+                            <div className="flex gap-2 shrink-0">
+                                <button
+                                    type="button"
+                                    onClick={addCommercialSection}
+                                    className="inline-flex items-center gap-1.5 px-3 py-2 min-h-[40px] bg-elev border border-border text-ink-muted text-xs font-semibold rounded hover:border-primary/40 transition-colors"
+                                >
+                                    <Plus className="w-3.5 h-3.5" aria-hidden="true" />
+                                    Seção
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={addCommercialProduct}
+                                    className="inline-flex items-center gap-1.5 px-3 py-2 min-h-[40px] bg-primary text-surface text-xs font-semibold rounded hover:brightness-90 transition-all"
+                                >
+                                    <Plus className="w-3.5 h-3.5" aria-hidden="true" />
+                                    Produto
+                                </button>
+                            </div>
+                        </div>
+
+                        {commercialItems.length === 0 ? (
+                            <div className="text-center py-10 border-2 border-dashed border-border rounded-md">
+                                <p className="text-sm text-ink-muted">Nenhum item adicionado</p>
+                                <p className="text-xs text-ink-faint mt-1">Adicione os produtos e seções do artigo.</p>
+                            </div>
+                        ) : (
+                            <div className="space-y-2">
+                                {commercialItems.map((item, i) => (
+                                    <div key={i} className="p-3 bg-elev rounded-md border border-border">
+                                        <div className="flex items-center gap-2">
+                                            <span className={`px-2 py-1 rounded text-xs font-bold shrink-0 ${item.type === 'product' ? 'bg-amber-100 text-amber-800' : 'bg-primary-soft text-primary'}`}>
+                                                {item.type === 'product' ? 'Produto' : 'Seção'}
+                                            </span>
+                                            {item.type === 'outline' && (
+                                                <input
+                                                    type="text"
+                                                    value={(item as CommercialOutline).text}
+                                                    onChange={e => updateCommercialItem(i, { text: e.target.value })}
+                                                    aria-label={`Título da seção ${i + 1}`}
+                                                    className="flex-1 bg-surface border border-border rounded px-3 py-1.5 text-sm focus:outline-none focus:border-primary/80 min-w-0"
+                                                    placeholder="Título da seção..."
+                                                />
+                                            )}
+                                            <div className="flex flex-col gap-0.5 shrink-0">
+                                                <button type="button" onClick={() => moveCommercialItem(i, 'up')} disabled={i === 0} aria-label="Mover para cima" className="text-ink-faint hover:text-ink disabled:opacity-20 p-0.5"><ChevronUp className="w-3.5 h-3.5" aria-hidden="true" /></button>
+                                                <button type="button" onClick={() => moveCommercialItem(i, 'down')} disabled={i === commercialItems.length - 1} aria-label="Mover para baixo" className="text-ink-faint hover:text-ink disabled:opacity-20 p-0.5"><ChevronDown className="w-3.5 h-3.5" aria-hidden="true" /></button>
+                                            </div>
+                                            <button type="button" onClick={() => removeCommercialItem(i)} aria-label={`Remover item ${i + 1}`} className="text-ink-faint hover:text-red-600 transition-colors shrink-0 p-1"><Trash2 className="w-4 h-4" aria-hidden="true" /></button>
+                                        </div>
+                                        {item.type === 'product' && (
+                                            <div className="grid grid-cols-2 gap-3 mt-3">
+                                                <div>
+                                                    <label className="block text-xs font-medium text-ink-muted mb-1">Nome do produto *</label>
+                                                    <input
+                                                        type="text"
+                                                        value={(item as CommercialProduct).name}
+                                                        onChange={e => updateCommercialItem(i, { name: e.target.value })}
+                                                        className="w-full bg-surface border border-border rounded px-3 py-1.5 text-sm focus:outline-none focus:border-primary/80"
+                                                        placeholder="Ex: Notebook Dell Inspiron 15"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs font-medium text-ink-muted mb-1">URL da imagem <span className="font-normal text-ink-faint">(opcional)</span></label>
+                                                    <input
+                                                        type="url"
+                                                        value={(item as CommercialProduct).imageUrl}
+                                                        onChange={e => updateCommercialItem(i, { imageUrl: e.target.value })}
+                                                        className="w-full bg-surface border border-border rounded px-3 py-1.5 text-sm focus:outline-none focus:border-primary/80"
+                                                        placeholder="https://..."
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {fieldErrors.structure && (
+                            <p role="alert" className="text-xs text-red-600 mt-3">{fieldErrors.structure}</p>
+                        )}
+                    </div>
+                </section>
+            )}
+
+            {/* Erro global */}
+            {fieldErrors._global && (
+                <div role="alert" className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-md text-sm text-red-700">
+                    <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" aria-hidden="true" />
+                    {fieldErrors._global}
                 </div>
             )}
 
             {/* Progresso */}
-            {progress && (
-                <div className="bg-surface rounded-lg border-2 border-primary/30 shadow-sm p-6">
-                    <div className="flex items-start gap-4">
-                        <div className="w-11 h-11 rounded-full bg-primary-soft flex items-center justify-center shrink-0">
-                            {isGenerating ? <Sparkles className="w-5 h-5 text-primary animate-pulse" /> : <span>✅</span>}
-                        </div>
-                        <div>
-                            <p className="font-bold text-ink">{isGenerating ? 'Criando seu post...' : 'Concluído!'}</p>
-                            {progressSection ? (
-                                <p className="text-sm text-ink-muted mt-1">
-                                    Escrevendo seção {progressSection.current} de {progressSection.total} — {progressSection.name}
-                                </p>
-                            ) : (
-                                <p className="text-sm text-ink-muted mt-1">{progress}</p>
-                            )}
-                            <p className="text-xs text-ink-faint mt-1.5">
-                                {isGenerating ? 'Gerando artigo... isso pode levar 1–2 minutos.' : 'Redirecionando para a lista de posts...'}
-                            </p>
-                        </div>
+            {isGenerating && (
+                <div className="bg-surface rounded-lg border-2 border-primary/30 p-6" style={{ boxShadow: '0 1px 2px rgba(80,40,20,0.04)' }}>
+                    <div className="flex items-center gap-3 mb-3">
+                        <Loader2 className="w-5 h-5 text-primary animate-spin shrink-0" aria-hidden="true" />
+                        <p className="font-semibold text-ink text-sm">Gerando seu artigo...</p>
                     </div>
+                    {progressSec ? (
+                        <>
+                            <div className="w-full bg-elev rounded-full h-1.5 mb-2" role="progressbar" aria-valuenow={progressSec.current} aria-valuemin={1} aria-valuemax={progressSec.total}>
+                                <div
+                                    className="h-full bg-primary rounded-full transition-all duration-500"
+                                    style={{ width: `${(progressSec.current / progressSec.total) * 100}%` }}
+                                />
+                            </div>
+                            <p className="text-xs text-ink-muted">
+                                Seção {progressSec.current} de {progressSec.total}: <span className="font-medium text-ink">{progressSec.name}</span>
+                            </p>
+                        </>
+                    ) : (
+                        <p className="text-xs text-ink-muted">{progressMsg || 'Isso pode levar 1–2 minutos.'}</p>
+                    )}
                 </div>
             )}
 
-            {/* Botão Gerar */}
-            <div className="flex flex-col items-end gap-2">
-                <div className="flex items-center gap-3">
-                    <a href="/admin/posts" className="px-4 py-2.5 border border-border rounded-md text-sm font-medium text-ink-muted hover:bg-elev transition-colors">
-                        Cancelar
-                    </a>
+            {/* Sucesso */}
+            {progressMsg === 'Artigo publicado!' && !isGenerating && (
+                <div className="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-md text-sm text-green-700">
+                    <CheckCircle2 className="w-5 h-5 shrink-0" aria-hidden="true" />
+                    Artigo publicado. Redirecionando para Artigos...
+                </div>
+            )}
+
+            {/* Ações */}
+            <div className="flex items-center justify-between pt-2">
+                <a
+                    href="/admin/posts"
+                    className="text-sm text-ink-muted hover:text-ink transition-colors"
+                >
+                    Cancelar
+                </a>
+                <div className="flex flex-col items-end gap-1.5">
                     <button
                         type="button"
                         onClick={handleGenerate}
                         disabled={isGenerating || !canGenerate}
-                        className="bg-primary hover:bg-primary disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-2.5 rounded-md text-sm font-bold flex items-center gap-2 transition-all shadow-sm shadow-none/20"
+                        className="bg-primary hover:brightness-90 disabled:opacity-50 disabled:cursor-not-allowed text-surface px-7 py-3 min-h-[48px] rounded-md text-sm font-semibold flex items-center gap-2 transition-all"
+                        style={{ boxShadow: '0 2px 8px rgba(80,40,20,0.14)' }}
                     >
                         {isGenerating ? (
-                            <><Loader2 className="w-4 h-4 animate-spin" /> Gerando...</>
+                            <><Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" /> Gerando...</>
                         ) : (
-                            <><Sparkles className="w-4 h-4" aria-hidden="true" /> Gerar e Publicar Post</>
+                            'Gerar e publicar artigo'
                         )}
                     </button>
-                </div>
-                {!isGenerating && (
-                    <p className="text-xs text-ink-faint text-right">
+                    <p className="text-xs text-ink-faint">
                         O artigo será publicado diretamente. Você pode editá-lo depois em Artigos.
                     </p>
-                )}
+                </div>
             </div>
         </div>
     );
