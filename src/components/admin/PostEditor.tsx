@@ -1,5 +1,5 @@
 ﻿import React, { useState, useEffect } from 'react';
-import { Save, AlertCircle, Loader2, ArrowLeft, Image as ImageIcon, Eye, Edit3, Video, AlertTriangle } from 'lucide-react';
+import { Save, AlertCircle, Loader2, ArrowLeft, Image as ImageIcon, Eye, Edit3, Video } from 'lucide-react';
 import { parseVideoUrl } from '../../lib/videoEmbed';
 import { normalizeCategories } from '../../lib/categorySlug';
 import { marked } from 'marked';
@@ -75,6 +75,13 @@ export default function PostEditor({ filePath }: PostEditorProps) {
         input.click();
     };
 
+    // Botão de vídeo da própria toolbar do Quill (estilo WordPress): abre a barra de inserção.
+    const handleVideoButton = () => {
+        setShowVideoBar(true);
+        setVideoShortcodeUrl('');
+        setVideoBarError('');
+    };
+
     const quillModules = React.useMemo(() => ({
         toolbar: {
             container: [
@@ -84,12 +91,13 @@ export default function PostEditor({ filePath }: PostEditorProps) {
                 [{ list: 'ordered' }, { list: 'bullet' }],
                 [{ indent: '-1' }, { indent: '+1' }],
                 ['blockquote', 'code-block'],
-                ['link', 'image'],
+                ['link', 'image', 'video'],
                 [{ align: [] }],
                 ['clean'],
             ],
             handlers: {
                 image: handleImageButton,
+                video: handleVideoButton,
             },
         },
         clipboard: { matchVisual: false },
@@ -110,8 +118,7 @@ export default function PostEditor({ filePath }: PostEditorProps) {
 
     const [post, setPost] = useState({
         title: '', slug: '', description: '', pubDate: new Date().toISOString().split('T')[0],
-        heroImage: '', category: '', author: '', draft: false, content: '',
-        videoUrl: '', videoPosition: 'after-hero' as 'hero' | 'after-hero' | 'inline'
+        heroImage: '', category: '', author: '', draft: false, content: ''
     });
 
     // Load Quill dynamically
@@ -143,14 +150,11 @@ export default function PostEditor({ filePath }: PostEditorProps) {
                         const parsedHtml = await marked.parse(body);
                         const rawPubDate = extract('pubDate');
                         if (rawPubDate) setOriginalPubDateISO(rawPubDate);
-                        const rawVideoPosition = extract('videoPosition');
-                        const validPos: 'hero' | 'after-hero' | 'inline' = rawVideoPosition === 'hero' || rawVideoPosition === 'inline' ? rawVideoPosition : 'after-hero';
                         setPost({
                             title: extract('title'), slug: filePath.split('/').pop()?.replace('.md', '') || '',
                             description: extract('description'), pubDate: rawPubDate ? formatDateForInput(rawPubDate) : new Date().toISOString().split('T')[0],
                             heroImage: extract('heroImage'), category: extract('category') || 'Geral', author: extract('author'),
-                            draft: extract('draft') === 'true', content: parsedHtml,
-                            videoUrl: extract('videoUrl'), videoPosition: validPos
+                            draft: extract('draft') === 'true', content: parsedHtml
                         });
                     } else {
                         setPost(p => ({ ...p, content: String(marked.parse(text)), slug: filePath.split('/').pop()?.replace('.md', '') || '' }));
@@ -229,10 +233,7 @@ export default function PostEditor({ filePath }: PostEditorProps) {
             } else if (/^\d{4}-\d{2}-\d{2}$/.test(post.pubDate)) {
                 finalPubDate = `${post.pubDate}T${new Date().toISOString().slice(11, 19)}.000Z`;
             }
-            const videoLines = post.videoUrl?.trim()
-                ? `videoUrl: "${yamlEscape(post.videoUrl.trim())}"\nvideoPosition: "${post.videoPosition || 'after-hero'}"\n`
-                : '';
-            const markdown = `---\ntitle: "${yamlEscape(post.title)}"\ndescription: "${yamlEscape(post.description)}"\npubDate: "${finalPubDate}"\nheroImage: "${yamlEscape(finalHeroImage)}"\ncategory: "${yamlEscape(post.category)}"\nauthor: "${yamlEscape(post.author)}"\n${videoLines}draft: ${post.draft}\n---\n${finalHtmlContent}`;
+            const markdown = `---\ntitle: "${yamlEscape(post.title)}"\ndescription: "${yamlEscape(post.description)}"\npubDate: "${finalPubDate}"\nheroImage: "${yamlEscape(finalHeroImage)}"\ncategory: "${yamlEscape(post.category)}"\nauthor: "${yamlEscape(post.author)}"\ndraft: ${post.draft}\n---\n${finalHtmlContent}`;
             const targetPath = `src/content/blog/${post.slug}.md`;
             commitFiles.push({ path: targetPath, content: markdown });
 
@@ -369,22 +370,11 @@ export default function PostEditor({ filePath }: PostEditorProps) {
 
                     {/* Conteúdo */}
                     <div className="bg-surface p-6 rounded-lg border border-border shadow-sm">
-                        <div className="flex items-center justify-between mb-2">
+                        <div className="mb-2">
                             <label className={labelClass} style={{ marginBottom: 0 }}>Conteúdo do Artigo</label>
-                            {!isPreview && (
-                                <button
-                                    type="button"
-                                    onClick={() => { setShowVideoBar(v => !v); setVideoShortcodeUrl(''); setVideoBarError(''); }}
-                                    aria-expanded={showVideoBar}
-                                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium transition-colors ${showVideoBar ? 'bg-elev text-ink' : 'text-ink-faint hover:text-ink hover:bg-elev'}`}
-                                >
-                                    <Video className="w-3.5 h-3.5" aria-hidden="true" />
-                                    Inserir vídeo
-                                </button>
-                            )}
                         </div>
 
-                        {/* Barra inline de vídeo — aparece abaixo da label, acima do editor */}
+                        {/* Barra de inserção de vídeo — disparada pelo botão de vídeo da toolbar, aparece acima do editor */}
                         {showVideoBar && !isPreview && (
                             <div className="mb-3 flex items-center gap-2 p-3 bg-elev rounded-md border border-border">
                                 <Video className="w-4 h-4 text-ink-faint shrink-0" aria-hidden="true" />
@@ -533,65 +523,6 @@ export default function PostEditor({ filePath }: PostEditorProps) {
                             )}
                         </label>
                         {pendingUploads['heroImage'] && <span className="text-[10px] text-amber-600 font-bold block mt-2">Upload pendente — será enviado ao salvar</span>}
-                    </div>
-
-                    {/* Vídeo de destaque */}
-                    <div className="bg-surface p-5 rounded-lg border border-border shadow-sm">
-                        <h3 className="font-semibold text-ink text-sm border-b border-border pb-3 mb-4 flex items-center gap-2">
-                            <Video className="w-4 h-4 text-ink-faint" aria-hidden="true" />
-                            Vídeo de destaque
-                            <span className="text-[10px] text-ink-faint font-normal ml-auto">opcional</span>
-                        </h3>
-                        <div className="space-y-3">
-                            <div>
-                                <input
-                                    type="text"
-                                    value={post.videoUrl}
-                                    onChange={e => setPost(p => ({ ...p, videoUrl: e.target.value }))}
-                                    placeholder="Cole a URL do vídeo principal do artigo"
-                                    className="w-full bg-elev border border-border rounded px-3 py-2 text-sm font-mono focus:outline-none focus:border-primary/80 transition-colors"
-                                    aria-label="URL do vídeo de destaque do artigo"
-                                />
-                                {(() => {
-                                    if (!post.videoUrl?.trim()) return (
-                                        <p className="text-[10px] text-ink-faint mt-1.5">YouTube, Vimeo, Loom, Wistia, mp4.</p>
-                                    );
-                                    const info = parseVideoUrl(post.videoUrl);
-                                    if (info.provider === 'unknown') return (
-                                        <p className="text-[10px] text-amber-700 mt-1.5 flex items-center gap-1">
-                                            <AlertTriangle className="w-3 h-3" aria-hidden="true" /> URL não reconhecida
-                                        </p>
-                                    );
-                                    return <p className="text-[10px] text-green-700 mt-1.5">✓ {info.provider}{info.id ? ` · ${info.id}` : ''}</p>;
-                                })()}
-                            </div>
-                            {post.videoUrl?.trim() && parseVideoUrl(post.videoUrl).provider !== 'unknown' && (
-                                <div>
-                                    <p className="text-[10px] font-semibold text-ink-faint uppercase tracking-widest mb-1.5">Onde exibir</p>
-                                    <div className="grid grid-cols-3 gap-1.5">
-                                        {[
-                                            { v: 'hero',       label: 'No lugar da capa' },
-                                            { v: 'after-hero', label: 'Após a capa' },
-                                            { v: 'inline',     label: 'Só via shortcode' },
-                                        ].map(opt => (
-                                            <button
-                                                key={opt.v}
-                                                type="button"
-                                                aria-pressed={post.videoPosition === opt.v}
-                                                onClick={() => setPost(p => ({ ...p, videoPosition: opt.v as any }))}
-                                                className={`px-2 py-2.5 min-h-[44px] text-[10px] font-medium rounded transition-colors ${
-                                                    post.videoPosition === opt.v
-                                                        ? 'bg-primary text-surface font-semibold'
-                                                        : 'bg-elev text-ink-muted hover:bg-elev border border-border'
-                                                }`}
-                                            >
-                                                {opt.label}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
                     </div>
 
                     {/* SEO Score Widget */}
