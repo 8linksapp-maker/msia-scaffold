@@ -15,11 +15,25 @@ async function hmac(secret: string, data: string): Promise<string> {
     return Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
+/**
+ * Comparação em tempo constante — não vaza, pelo tempo de resposta, quantos
+ * caracteres bateram. Protege a verificação da senha e da assinatura HMAC
+ * contra timing attacks. O tamanho ainda pode vazar (aceitável aqui).
+ */
+function timingSafeEqual(a: string, b: string): boolean {
+    const ab = new TextEncoder().encode(a);
+    const bb = new TextEncoder().encode(b);
+    let diff = ab.length ^ bb.length;
+    const len = Math.max(ab.length, bb.length);
+    for (let i = 0; i < len; i++) diff |= (ab[i] ?? 0) ^ (bb[i] ?? 0);
+    return diff === 0;
+}
+
 /** Cria a string de cookie assinada. Retorna null se ADMIN_SECRET não definido. */
 export async function createSession(password: string): Promise<string | null> {
     const secret = import.meta.env.ADMIN_SECRET;
     if (!secret) return null;
-    if (password !== secret) return null;
+    if (!timingSafeEqual(password, secret)) return null;
 
     const expires = Date.now() + EXPIRES_MS;
     const payload = `${expires}`;
@@ -41,7 +55,7 @@ export async function validateSession(cookieValue: string | undefined): Promise<
     if (isNaN(expires) || Date.now() > expires) return false;
 
     const expected = await hmac(secret, expStr);
-    return expected === sig;
+    return timingSafeEqual(expected, sig);
 }
 
 export const COOKIE_NAME_EXPORT = COOKIE_NAME;

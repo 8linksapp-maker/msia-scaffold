@@ -4,7 +4,7 @@ import { parseVideoUrl } from '../../lib/videoEmbed';
 import { normalizeCategories } from '../../lib/categorySlug';
 import { marked } from 'marked';
 import { triggerToast } from './CmsToaster';
-import { githubApi } from '../../lib/adminApi';
+import { githubApi, atomicCommitApi, type CommitFile } from '../../lib/adminApi';
 import { yamlEscape } from '../../lib/yamlEscape';
 import SEOScoreWidget from '../../plugins/seo/SEOScoreWidget';
 
@@ -19,7 +19,6 @@ export default function PostEditor({ filePath }: PostEditorProps) {
     const [error, setError] = useState('');
     const [authors, setAuthors] = useState<any[]>([]);
     const [dynamicCategories, setDynamicCategories] = useState<string[]>([]);
-    const [fileSha, setFileSha] = useState('');
     const [isPreview, setIsPreview] = useState(false);
     const [pendingUploads, setPendingUploads] = useState<Record<string, File>>({});
     const [QuillEditor, setQuillEditor] = useState<any>(null);
@@ -135,7 +134,6 @@ export default function PostEditor({ filePath }: PostEditorProps) {
 
                 if (isEditing && filePath) {
                     const fileData = await githubApi('read', filePath);
-                    setFileSha(fileData.sha);
                     const text = fileData.content;
                     const match = text.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
                     if (match) {
@@ -188,17 +186,19 @@ export default function PostEditor({ filePath }: PostEditorProps) {
         e.target.value = '';
     };
 
-    const extractAndUploadInlineImages = async (html: string) => {
+    // Extrai imagens inline (data URLs) sem subir: reescreve o HTML para os
+    // caminhos finais e devolve os arquivos para irem no commit atômico junto do .md.
+    const extractInlineImages = (html: string): { html: string; files: CommitFile[] } => {
         const imgRegex = /<img[^>]+src="data:image\/([^;]+);base64,([^"]+)"[^>]*>/g;
         let modifiedHtml = html;
-        const matches = [...html.matchAll(imgRegex)];
-        for (const m of matches) {
+        const files: CommitFile[] = [];
+        for (const m of [...html.matchAll(imgRegex)]) {
             const ext = m[1]; const base64Content = m[2];
             const ghPath = `public/uploads/${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`;
-            await githubApi('write', ghPath, { content: base64Content, isBase64: true, message: `Upload imagem inline ${ghPath}` });
+            files.push({ path: ghPath, content: base64Content, encoding: 'base64' });
             modifiedHtml = modifiedHtml.replace(`data:image/${ext};base64,${base64Content}`, ghPath.replace('public', ''));
         }
-        return modifiedHtml;
+        return { html: modifiedHtml, files };
     };
 
     const handleSave = async (e?: React.FormEvent) => {
@@ -207,17 +207,21 @@ export default function PostEditor({ filePath }: PostEditorProps) {
         setSaving(true); setError('');
         triggerToast('Processando e salvando artigo...', 'progress', 20);
         try {
+            // Coleta todos os arquivos (capa + imagens inline + .md) para um commit só.
+            const commitFiles: CommitFile[] = [];
+
             let finalHeroImage = post.heroImage;
             if (pendingUploads['heroImage']) {
                 const fileObj = pendingUploads['heroImage'];
                 const base64Content = await fileToBase64(fileObj);
                 const fileExt = fileObj.name.split('.').pop() || 'jpg';
                 const ghPath = `public/uploads/${Date.now()}-blog-cover.${fileExt}`;
-                await githubApi('write', ghPath, { content: base64Content, isBase64: true, message: `Upload capa blog ${ghPath}` });
+                commitFiles.push({ path: ghPath, content: base64Content, encoding: 'base64' });
                 finalHeroImage = ghPath.replace('public', '');
             }
             const cleanedContent = post.content.replace(/&nbsp;/g, ' ').replace(/\u00A0/g, ' ');
-            const finalHtmlContent = await extractAndUploadInlineImages(cleanedContent);
+            const { html: finalHtmlContent, files: inlineFiles } = extractInlineImages(cleanedContent);
+            commitFiles.push(...inlineFiles);
             // Preserva ISO original se aluno nao mudou a data; caso contrario usa data + horario atual (garante ordenacao por minuto)
             let finalPubDate = post.pubDate;
             if (originalPubDateISO && originalPubDateISO.split('T')[0] === post.pubDate) {
@@ -230,8 +234,14 @@ export default function PostEditor({ filePath }: PostEditorProps) {
                 : '';
             const markdown = `---\ntitle: "${yamlEscape(post.title)}"\ndescription: "${yamlEscape(post.description)}"\npubDate: "${finalPubDate}"\nheroImage: "${yamlEscape(finalHeroImage)}"\ncategory: "${yamlEscape(post.category)}"\nauthor: "${yamlEscape(post.author)}"\n${videoLines}draft: ${post.draft}\n---\n${finalHtmlContent}`;
             const targetPath = `src/content/blog/${post.slug}.md`;
-            const res = await githubApi('write', targetPath, { content: markdown, sha: fileSha || undefined, message: `CMS: ${isEditing ? 'Edição' : 'Criação'} do artigo ${post.slug}` });
-            if (res.sha) setFileSha(res.sha);
+            commitFiles.push({ path: targetPath, content: markdown });
+
+            // Um único commit atômico: capa + imagens inline + .md.
+            // Falha tudo ou grava tudo — sem imagem órfã e sem rebuilds repetidos.
+            await atomicCommitApi(
+                commitFiles,
+                `CMS: ${isEditing ? 'Edição' : 'Criação'} do artigo ${post.slug}`
+            );
             setPendingUploads({});
             triggerToast('Artigo salvo com sucesso!', 'success', 100);
             if (!isEditing) setTimeout(() => { window.location.href = '/admin/posts'; }, 1500);
