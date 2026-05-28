@@ -20,6 +20,8 @@ export default function SettingsMetaPixel() {
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
     const [saved, setSaved] = useState(false);
+    const [showPixelHelper, setShowPixelHelper] = useState(false);
+    const [openAccordion, setOpenAccordion] = useState<'new' | 'existing' | null>(null);
 
     useEffect(() => {
         githubApi('read', CONFIG_PATH)
@@ -51,6 +53,7 @@ export default function SettingsMetaPixel() {
             setFileSha(res.sha || fileSha);
             setFullConfig(updated);
             setSaved(true);
+            setShowPixelHelper(true);
             triggerToast('Meta Pixel configurado!', 'success', 100);
             setTimeout(() => setSaved(false), 3000);
         } catch (err: any) {
@@ -131,35 +134,93 @@ export default function SettingsMetaPixel() {
             )}
 
             {/* Botão salvar */}
-            <button
-                onClick={handleSave}
-                disabled={saving}
-                className="bg-primary hover:bg-primary disabled:opacity-50 text-white px-6 py-3 rounded-md text-sm font-bold flex items-center gap-2 transition-all shadow-sm shadow-none/20"
-            >
-                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : saved ? <CheckCircle className="w-4 h-4" aria-hidden="true" /> : <Save className="w-4 h-4" aria-hidden="true" />}
-                {saving ? 'Salvando...' : saved ? 'Salvo!' : 'Salvar Configuração'}
-            </button>
+            <div className="flex items-center gap-3 flex-wrap">
+                <button
+                    onClick={handleSave}
+                    disabled={saving}
+                    className="bg-primary hover:bg-primary disabled:opacity-50 text-white px-6 py-3 rounded-md text-sm font-bold flex items-center gap-2 transition-all shadow-sm shadow-none/20"
+                >
+                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : saved ? <CheckCircle className="w-4 h-4" aria-hidden="true" /> : <Save className="w-4 h-4" aria-hidden="true" />}
+                    {saving ? 'Salvando...' : saved ? 'Salvo!' : 'Salvar Configuração'}
+                </button>
+                <a
+                    href="https://business.facebook.com/events_manager"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-semibold text-primary hover:underline flex items-center gap-1"
+                >
+                    Abrir Gerenciador de Eventos
+                </a>
+            </div>
 
-            {/* Instruções */}
-            <div className="bg-blue-50 rounded-lg border border-blue-200 p-5">
-                <p className="text-xs font-bold text-blue-700 uppercase tracking-widest mb-3">Como configurar</p>
-                <ol className="space-y-2">
-                    {[
-                        'Acesse business.facebook.com e vá em Gerenciador de Eventos',
-                        'Clique em "Conectar fontes de dados" → Web → Meta Pixel',
-                        'Crie ou selecione um pixel existente',
-                        'Copie o Pixel ID (número de 15–16 dígitos)',
-                        'Cole aqui e clique em "Salvar Configuração"',
-                        'O pixel será inserido automaticamente em todas as páginas',
-                    ].map((step, i) => (
-                        <li key={i} className="flex items-start gap-2.5 text-sm text-blue-800">
-                            <span className="w-5 h-5 rounded-full bg-blue-200 text-blue-700 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
-                                {i + 1}
-                            </span>
-                            {step}
-                        </li>
-                    ))}
-                </ol>
+            {showPixelHelper && (
+                <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-sm text-green-800">
+                    Para confirmar que está funcionando, instale a extensão gratuita "Meta Pixel Helper" no Chrome e visite seu site.
+                </div>
+            )}
+
+            {/* Instruções em accordion */}
+            <div className="bg-blue-50 rounded-lg border border-blue-200 overflow-hidden">
+                <p className="text-xs font-bold text-blue-700 uppercase tracking-widest px-5 pt-4 pb-2">Como configurar</p>
+
+                {/* Trilha 1 */}
+                <div className="border-t border-blue-200">
+                    <button
+                        type="button"
+                        onClick={() => setOpenAccordion(openAccordion === 'new' ? null : 'new')}
+                        className="w-full flex items-center justify-between px-5 py-3 text-sm font-semibold text-blue-800 hover:bg-blue-100 transition-colors text-left"
+                    >
+                        Criar meu primeiro Pixel
+                        <span className="text-blue-500 text-xs">{openAccordion === 'new' ? '▲' : '▼'}</span>
+                    </button>
+                    {openAccordion === 'new' && (
+                        <ol className="px-5 pb-4 space-y-2">
+                            {[
+                                'Acesse business.facebook.com e vá em Gerenciador de Eventos',
+                                'Clique em "Conectar fontes de dados" → Web → Meta Pixel',
+                                'Dê um nome ao pixel e clique em Continuar',
+                                'Copie o Pixel ID exibido (número de 15–16 dígitos)',
+                                'Cole aqui e clique em Salvar Configuração',
+                            ].map((step, i) => (
+                                <li key={i} className="flex items-start gap-2.5 text-sm text-blue-800">
+                                    <span className="w-5 h-5 rounded-full bg-blue-200 text-blue-700 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                                        {i + 1}
+                                    </span>
+                                    {step}
+                                </li>
+                            ))}
+                        </ol>
+                    )}
+                </div>
+
+                {/* Trilha 2 */}
+                <div className="border-t border-blue-200">
+                    <button
+                        type="button"
+                        onClick={() => setOpenAccordion(openAccordion === 'existing' ? null : 'existing')}
+                        className="w-full flex items-center justify-between px-5 py-3 text-sm font-semibold text-blue-800 hover:bg-blue-100 transition-colors text-left"
+                    >
+                        Ja tenho um Pixel — onde encontrar o ID
+                        <span className="text-blue-500 text-xs">{openAccordion === 'existing' ? '▲' : '▼'}</span>
+                    </button>
+                    {openAccordion === 'existing' && (
+                        <ol className="px-5 pb-4 space-y-2">
+                            {[
+                                'Acesse business.facebook.com/events_manager',
+                                'No menu esquerdo, selecione seu pixel',
+                                'O Pixel ID aparece logo abaixo do nome do pixel (número de 15–16 dígitos)',
+                                'Copie e cole aqui',
+                            ].map((step, i) => (
+                                <li key={i} className="flex items-start gap-2.5 text-sm text-blue-800">
+                                    <span className="w-5 h-5 rounded-full bg-blue-200 text-blue-700 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                                        {i + 1}
+                                    </span>
+                                    {step}
+                                </li>
+                            ))}
+                        </ol>
+                    )}
+                </div>
             </div>
         </div>
     );

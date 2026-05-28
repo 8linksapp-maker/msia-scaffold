@@ -112,7 +112,7 @@ export default function SettingsSocialShare() {
         <label className="flex items-center justify-between cursor-pointer">
           <div>
             <h3 className="font-bold text-ink">Ativar Compartilhamento</h3>
-            <p className="text-sm text-ink-muted mt-0.5">Exibe botões de share nos artigos</p>
+            <p className="text-sm text-ink-muted mt-0.5">Os botões aparecem ao final de cada artigo do blog.</p>
           </div>
           <div
             onClick={() => setEnabled(!enabled)}
@@ -136,7 +136,7 @@ export default function SettingsSocialShare() {
         />
         {sectionTitle && (
           <p className="text-xs text-ink-faint mt-2 ml-1">
-            Preview: <span className="font-bold uppercase tracking-widest text-ink-muted" style={{ fontSize: '0.7rem' }}>{sectionTitle}</span>
+            Preview: <span className="text-xs font-bold uppercase tracking-widest text-ink-muted">{sectionTitle}</span>
           </p>
         )}
       </div>
@@ -171,6 +171,40 @@ export default function SettingsSocialShare() {
             <option key={s.id} value={s.id}>{s.label}</option>
           ))}
         </select>
+
+        {/* Style previews */}
+        <div className="mt-5 space-y-3">
+          <p className="text-xs font-bold text-ink-muted uppercase tracking-wider">Exemplos de estilo</p>
+          {/* Apenas ícones */}
+          <div className={`p-3 rounded-md border transition-all ${style === 'icon' ? 'border-primary/40 bg-primary-soft' : 'border-border bg-elev'}`}>
+            <p className="text-xs text-ink-faint mb-2">Apenas ícones</p>
+            <div className="flex gap-2 flex-wrap">
+              {PLATFORMS.filter(p => platforms.includes(p.id)).slice(0, 5).map(p => (
+                <span key={p.id} className="w-9 h-9 flex items-center justify-center rounded-md bg-surface border border-border text-base">{p.icon}</span>
+              ))}
+            </div>
+          </div>
+          {/* Apenas texto */}
+          <div className={`p-3 rounded-md border transition-all ${style === 'label' ? 'border-primary/40 bg-primary-soft' : 'border-border bg-elev'}`}>
+            <p className="text-xs text-ink-faint mb-2">Apenas texto</p>
+            <div className="flex gap-2 flex-wrap">
+              {PLATFORMS.filter(p => platforms.includes(p.id)).slice(0, 5).map(p => (
+                <span key={p.id} className="px-3 py-1.5 rounded-md bg-surface border border-border text-xs font-semibold text-ink">{p.label}</span>
+              ))}
+            </div>
+          </div>
+          {/* Ícone + texto */}
+          <div className={`p-3 rounded-md border transition-all ${style === 'both' ? 'border-primary/40 bg-primary-soft' : 'border-border bg-elev'}`}>
+            <p className="text-xs text-ink-faint mb-2">Ícone + texto</p>
+            <div className="flex gap-2 flex-wrap">
+              {PLATFORMS.filter(p => platforms.includes(p.id)).slice(0, 4).map(p => (
+                <span key={p.id} className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-surface border border-border text-xs font-semibold text-ink">
+                  <span>{p.icon}</span>{p.label}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
 
       {error && (

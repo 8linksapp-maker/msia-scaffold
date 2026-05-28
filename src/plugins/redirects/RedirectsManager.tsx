@@ -38,6 +38,7 @@ export default function RedirectsManager() {
 
   const [testingId, setTestingId] = useState<string | null>(null);
   const [testResult, setTestResult] = useState<Record<string, { ok: boolean; status: number; location?: string }>>({});
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
   const handleTest = async (r: Redirect) => {
     setTestingId(r.id);
@@ -133,8 +134,13 @@ export default function RedirectsManager() {
   };
 
   const handleDelete = (id: string) => {
-    if (!confirm('Remover este redirect?')) return;
-    saveRedirects(redirects.filter(r => r.id !== id));
+    setPendingDeleteId(id);
+  };
+
+  const confirmDelete = () => {
+    if (!pendingDeleteId) return;
+    saveRedirects(redirects.filter(r => r.id !== pendingDeleteId));
+    setPendingDeleteId(null);
   };
 
   const handleToggle = (id: string) => {
@@ -202,9 +208,14 @@ export default function RedirectsManager() {
                   onChange={e => setForm(f => ({ ...f, type: Number(e.target.value) as 301 | 302 }))}
                   className={inputClass.replace('font-mono', '')}
                 >
-                  <option value={301}>301 — Permanente</option>
-                  <option value={302}>302 — Temporário</option>
+                  <option value={301}>Permanente (301)</option>
+                  <option value={302}>Temporário (302)</option>
                 </select>
+                <p className="text-xs text-ink-faint mt-1 ml-1">
+                  {form.type === 301
+                    ? 'Permanente — o endereço mudou para sempre.'
+                    : 'Temporário — mudança provisória (promoção, manutenção).'}
+                </p>
               </div>
               <div>
                 <label className={labelClass}>Nota (opcional)</label>
@@ -254,6 +265,39 @@ export default function RedirectsManager() {
         </div>
       )}
 
+      {/* Como funciona */}
+      <div className="bg-blue-50 rounded-lg border border-blue-200 p-5">
+        <p className="text-xs font-bold text-blue-700 uppercase tracking-widest mb-2">Como funciona</p>
+        <ul className="space-y-1 text-sm text-blue-800">
+          <li>• Use quando renomear ou mover uma página — quem acessar o endereço antigo chega ao novo automaticamente</li>
+          <li>• Escolha <strong>Permanente (301)</strong> quando a mudança for definitiva (ex: renomeou um artigo)</li>
+          <li>• Escolha <strong>Temporário (302)</strong> quando for provisório (ex: página em manutenção ou promoção por tempo limitado)</li>
+          <li>• No campo <strong>De</strong>, coloque o caminho antigo (ex: <code>/artigo-antigo</code>). No campo <strong>Para</strong>, o novo</li>
+          <li>• Os redirects são aplicados automaticamente na Vercel após o deploy</li>
+        </ul>
+      </div>
+
+      {/* Delete confirmation banner */}
+      {pendingDeleteId && (
+        <div className="p-4 bg-red-50 border border-red-200 rounded-lg flex items-center justify-between gap-4">
+          <p className="text-sm font-medium text-red-700">Remover este redirect? Esta ação não pode ser desfeita.</p>
+          <div className="flex gap-2 shrink-0">
+            <button
+              onClick={confirmDelete}
+              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-bold rounded-md transition-colors"
+            >
+              Remover
+            </button>
+            <button
+              onClick={() => setPendingDeleteId(null)}
+              className="px-4 py-2 bg-elev hover:bg-border text-ink-muted text-sm font-bold rounded-md transition-colors"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Redirects list */}
       {redirects.length === 0 ? (
         <div className="bg-surface rounded-lg border border-border p-12 text-center">
@@ -284,8 +328,8 @@ export default function RedirectsManager() {
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${r.type === 301 ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
-                      {r.type}
+                    <span className={`text-xs font-bold px-2 py-0.5 rounded-full whitespace-nowrap ${r.type === 301 ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
+                      {r.type === 301 ? 'Permanente (301)' : 'Temporário (302)'}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-ink-muted text-xs truncate max-w-40">{r.note || '—'}</td>
@@ -315,9 +359,11 @@ export default function RedirectsManager() {
                       </button>
                     </div>
                     {testResult[r.id] && (
-                      <div className={`mt-1 flex items-center gap-1 text-[10px] font-bold ${testResult[r.id].ok ? 'text-emerald-600' : 'text-red-500'}`}>
-                        {testResult[r.id].ok ? <CheckCircle className="w-3 h-3" aria-hidden="true" /> : <XCircle className="w-3 h-3" aria-hidden="true" />}
-                        {testResult[r.id].ok ? `${testResult[r.id].status} → OK` : testResult[r.id].status ? `${testResult[r.id].status} — Falhou` : 'Erro de rede'}
+                      <div className={`mt-2 flex items-start gap-1.5 text-xs font-medium ${testResult[r.id].ok ? 'text-emerald-700' : 'text-red-600'}`}>
+                        {testResult[r.id].ok
+                          ? <><CheckCircle className="w-3.5 h-3.5 shrink-0 mt-0.5" aria-hidden="true" /><span>Redirect funcionando: {r.from} → {testResult[r.id].location || r.to}</span></>
+                          : <><XCircle className="w-3.5 h-3.5 shrink-0 mt-0.5" aria-hidden="true" /><span>{testResult[r.id].status ? `Não encontrado: o servidor retornou erro ${testResult[r.id].status}` : 'Erro de rede ao testar'}</span></>
+                        }
                       </div>
                     )}
                   </td>
@@ -341,17 +387,6 @@ export default function RedirectsManager() {
         </div>
       )}
 
-      {/* Info */}
-      <div className="bg-blue-50 rounded-lg border border-blue-200 p-5">
-        <p className="text-xs font-bold text-blue-700 uppercase tracking-widest mb-2">Como funciona</p>
-        <ul className="space-y-1 text-sm text-blue-800">
-          <li>• Use quando renomear ou mover uma página — quem acessar o endereço antigo chega ao novo automaticamente</li>
-          <li>• Escolha <strong>301</strong> quando a mudança for definitiva (ex: renomeou um artigo)</li>
-          <li>• Escolha <strong>302</strong> quando for temporário (ex: página em manutenção ou promoção por tempo limitado)</li>
-          <li>• No campo <strong>De</strong>, coloque o caminho antigo (ex: <code>/artigo-antigo</code>). No campo <strong>Para</strong>, o novo</li>
-          <li>• Os redirects são aplicados automaticamente na Vercel após o deploy</li>
-        </ul>
-      </div>
     </div>
   );
 }

@@ -20,6 +20,7 @@ export default function SettingsAdSense() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [saved, setSaved] = useState(false);
+  const [showApprovalNote, setShowApprovalNote] = useState(false);
 
   useEffect(() => {
     githubApi('read', CONFIG_PATH)
@@ -51,6 +52,7 @@ export default function SettingsAdSense() {
       setFileSha(res.sha || fileSha);
       setFullConfig(updated);
       setSaved(true);
+      setShowApprovalNote(true);
       triggerToast('AdSense configurado!', 'success', 100);
       setTimeout(() => setSaved(false), 3000);
     } catch (err: any) {
@@ -82,6 +84,28 @@ export default function SettingsAdSense() {
 
   return (
     <div className="max-w-2xl space-y-6">
+      {/* Instructions — shown before the input */}
+      <div className="bg-blue-50 rounded-lg border border-blue-200 p-5">
+        <p className="text-xs font-bold text-blue-700 uppercase tracking-widest mb-3">Como configurar</p>
+        <ol className="space-y-2">
+          {[
+            'Acesse adsense.google.com e crie ou entre na sua conta',
+            'No menu lateral, vá em Conta → Informações da conta',
+            'Copie o Publisher ID (formato ca-pub-XXXXXXXXXXXXXXXX)',
+            'Cole aqui e clique em "Salvar Configuração"',
+            'O script AdSense auto-ads será inserido no <head> de todas as páginas',
+            'O Google configurará automaticamente os locais dos anúncios',
+          ].map((step, i) => (
+            <li key={i} className="flex items-start gap-2.5 text-sm text-blue-800">
+              <span className="w-5 h-5 rounded-full bg-blue-200 text-blue-700 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                {i + 1}
+              </span>
+              {step}
+            </li>
+          ))}
+        </ol>
+      </div>
+
       {/* Publisher ID */}
       <div className="bg-surface rounded-lg border border-border shadow-sm p-6">
         <h3 className="font-bold text-ink mb-1">Publisher ID</h3>
@@ -100,7 +124,7 @@ export default function SettingsAdSense() {
         />
         {publisherId && !isValid && (
           <p className="text-xs text-amber-600 mt-2 ml-1">
-            O Publisher ID deve começar com "ca-pub-".
+            Formato incorreto. Seu Publisher ID começa com ca-pub- e fica em adsense.google.com → Conta → Informações da conta.
           </p>
         )}
       </div>
@@ -140,27 +164,11 @@ export default function SettingsAdSense() {
         {saving ? 'Salvando...' : saved ? 'Salvo!' : 'Salvar Configuração'}
       </button>
 
-      {/* Instructions */}
-      <div className="bg-blue-50 rounded-lg border border-blue-200 p-5">
-        <p className="text-xs font-bold text-blue-700 uppercase tracking-widest mb-3">Como configurar</p>
-        <ol className="space-y-2">
-          {[
-            'Acesse adsense.google.com e crie ou entre na sua conta',
-            'No menu lateral, vá em Conta → Informações da conta',
-            'Copie o Publisher ID (formato ca-pub-XXXXXXXXXXXXXXXX)',
-            'Cole aqui e clique em "Salvar Configuração"',
-            'O script AdSense auto-ads será inserido no <head> de todas as páginas',
-            'O Google configurará automaticamente os locais dos anúncios',
-          ].map((step, i) => (
-            <li key={i} className="flex items-start gap-2.5 text-sm text-blue-800">
-              <span className="w-5 h-5 rounded-full bg-blue-200 text-blue-700 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
-                {i + 1}
-              </span>
-              {step}
-            </li>
-          ))}
-        </ol>
-      </div>
+      {showApprovalNote && (
+        <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800">
+          Código instalado. Se sua conta ainda não foi aprovada pelo Google, os anúncios podem levar 24–48h para aparecer.
+        </div>
+      )}
     </div>
   );
 }

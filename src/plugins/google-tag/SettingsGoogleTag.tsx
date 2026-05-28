@@ -24,6 +24,7 @@ function getTagType(id: string): { label: string; color: string; bg: string } {
 
 export default function SettingsGoogleTag() {
     const [tags, setTags] = useState<string[]>([]);
+    const [savedTags, setSavedTags] = useState<string[]>([]);
     const [newTag, setNewTag] = useState('');
     const [fileSha, setFileSha] = useState('');
     const [fullConfig, setFullConfig] = useState<any>(null);
@@ -45,6 +46,7 @@ export default function SettingsGoogleTag() {
                 const legacyGTM = config?.googleTagManager?.containerId || '';
                 const merged = [...new Set([...existing, ...(legacyGA ? [legacyGA] : []), ...(legacyGTM ? [legacyGTM] : [])])];
                 setTags(merged);
+                setSavedTags(merged);
                 setFileSha(data.sha);
             })
             .catch(err => setError(err.message))
@@ -94,6 +96,7 @@ export default function SettingsGoogleTag() {
             });
             setFileSha(res.sha || fileSha);
             setFullConfig(updated);
+            setSavedTags(tags);
             setSaved(true);
             triggerToast('Google Tag configurado!', 'success', 100);
             setTimeout(() => setSaved(false), 3000);
@@ -133,7 +136,15 @@ export default function SettingsGoogleTag() {
                 {tags.length === 0 ? (
                     <div className="text-center py-8 text-ink-faint">
                         <Tag className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                        <p className="text-sm">Nenhuma tag configurada</p>
+                        <p className="text-sm font-medium text-ink-muted mb-1">Conecte o Google Analytics para ver as visitas do seu site.</p>
+                        <a
+                            href="https://support.google.com/analytics/answer/9304153"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-primary font-semibold hover:underline"
+                        >
+                            Como encontrar meu ID
+                        </a>
                     </div>
                 ) : (
                     <div className="space-y-2 mb-4">
@@ -203,6 +214,14 @@ export default function SettingsGoogleTag() {
                 </div>
             )}
 
+            {/* Unsaved changes banner */}
+            {JSON.stringify(tags) !== JSON.stringify(savedTags) && (
+                <div className="flex items-center gap-2 px-4 py-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800 font-medium">
+                    <AlertCircle className="w-4 h-4 shrink-0" aria-hidden="true" />
+                    Mudanças não salvas — clique em Salvar para aplicar.
+                </div>
+            )}
+
             {/* Save button */}
             <button
                 onClick={handleSave}
@@ -216,18 +235,18 @@ export default function SettingsGoogleTag() {
             {/* Instructions */}
             <div className="bg-blue-50 rounded-lg border border-blue-200 p-5">
                 <p className="text-xs font-bold text-blue-700 uppercase tracking-widest mb-3">Tipos de tag aceitos</p>
-                <div className="space-y-2">
+                <div className="space-y-3">
                     {[
-                        { prefix: 'G-XXXXXXXXXX', label: 'Google Analytics 4', desc: 'Encontre em analytics.google.com > Admin > Data Streams' },
-                        { prefix: 'AW-XXXXXXXXXX', label: 'Google Ads', desc: 'Encontre em ads.google.com > Ferramentas > Tag do Google' },
-                        { prefix: 'GTM-XXXXXXX', label: 'Google Tag Manager', desc: 'Encontre em tagmanager.google.com > seu container' },
-                        { prefix: 'DC-XXXXXXXX', label: 'Display & Video 360', desc: 'Tag de Floodlight para campanhas de display' },
+                        { prefix: 'G-XXXXXXXX', label: 'Google Analytics', benefit: 'veja quantas pessoas visitam e de onde vêm' },
+                        { prefix: 'AW-XXXXXXXX', label: 'Google Ads', benefit: 'meça os resultados das suas campanhas pagas' },
+                        { prefix: 'GTM-XXXXXXX', label: 'Tag Manager', benefit: 'centralize todas as tags em um lugar' },
+                        { prefix: 'DC-XXXXXXXX', label: 'Display & Video 360', benefit: 'tag de Floodlight para campanhas de display' },
                     ].map((item, i) => (
                         <div key={i} className="flex items-start gap-3 text-sm text-blue-800">
                             <span className="font-mono font-bold text-blue-600 shrink-0 w-28">{item.prefix}</span>
                             <div>
                                 <span className="font-bold">{item.label}</span>
-                                <span className="text-blue-600"> - {item.desc}</span>
+                                <span className="text-blue-600"> — {item.benefit}</span>
                             </div>
                         </div>
                     ))}

@@ -6,7 +6,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Sparkles, Loader2, AlertCircle, ArrowLeft, Plus, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
+import { Sparkles, Loader2, AlertCircle, ArrowLeft, Plus, Trash2, ChevronUp, ChevronDown, ChevronRight } from 'lucide-react';
 import { triggerToast } from '../../components/admin/CmsToaster';
 
 interface Author {
@@ -53,7 +53,9 @@ export default function AIPostGenerator({ authors, categories }: Props) {
     const [commercialItems, setCommercialItems] = useState<CommercialItem[]>([]);
     const [isGenerating, setIsGenerating] = useState(false);
     const [progress, setProgress] = useState('');
+    const [progressSection, setProgressSection] = useState<{ current: number; total: number; name: string } | null>(null);
     const [error, setError] = useState('');
+    const [showAdvancedOutlines, setShowAdvancedOutlines] = useState(false);
 
     useEffect(() => { setIsMounted(true); }, []);
 
@@ -125,7 +127,8 @@ export default function AIPostGenerator({ authors, categories }: Props) {
 
         setError('');
         setIsGenerating(true);
-        setProgress('Conectando ao servidor...');
+        setProgress('Gerando artigo... isso pode levar 1–2 minutos.');
+        setProgressSection(null);
 
         try {
             const response = await fetch('/api/admin/plugins/ai/generate', {
@@ -160,7 +163,12 @@ export default function AIPostGenerator({ authors, categories }: Props) {
                         if (line.startsWith('data: ')) {
                             try {
                                 const data = JSON.parse(line.slice(6));
-                                if (data.step === 'progress') setProgress(data.message);
+                                if (data.step === 'progress') {
+                                    setProgress(data.message);
+                                    if (data.sectionCurrent && data.sectionTotal && data.sectionName) {
+                                        setProgressSection({ current: data.sectionCurrent, total: data.sectionTotal, name: data.sectionName });
+                                    }
+                                }
                                 if (data.step === 'done') {
                                     setProgress('Post publicado com sucesso!');
                                     triggerToast(`Post "${data.title}" publicado!`, 'success');
@@ -178,6 +186,7 @@ export default function AIPostGenerator({ authors, categories }: Props) {
         } catch (err: any) {
             setError(err.message || 'Erro ao gerar post');
             setProgress('');
+            setProgressSection(null);
         } finally {
             setIsGenerating(false);
         }
@@ -292,15 +301,34 @@ export default function AIPostGenerator({ authors, categories }: Props) {
                 <div className="bg-surface rounded-lg border border-border shadow-sm p-6">
                     <div className="flex items-center justify-between mb-4">
                         <div>
-                            <p className={labelClass}>Estrutura do Post (Outlines)</p>
+                            <p className={labelClass}>Seções do artigo</p>
                             <p className="text-xs text-ink-faint ml-1">Introdução e conclusão são geradas automaticamente.</p>
                         </div>
-                        <div className="flex gap-1.5">
-                            {(['h1','h2','h3','h4'] as Outline['level'][]).map(l => (
-                                <button key={l} type="button" onClick={() => addOutline(l)} className={`px-2.5 py-1 rounded-lg text-xs font-bold ${levelColors[l]} hover:opacity-80 transition-opacity`}>
-                                    +{l.toUpperCase()}
-                                </button>
-                            ))}
+                        <div className="flex flex-col items-end gap-1.5">
+                            <button
+                                type="button"
+                                onClick={() => addOutline('h2')}
+                                className="px-3 py-1.5 rounded-lg text-xs font-bold bg-primary text-white hover:opacity-90 transition-opacity flex items-center gap-1"
+                            >
+                                <Plus className="w-3 h-3" aria-hidden="true" /> Adicionar seção
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setShowAdvancedOutlines(v => !v)}
+                                className="flex items-center gap-0.5 text-xs text-ink-faint hover:text-ink-muted transition-colors"
+                            >
+                                <ChevronRight className={`w-3 h-3 transition-transform ${showAdvancedOutlines ? 'rotate-90' : ''}`} />
+                                Opções avançadas
+                            </button>
+                            {showAdvancedOutlines && (
+                                <div className="flex gap-1.5">
+                                    {(['h1','h3','h4'] as Outline['level'][]).map(l => (
+                                        <button key={l} type="button" onClick={() => addOutline(l)} className={`px-2.5 py-1 rounded-lg text-xs font-bold ${levelColors[l]} hover:opacity-80 transition-opacity`}>
+                                            +{l.toUpperCase()}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
                     {outlines.length > 0 ? (
@@ -320,8 +348,8 @@ export default function AIPostGenerator({ authors, categories }: Props) {
                         </div>
                     ) : (
                         <div className="text-center py-8 border-2 border-dashed border-border rounded-md">
-                            <p className="text-ink-faint text-sm mb-1">Nenhuma outline adicionada</p>
-                            <p className="text-ink-faint text-xs">Clique nos botões acima para adicionar títulos</p>
+                            <p className="text-ink-faint text-sm mb-1">Nenhuma seção adicionada</p>
+                            <p className="text-ink-faint text-xs">Clique em "Adicionar seção" para estruturar o artigo</p>
                         </div>
                     )}
                 </div>
@@ -408,9 +436,15 @@ export default function AIPostGenerator({ authors, categories }: Props) {
                         </div>
                         <div>
                             <p className="font-bold text-ink">{isGenerating ? 'Criando seu post...' : 'Concluído!'}</p>
-                            <p className="text-sm text-ink-muted mt-1">{progress}</p>
+                            {progressSection ? (
+                                <p className="text-sm text-ink-muted mt-1">
+                                    Escrevendo seção {progressSection.current} de {progressSection.total} — {progressSection.name}
+                                </p>
+                            ) : (
+                                <p className="text-sm text-ink-muted mt-1">{progress}</p>
+                            )}
                             <p className="text-xs text-ink-faint mt-1.5">
-                                {isGenerating ? 'Aguarde enquanto a IA escreve cada seção. Isso pode levar alguns minutos.' : 'Redirecionando para a lista de posts...'}
+                                {isGenerating ? 'Gerando artigo... isso pode levar 1–2 minutos.' : 'Redirecionando para a lista de posts...'}
                             </p>
                         </div>
                     </div>
@@ -418,22 +452,29 @@ export default function AIPostGenerator({ authors, categories }: Props) {
             )}
 
             {/* Botão Gerar */}
-            <div className="flex items-center justify-end gap-3">
-                <a href="/admin/posts" className="px-4 py-2.5 border border-border rounded-md text-sm font-medium text-ink-muted hover:bg-elev transition-colors">
-                    Cancelar
-                </a>
-                <button
-                    type="button"
-                    onClick={handleGenerate}
-                    disabled={isGenerating || !canGenerate}
-                    className="bg-primary hover:bg-primary disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-2.5 rounded-md text-sm font-bold flex items-center gap-2 transition-all shadow-sm shadow-none/20"
-                >
-                    {isGenerating ? (
-                        <><Loader2 className="w-4 h-4 animate-spin" /> Gerando...</>
-                    ) : (
-                        <><Sparkles className="w-4 h-4" aria-hidden="true" /> Gerar e Publicar Post</>
-                    )}
-                </button>
+            <div className="flex flex-col items-end gap-2">
+                <div className="flex items-center gap-3">
+                    <a href="/admin/posts" className="px-4 py-2.5 border border-border rounded-md text-sm font-medium text-ink-muted hover:bg-elev transition-colors">
+                        Cancelar
+                    </a>
+                    <button
+                        type="button"
+                        onClick={handleGenerate}
+                        disabled={isGenerating || !canGenerate}
+                        className="bg-primary hover:bg-primary disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-2.5 rounded-md text-sm font-bold flex items-center gap-2 transition-all shadow-sm shadow-none/20"
+                    >
+                        {isGenerating ? (
+                            <><Loader2 className="w-4 h-4 animate-spin" /> Gerando...</>
+                        ) : (
+                            <><Sparkles className="w-4 h-4" aria-hidden="true" /> Gerar e Publicar Post</>
+                        )}
+                    </button>
+                </div>
+                {!isGenerating && (
+                    <p className="text-xs text-ink-faint text-right">
+                        O artigo será publicado diretamente. Você pode editá-lo depois em Artigos.
+                    </p>
+                )}
             </div>
         </div>
     );

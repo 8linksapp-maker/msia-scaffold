@@ -9,7 +9,7 @@ import { useState, useEffect } from 'react';
 import {
   Save, Loader2, AlertCircle, Plus, Trash2, Edit2,
   ToggleLeft, ToggleRight, ShoppingCart, Copy, Settings, Package,
-  Tag, Zap, Eye, TrendingUp, KeyRound, EyeOff,
+  Tag, Zap, Eye, TrendingUp, KeyRound, EyeOff, ChevronDown,
 } from 'lucide-react';
 import { githubApi } from '../../lib/adminApi';
 import { triggerToast } from '../../components/admin/CmsToaster';
@@ -261,6 +261,8 @@ export default function AffiliateManager() {
   const [asinInput, setAsinInput] = useState('');
   const [importing, setImporting] = useState(false);
   const [showSecretKey, setShowSecretKey] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  const [showApiCredentials, setShowApiCredentials] = useState(false);
 
   const activeCount = products.filter(p => p.enabled !== false).length;
 
@@ -421,8 +423,13 @@ export default function AffiliateManager() {
   };
 
   const handleDelete = (id: string) => {
-    if (!confirm('Remover este produto?')) return;
-    saveProducts(products.filter(p => p.id !== id));
+    setPendingDeleteId(id);
+  };
+
+  const confirmDelete = () => {
+    if (!pendingDeleteId) return;
+    saveProducts(products.filter(p => p.id !== pendingDeleteId));
+    setPendingDeleteId(null);
   };
 
   const handleToggle = (id: string) => {
@@ -906,16 +913,46 @@ export default function AffiliateManager() {
             </div>
           )}
 
+          {/* Delete confirmation banner */}
+          {pendingDeleteId && (
+            <div className="p-4 bg-red-50 border border-red-200 rounded-lg flex items-center justify-between gap-4">
+              <p className="text-sm font-medium text-red-700">Remover este produto? Esta ação não pode ser desfeita.</p>
+              <div className="flex gap-2 shrink-0">
+                <button
+                  onClick={confirmDelete}
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-bold rounded-md transition-colors"
+                >
+                  Remover
+                </button>
+                <button
+                  onClick={() => setPendingDeleteId(null)}
+                  className="px-4 py-2 bg-elev hover:bg-border text-ink-muted text-sm font-bold rounded-md transition-colors"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Products list */}
           {!showForm && products.length === 0 && (
-            <div className="bg-surface rounded-lg border border-dashed border-border p-16 text-center">
+            <div className="bg-surface rounded-lg border border-dashed border-border p-12 text-center">
               <div className="w-16 h-16 bg-gradient-to-br from-amber-100 to-orange-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                 <ShoppingCart className="w-7 h-7 text-amber-400" />
               </div>
-              <h3 className="font-bold text-ink mb-2 text-lg">Nenhum produto ainda</h3>
-              <p className="text-ink-faint text-sm mb-6 max-w-xs mx-auto leading-relaxed">
-                Cadastre produtos da Amazon e insira-os nos seus posts com um shortcode simples
-              </p>
+              <h3 className="font-bold text-ink mb-4 text-lg">Nenhum produto ainda</h3>
+              <div className="flex items-start justify-center gap-2 mb-6 max-w-sm mx-auto">
+                {[
+                  'Crie um produto aqui',
+                  'Copie o shortcode gerado',
+                  'Cole no artigo onde quer que o produto apareça',
+                ].map((step, i) => (
+                  <div key={i} className="flex-1 text-center">
+                    <div className="w-7 h-7 rounded-full bg-amber-100 text-amber-700 text-xs font-bold flex items-center justify-center mx-auto mb-2">{i + 1}</div>
+                    <p className="text-xs text-ink-faint leading-snug">{step}</p>
+                  </div>
+                ))}
+              </div>
               <button
                 onClick={handleAdd}
                 className="text-white px-6 py-3 rounded-md text-sm font-bold inline-flex items-center gap-2 transition-all active:scale-95"
@@ -1129,49 +1166,62 @@ export default function AffiliateManager() {
             />
           </div>
 
-          {/* PA-API credentials */}
-          <div className="border border-border rounded-lg p-5 space-y-4">
-            <div className="flex items-center gap-2 mb-1">
-              <KeyRound className="w-4 h-4 text-amber-500" />
-              <p className="text-sm font-bold text-ink">Credenciais PA-API 5.0</p>
-              <span className="ml-auto text-xs text-ink-faint">Necessário para "Importar da Amazon"</span>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className={labelClass}>Access Key</label>
-                <input
-                  type="text"
-                  value={config.amazonAccessKey}
-                  onChange={e => setConfig(c => ({ ...c, amazonAccessKey: e.target.value }))}
-                  className={`${inputClass} font-mono`}
-                  placeholder="AKIAIOSFODNN7EXAMPLE"
-                  autoComplete="off"
-                />
+          {/* PA-API credentials — collapsible */}
+          <div className="border border-border rounded-lg overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setShowApiCredentials(v => !v)}
+              className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-elev transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <KeyRound className="w-4 h-4 text-amber-500" />
+                <span className="text-sm font-bold text-ink">Importação automática por ASIN (avançado — opcional)</span>
               </div>
-              <div>
-                <label className={labelClass}>Secret Key</label>
-                <div className="relative">
-                  <input
-                    type={showSecretKey ? 'text' : 'password'}
-                    value={config.amazonSecretKey}
-                    onChange={e => setConfig(c => ({ ...c, amazonSecretKey: e.target.value }))}
-                    className={`${inputClass} font-mono pr-10`}
-                    placeholder="wJalrXUtnFEMI/K7MDENG/bPxRfiCY"
-                    autoComplete="new-password"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowSecretKey(v => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-faint hover:text-ink-muted"
-                  >
-                    {showSecretKey ? <EyeOff className="w-4 h-4" aria-hidden="true" /> : <Eye className="w-4 h-4" aria-hidden="true" />}
-                  </button>
+              <ChevronDown className={`w-4 h-4 text-ink-faint transition-transform ${showApiCredentials ? 'rotate-180' : ''}`} />
+            </button>
+            {showApiCredentials && (
+              <div className="px-5 pb-5 space-y-4 border-t border-border">
+                <p className="text-xs text-ink-faint mt-3 leading-relaxed">
+                  Só necessário se quiser preencher dados automaticamente pelo código do produto Amazon. A maioria das pessoas pode ignorar esta seção.
+                </p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className={labelClass}>PA-API Access Key</label>
+                    <input
+                      type="text"
+                      value={config.amazonAccessKey}
+                      onChange={e => setConfig(c => ({ ...c, amazonAccessKey: e.target.value }))}
+                      className={`${inputClass} font-mono`}
+                      placeholder="AKIAIOSFODNN7EXAMPLE"
+                      autoComplete="off"
+                    />
+                  </div>
+                  <div>
+                    <label className={labelClass}>PA-API Secret Key</label>
+                    <div className="relative">
+                      <input
+                        type={showSecretKey ? 'text' : 'password'}
+                        value={config.amazonSecretKey}
+                        onChange={e => setConfig(c => ({ ...c, amazonSecretKey: e.target.value }))}
+                        className={`${inputClass} font-mono pr-10`}
+                        placeholder="wJalrXUtnFEMI/K7MDENG/bPxRfiCY"
+                        autoComplete="new-password"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowSecretKey(v => !v)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-faint hover:text-ink-muted"
+                      >
+                        {showSecretKey ? <EyeOff className="w-4 h-4" aria-hidden="true" /> : <Eye className="w-4 h-4" aria-hidden="true" />}
+                      </button>
+                    </div>
+                  </div>
                 </div>
+                <p className="text-xs text-ink-faint ml-0.5">
+                  As chaves são salvas no <code className="font-mono">pluginsConfig.json</code> do seu repositório. Mantenha-o privado.
+                </p>
               </div>
-            </div>
-            <p className="text-xs text-ink-faint mt-1 ml-0.5">
-              As chaves são salvas no <code className="font-mono">pluginsConfig.json</code> do seu repositório. Mantenha-o privado.
-            </p>
+            )}
           </div>
 
           <div className="border-t border-border pt-5">

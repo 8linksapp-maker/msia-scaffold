@@ -1,4 +1,4 @@
-﻿/**
+/**
  * SettingsAI.tsx — Plugin AI Generator (Walker)
  *
  * UI para configurar provedor de IA e API Keys.
@@ -22,7 +22,6 @@ const PROVIDERS = [
         badge: 'GRATUITO',
         badgeClass: 'bg-green-100 text-green-700',
         description: 'Gemini 1.5 Flash — generoso plano gratuito, ideal para começar.',
-        icon: '🟢',
         docsUrl: 'https://aistudio.google.com/app/apikey',
         docsLabel: 'Obter chave gratuita no Google AI Studio',
         placeholder: 'AIzaSy...',
@@ -33,11 +32,17 @@ const PROVIDERS = [
         badge: 'PAGO',
         badgeClass: 'bg-amber-100 text-amber-700',
         description: 'GPT-4o Mini — alta qualidade, requer saldo na conta OpenAI.',
-        icon: '⚡',
         docsUrl: 'https://platform.openai.com/api-keys',
         docsLabel: 'Obter chave na plataforma OpenAI',
         placeholder: 'sk-...',
     },
+];
+
+const STEP_LABELS = [
+    'Escolha o provedor',
+    'Cole sua chave',
+    'Teste a conexão',
+    'Salve',
 ];
 
 export default function SettingsAI() {
@@ -54,6 +59,7 @@ export default function SettingsAI() {
     const [testResult, setTestResult] = useState<{ ok: boolean; message: string } | null>(null);
     const [error, setError] = useState('');
     const [saved, setSaved] = useState(false);
+    const [testedInSession, setTestedInSession] = useState(false);
 
     useEffect(() => {
         githubApi('read', CONFIG_PATH)
@@ -113,6 +119,7 @@ export default function SettingsAI() {
             });
             const data = await res.json();
             setTestResult({ ok: data.success, message: data.message });
+            if (data.success) setTestedInSession(true);
         } catch {
             setTestResult({ ok: false, message: 'Erro ao testar — verifique se o servidor está rodando.' });
         } finally {
@@ -138,34 +145,53 @@ export default function SettingsAI() {
     );
 
     const currentProvider = PROVIDERS.find(p => p.id === provider)!;
+    const keyIsEmpty = !apiKey.trim();
 
     return (
         <div className="max-w-2xl space-y-6">
-            {/* Aviso de segurança */}
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex gap-3">
-                <span className="text-xl shrink-0">⚠️</span>
-                <div>
-                    <p className="font-bold text-amber-800 text-sm">Repositório Privado Obrigatório</p>
-                    <p className="text-amber-700 text-xs mt-0.5 leading-relaxed">
-                        Sua API Key será salva em <code className="bg-amber-100 px-1 rounded font-mono">pluginsConfig.json</code> no repositório.
-                        Certifique-se de que o repositório é <strong>privado</strong> no GitHub antes de salvar.
-                    </p>
+
+            {/* Banner: chave vazia */}
+            {keyIsEmpty && (
+                <div className="bg-amber-50 border border-amber-300 rounded-lg p-5 text-center">
+                    <p className="font-bold text-amber-800 text-sm">O Gerador de Posts está desativado</p>
+                    <p className="text-amber-700 text-xs mt-1">Configure uma chave de API para começar a gerar conteúdo.</p>
                 </div>
+            )}
+
+            {/* Aviso de segurança */}
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <p className="font-bold text-red-800 text-sm mb-1">Atenção: esta chave dá acesso pago à IA.</p>
+                <p className="text-red-700 text-xs leading-relaxed">
+                    Se alguém tiver acesso ao seu repositório GitHub, poderá usar sua chave e gerar cobranças na sua conta.
+                    Confirme que seu repositório está configurado como <strong>Privado</strong> antes de continuar.
+                </p>
             </div>
 
-            {/* Seleção de provedor */}
+            {/* Indicador de passos */}
+            <div className="bg-surface rounded-lg border border-border shadow-sm p-4">
+                <p className="text-xs font-bold text-ink-faint uppercase tracking-widest mb-3">Como configurar</p>
+                <ol className="flex flex-wrap gap-x-4 gap-y-2">
+                    {STEP_LABELS.map((label, i) => (
+                        <li key={i} className="flex items-center gap-1.5 text-xs text-ink-muted">
+                            <span className="w-5 h-5 rounded-full bg-elev text-ink-faint flex items-center justify-center text-xs font-bold shrink-0">{i + 1}</span>
+                            {label}
+                        </li>
+                    ))}
+                </ol>
+            </div>
+
+            {/* Passo 1: Seleção de provedor */}
             <div className="bg-surface rounded-lg border border-border shadow-sm p-6">
-                <p className={labelClass}>Provedor de IA</p>
+                <p className={labelClass}>1. Provedor de IA</p>
                 <div className="grid grid-cols-2 gap-3">
                     {PROVIDERS.map(p => (
                         <button
                             key={p.id}
                             type="button"
-                            onClick={() => { setProvider(p.id); setTestResult(null); }}
+                            onClick={() => { setProvider(p.id); setTestResult(null); setTestedInSession(false); }}
                             className={`p-4 rounded-md border-2 text-left transition-all ${provider === p.id ? 'border-primary/80 bg-primary-soft' : 'border-border hover:border-border'}`}
                         >
                             <div className="flex items-center gap-2 mb-1">
-                                <span className="text-lg">{p.icon}</span>
                                 <span className="font-bold text-ink text-sm">{p.name}</span>
                                 <span className={`ml-auto text-xs font-bold px-2 py-0.5 rounded-full ${p.badgeClass}`}>{p.badge}</span>
                             </div>
@@ -175,10 +201,10 @@ export default function SettingsAI() {
                 </div>
             </div>
 
-            {/* API Key */}
+            {/* Passo 2: API Key */}
             <div className="bg-surface rounded-lg border border-border shadow-sm p-6">
                 <div className="flex items-center justify-between mb-2">
-                    <p className={labelClass}>API Key — {currentProvider.name}</p>
+                    <p className={labelClass}>2. API Key — {currentProvider.name}</p>
                     <a href={currentProvider.docsUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline">
                         {currentProvider.docsLabel} ↗
                     </a>
@@ -187,7 +213,7 @@ export default function SettingsAI() {
                     <input
                         type={showKey ? 'text' : 'password'}
                         value={apiKey}
-                        onChange={e => { setApiKey(e.target.value); setTestResult(null); }}
+                        onChange={e => { setApiKey(e.target.value); setTestResult(null); setTestedInSession(false); }}
                         placeholder={currentProvider.placeholder}
                         className={`${inputClass} font-mono pr-12`}
                     />
@@ -264,7 +290,7 @@ export default function SettingsAI() {
                 </div>
             </div>
 
-            {/* Botões */}
+            {/* Passo 3+4: Botões */}
             <div className="flex gap-3">
                 <button
                     type="button"
@@ -272,19 +298,23 @@ export default function SettingsAI() {
                     disabled={testing || !apiKey.trim()}
                     className="px-5 py-2.5 border border-border rounded-md text-sm font-medium text-ink hover:bg-elev disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
                 >
-                    {testing ? <Loader2 className="w-4 h-4 animate-spin" /> : '🧪'}
-                    {testing ? 'Testando...' : 'Testar Chave'}
+                    {testing ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                    {testing ? 'Testando...' : '3. Testar Chave'}
                 </button>
                 <button
                     type="button"
                     onClick={handleSave}
-                    disabled={saving}
-                    className="bg-primary hover:bg-primary disabled:opacity-50 text-white px-6 py-2.5 rounded-md text-sm font-bold flex items-center gap-2 transition-all shadow-sm shadow-none/20"
+                    disabled={saving || !testedInSession}
+                    title={!testedInSession ? 'Teste a chave antes de salvar' : undefined}
+                    className="bg-primary hover:bg-primary disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-2.5 rounded-md text-sm font-bold flex items-center gap-2 transition-all shadow-sm shadow-none/20"
                 >
                     {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : saved ? <CheckCircle className="w-4 h-4" aria-hidden="true" /> : <Save className="w-4 h-4" aria-hidden="true" />}
-                    {saving ? 'Salvando...' : saved ? 'Salvo!' : 'Salvar Configurações'}
+                    {saving ? 'Salvando...' : saved ? 'Salvo!' : '4. Salvar Configurações'}
                 </button>
             </div>
+            {!testedInSession && apiKey.trim() && (
+                <p className="text-xs text-ink-faint ml-1">Teste a chave primeiro para habilitar o botão Salvar.</p>
+            )}
         </div>
     );
 }

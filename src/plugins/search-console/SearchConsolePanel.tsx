@@ -43,6 +43,12 @@ function fmtPos(n: number) { return n.toFixed(1); }
 function fmtPage(url: string) {
     try { return new URL(url).pathname || '/'; } catch { return url; }
 }
+function fmtDatePtBr(isoDate: string) {
+    try {
+        const [y, m, d] = isoDate.split('-').map(Number);
+        return new Date(y, m - 1, d).toLocaleDateString('pt-BR', { day: 'numeric', month: 'short', year: 'numeric' });
+    } catch { return isoDate; }
+}
 
 function StatCard({ icon, label, value, sub }: { icon: React.ReactNode; label: string; value: string; sub?: string }) {
     return (
@@ -148,8 +154,17 @@ export default function SearchConsolePanel() {
                 <p className="font-bold mb-1">Não foi possível carregar os dados</p>
                 <p className="text-sm">{error}</p>
                 {error.includes('não configurado') && (
-                    <p className="text-sm mt-2">Configure o service account na aba <strong>Configurações</strong>.</p>
+                    <p className="text-sm mt-2">
+                        Configure o service account em{' '}
+                        <a href="/admin/search-console" className="underline font-semibold">Configurações</a>.
+                    </p>
                 )}
+                <a
+                    href="/admin/search-console"
+                    className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-red-700 text-white text-sm font-bold rounded-md hover:bg-red-800 transition-colors"
+                >
+                    Configurar agora
+                </a>
             </div>
         </div>
     );
@@ -163,7 +178,7 @@ export default function SearchConsolePanel() {
             {/* Header com seletor de período */}
             <div className="flex items-center justify-between flex-wrap gap-3">
                 <p className="text-sm text-ink-muted">
-                    {period.startDate} → {period.endDate}
+                    {fmtDatePtBr(period.startDate)} – {fmtDatePtBr(period.endDate)}
                 </p>
                 <div className="flex gap-1 bg-elev rounded-md p-1">
                     {DAYS_OPTIONS.map(opt => (
@@ -182,8 +197,8 @@ export default function SearchConsolePanel() {
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <StatCard icon={<MousePointerClick className="w-4 h-4" aria-hidden="true" />} label="Cliques" value={fmt(summary.totalClicks)} sub="total no período" />
                 <StatCard icon={<Eye className="w-4 h-4" aria-hidden="true" />} label="Impressões" value={fmt(summary.totalImpressions)} sub="total no período" />
-                <StatCard icon={<TrendingUp className="w-4 h-4" aria-hidden="true" />} label="CTR médio" value={fmtCtr(summary.avgCtr)} sub="cliques ÷ impressões" />
-                <StatCard icon={<Hash className="w-4 h-4" aria-hidden="true" />} label="Posição média" value={`#${fmtPos(summary.avgPosition)}`} sub="quanto menor, melhor" />
+                <StatCard icon={<TrendingUp className="w-4 h-4" aria-hidden="true" />} label="CTR médio" value={fmtCtr(summary.avgCtr)} sub="para blogs, acima de 3% é bom" />
+                <StatCard icon={<Hash className="w-4 h-4" aria-hidden="true" />} label="Posição média" value={`#${fmtPos(summary.avgPosition)}`} sub="quanto mais próximo de 1, melhor" />
             </div>
 
             {/* Tabelas */}

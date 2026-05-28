@@ -1,14 +1,14 @@
-﻿/**
+/**
  * EmailSequenceEditor.tsx — Editor de sequência de emails automáticos
  *
  * UI para criar/editar emails enviados via Brevo após inscrição.
  * v1: envio manual individual (sem cron). Salva em pluginsConfig.json.
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
     Plus, Trash2, Send, Loader2, CheckCircle, AlertCircle, Save,
-    Mail, Calendar, Clock
+    Mail, Calendar, Clock, ChevronDown, ChevronUp
 } from 'lucide-react';
 import { githubApi } from '../../lib/adminApi';
 import { triggerToast } from '../../components/admin/CmsToaster';
@@ -20,6 +20,49 @@ interface EmailItem {
     subject: string;
     body: string;
     delayDays: number;
+}
+
+const VARIABLES = [
+    { token: '{{nome}}', label: 'nome do inscrito' },
+    { token: '{{email}}', label: 'email do inscrito' },
+];
+
+function VariablesPanel({ bodyRef, onInsert }: {
+    bodyRef: React.RefObject<HTMLTextAreaElement | null>;
+    onInsert: (token: string) => void;
+}) {
+    const [open, setOpen] = useState(false);
+    return (
+        <div className="border border-border rounded-md overflow-hidden">
+            <button
+                type="button"
+                onClick={() => setOpen(v => !v)}
+                className="w-full flex items-center justify-between px-3 py-2 bg-elev text-xs font-semibold text-ink-muted hover:bg-primary-soft transition-colors"
+            >
+                Variáveis disponíveis
+                {open ? <ChevronUp className="w-3.5 h-3.5" aria-hidden="true" /> : <ChevronDown className="w-3.5 h-3.5" aria-hidden="true" />}
+            </button>
+            {open && (
+                <div className="p-3 space-y-2 bg-surface">
+                    {VARIABLES.map(v => (
+                        <div key={v.token} className="flex items-center justify-between gap-3">
+                            <div>
+                                <code className="text-xs font-mono bg-elev px-1.5 py-0.5 rounded text-primary">{v.token}</code>
+                                <span className="text-xs text-ink-muted ml-2">{v.label}</span>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => onInsert(v.token)}
+                                className="text-xs font-medium text-primary hover:underline shrink-0"
+                            >
+                                Inserir
+                            </button>
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
 }
 
 export default function EmailSequenceEditor() {
@@ -35,6 +78,9 @@ export default function EmailSequenceEditor() {
     const [sendResults, setSendResults] = useState<Record<string, { ok: boolean; msg: string }>>({});
     const [sequenceStats, setSequenceStats] = useState<Array<{ sequenceIndex: number; sent: number; failed: number; lastSentAt: string }>>([]);
     const [lastRunAt, setLastRunAt] = useState<string | null>(null);
+
+    // Refs for each email body textarea (keyed by email id)
+    const bodyRefs = useRef<Record<string, HTMLTextAreaElement | null>>({});
 
     useEffect(() => {
         Promise.all([
@@ -77,6 +123,31 @@ export default function EmailSequenceEditor() {
     function updateEmail(id: string, field: keyof Omit<EmailItem, 'id'>, value: string | number) {
         setEmails(prev => prev.map(e => e.id === id ? { ...e, [field]: value } : e));
     }
+
+    function insertVariable(emailId: string, token: string) {
+        const textarea = bodyRefs.current[emailId];
+        if (textarea) {
+            const start = textarea.selectionStart ?? textarea.value.length;
+            const end = textarea.selectionEnd ?? textarea.value.length;
+            const current = textarea.value;
+            const next = current.slice(0, start) + token + current.slice(end);
+            updateEmail(emailId, 'body', next);
+            // Restore focus + cursor after update
+            requestAnimationFrame(() => {
+                textarea.focus();
+                const pos = start + token.length;
+                textarea.setSelectionRange(pos, pos);
+            });
+        } else {
+            // Fallback: append at end
+            setEmails(prev => prev.map(e =>
+                e.id === emailId ? { ...e, body: e.body + token } : e
+            ));
+        }
+    }
+
+    // Warnings: emails with delay=0
+    const immediateEmails = emails.map((e, i) => ({ ...e, idx: i + 1 })).filter(e => e.delayDays === 0);
 
     async function handleSave() {
         setSaving(true); setSaved(false); setError('');
@@ -245,6 +316,9 @@ export default function EmailSequenceEditor() {
                                             onChange={e => updateEmail(emailItem.id, 'delayDays', Number(e.target.value))}
                                             className={inputClass}
                                         />
+                                        <p className="text-xs text-ink-faint mt-1">
+                                            Digite 1 para enviar no dia seguinte à inscrição. Use 0 apenas para envio imediato.
+                                        </p>
                                     </div>
                                     <div className="col-span-2">
                                         <label className={labelClass}>Assunto</label>
@@ -258,10 +332,19 @@ export default function EmailSequenceEditor() {
                                     </div>
                                 </div>
 
+                                {/* Aviso delay=0 inline */}
+                                {emailItem.delayDays === 0 && (
+                                    <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-md text-xs text-amber-700">
+                                        <AlertCircle className="w-3.5 h-3.5 shrink-0 mt-0.5" aria-hidden="true" />
+                                        O email #{idx + 1} será enviado imediatamente após a inscrição.
+                                    </div>
+                                )}
+
                                 {/* Corpo */}
                                 <div>
                                     <label className={labelClass}>Conteúdo (texto simples / markdown)</label>
                                     <textarea
+                                        ref={el => { bodyRefs.current[emailItem.id] = el; }}
                                         rows={5}
                                         value={emailItem.body}
                                         onChange={e => updateEmail(emailItem.id, 'body', e.target.value)}
@@ -269,6 +352,12 @@ export default function EmailSequenceEditor() {
                                         className={`${inputClass} resize-none font-mono text-xs`}
                                     />
                                 </div>
+
+                                {/* Painel de variáveis */}
+                                <VariablesPanel
+                                    bodyRef={{ current: bodyRefs.current[emailItem.id] ?? null }}
+                                    onInsert={token => insertVariable(emailItem.id, token)}
+                                />
 
                                 {/* Enviar teste */}
                                 <div className="flex items-center gap-3 pt-1">
@@ -310,17 +399,15 @@ export default function EmailSequenceEditor() {
                     <Plus className="w-4 h-4" aria-hidden="true" />
                     Adicionar Email
                 </button>
-                {emails.length > 0 && (
-                    <button
-                        type="button"
-                        onClick={handleSave}
-                        disabled={saving}
-                        className="bg-primary hover:bg-primary disabled:opacity-50 text-white px-6 py-2.5 rounded-md text-sm font-bold flex items-center gap-2 transition-all shadow-sm shadow-none/20"
-                    >
-                        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : saved ? <CheckCircle className="w-4 h-4" aria-hidden="true" /> : <Save className="w-4 h-4" aria-hidden="true" />}
-                        {saving ? 'Salvando...' : saved ? 'Salvo!' : 'Salvar Sequência'}
-                    </button>
-                )}
+                <button
+                    type="button"
+                    onClick={handleSave}
+                    disabled={saving}
+                    className="bg-primary hover:bg-primary disabled:opacity-50 text-white px-6 py-2.5 rounded-md text-sm font-bold flex items-center gap-2 transition-all shadow-sm shadow-none/20"
+                >
+                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : saved ? <CheckCircle className="w-4 h-4" aria-hidden="true" /> : <Save className="w-4 h-4" aria-hidden="true" />}
+                    {saving ? 'Salvando...' : saved ? 'Salvo!' : emails.length === 0 ? 'Salvar (sequência vazia)' : 'Salvar Sequência'}
+                </button>
             </div>
 
             {error && (

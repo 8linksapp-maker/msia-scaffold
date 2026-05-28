@@ -1,4 +1,4 @@
-﻿/**
+/**
  * SettingsSEO.tsx — Plugin SEO Toolkit
  *
  * Configura dados da organização e schemas JSON-LD.
@@ -6,11 +6,19 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Save, Loader2, AlertCircle, Plus, Trash2 } from 'lucide-react';
+import { Save, Loader2, AlertCircle, Plus, Trash2, Building2 } from 'lucide-react';
 import { githubApi } from '../../lib/adminApi';
 import { triggerToast } from '../../components/admin/CmsToaster';
 
 const CONFIG_PATH = 'src/data/pluginsConfig.json';
+
+const SAMEAS_PLACEHOLDERS = [
+    'https://facebook.com/suapagina',
+    'https://instagram.com/seuusuario',
+    'https://linkedin.com/in/seuperfil',
+    'https://twitter.com/seuusuario',
+    'https://youtube.com/@seucanal',
+];
 
 export default function SettingsSEO() {
   const [enabled, setEnabled] = useState(true);
@@ -25,6 +33,7 @@ export default function SettingsSEO() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [savedStatus, setSavedStatus] = useState<{ orgName: string; orgLogo: string; socialCount: number } | null>(null);
 
   useEffect(() => {
     githubApi('read', CONFIG_PATH)
@@ -54,6 +63,7 @@ export default function SettingsSEO() {
   const handleSave = async () => {
     setSaving(true);
     setError('');
+    setSavedStatus(null);
     triggerToast('Salvando configuração de SEO...', 'progress', 30);
     try {
       const cleanSameAs = sameAs.filter(s => s.trim());
@@ -68,6 +78,7 @@ export default function SettingsSEO() {
       });
       setFileSha(res.sha || fileSha);
       setFullConfig(updated);
+      setSavedStatus({ orgName, orgLogo, socialCount: cleanSameAs.length });
       triggerToast('SEO Toolkit configurado!', 'success', 100);
     } catch (err: any) {
       setError(err.message);
@@ -101,7 +112,7 @@ export default function SettingsSEO() {
         <label className="flex items-center justify-between cursor-pointer">
           <div>
             <h3 className="font-bold text-ink">Ativar SEO Toolkit</h3>
-            <p className="text-sm text-ink-muted mt-0.5">Injeta JSON-LD structured data nos artigos</p>
+            <p className="text-sm text-ink-muted mt-0.5">Ajuda o Google a entender seu site e pode mostrar informações extras nos resultados de busca.</p>
           </div>
           <div
             onClick={() => setEnabled(!enabled)}
@@ -129,7 +140,7 @@ export default function SettingsSEO() {
 
         <div>
           <label className={labelClass}>Perfis Sociais (sameAs)</label>
-          <p className="text-xs text-ink-faint mb-3">URLs dos perfis sociais da organização</p>
+          <p className="text-xs text-ink-faint mb-3">Adicione os perfis da sua marca nas redes sociais</p>
           <div className="space-y-2">
             {sameAs.map((url, i) => (
               <div key={i} className="flex gap-2">
@@ -138,7 +149,7 @@ export default function SettingsSEO() {
                   value={url}
                   onChange={e => updateSameAs(i, e.target.value)}
                   className={inputClass}
-                  placeholder="https://facebook.com/seuperfil"
+                  placeholder={SAMEAS_PLACEHOLDERS[i % SAMEAS_PLACEHOLDERS.length]}
                 />
                 {sameAs.length > 1 && (
                   <button onClick={() => removeSameAs(i)} className="p-3 text-red-500 hover:bg-red-50 rounded-md transition-colors">
@@ -159,9 +170,24 @@ export default function SettingsSEO() {
         <h3 className="font-bold text-ink mb-4">Tipos de Schema</h3>
         <div className="space-y-3">
           {[
-            { label: 'Article Schema', desc: 'Dados do artigo, autor e editor', val: articleSchema, set: setArticleSchema },
-            { label: 'BreadcrumbList Schema', desc: 'Trilha de navegação (Home > Categoria > Post)', val: breadcrumbSchema, set: setBreadcrumbSchema },
-            { label: 'WebSite Schema', desc: 'Dados do site com SearchAction', val: websiteSchema, set: setWebsiteSchema },
+            {
+              label: 'Article',
+              desc: 'Permite que o Google exiba data e autor nos resultados de busca.',
+              val: articleSchema,
+              set: setArticleSchema,
+            },
+            {
+              label: 'WebSite',
+              desc: 'Ativa a caixa de busca do seu site direto no Google.',
+              val: websiteSchema,
+              set: setWebsiteSchema,
+            },
+            {
+              label: 'Breadcrumb',
+              desc: 'Mostra o caminho da página (ex: Home > Categoria > Artigo) nos resultados.',
+              val: breadcrumbSchema,
+              set: setBreadcrumbSchema,
+            },
           ].map(({ label, desc, val, set }) => (
             <label key={label} className="flex items-center justify-between p-3 rounded-md bg-elev cursor-pointer hover:bg-primary-soft transition-colors">
               <div>
@@ -188,6 +214,32 @@ export default function SettingsSEO() {
         {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" aria-hidden="true" />}
         {saving ? 'Salvando...' : 'Salvar Configuração'}
       </button>
+
+      {/* Status pós-save */}
+      {savedStatus && (
+        <div className="bg-surface border border-border rounded-lg p-4 flex items-center gap-4">
+          {savedStatus.orgLogo ? (
+            <img
+              src={savedStatus.orgLogo}
+              alt="Logo da organização"
+              className="w-10 h-10 rounded-md object-contain border border-border bg-elev shrink-0"
+              onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }}
+            />
+          ) : (
+            <div className="w-10 h-10 rounded-md bg-elev border border-border flex items-center justify-center shrink-0">
+              <Building2 className="w-5 h-5 text-ink-faint" aria-hidden="true" />
+            </div>
+          )}
+          <div>
+            <p className="font-semibold text-ink text-sm">{savedStatus.orgName || 'Organização sem nome'}</p>
+            <p className="text-xs text-ink-muted mt-0.5">
+              {savedStatus.socialCount > 0
+                ? `${savedStatus.socialCount} perfil${savedStatus.socialCount > 1 ? 'is' : ''} social${savedStatus.socialCount > 1 ? 'is' : ''} configurado${savedStatus.socialCount > 1 ? 's' : ''}`
+                : 'Nenhum perfil social configurado'}
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

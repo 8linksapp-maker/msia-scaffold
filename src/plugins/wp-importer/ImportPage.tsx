@@ -165,15 +165,24 @@ function parseWordPressXML(xmlText: string): ParsedData {
 
 // ── Component ───────────────────────────────────────────────────────────────
 
+interface PreviewData {
+    totalPosts: number;
+    totalAuthors: number;
+    totalCategories: number;
+    existingPostsEstimate: number;
+}
+
 export default function ImportPage() {
     const [file, setFile] = useState<File | null>(null);
     const [importing, setImporting] = useState(false);
     const [progress, setProgress] = useState('');
     const [result, setResult] = useState<ImportResult | null>(null);
     const [error, setError] = useState('');
+    const [preview, setPreview] = useState<PreviewData | null>(null);
+    const [previewLoading, setPreviewLoading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const f = e.target.files?.[0];
         if (!f) return;
         if (!f.name.endsWith('.xml') && f.type !== 'text/xml' && f.type !== 'application/xml') {
@@ -183,6 +192,22 @@ export default function ImportPage() {
         setFile(f);
         setError('');
         setResult(null);
+        setPreview(null);
+        setPreviewLoading(true);
+        try {
+            const xmlText = await f.text();
+            const parsed = parseWordPressXML(xmlText);
+            setPreview({
+                totalPosts: parsed.posts.length,
+                totalAuthors: parsed.authors.length,
+                totalCategories: parsed.categories.length,
+                existingPostsEstimate: 0,
+            });
+        } catch (err: any) {
+            setError(err.message || 'Erro ao ler o arquivo XML.');
+        } finally {
+            setPreviewLoading(false);
+        }
     };
 
     const BATCH_SIZE = 10;
@@ -359,10 +384,58 @@ export default function ImportPage() {
                 />
             </div>
 
+            {/* Preview após seleção do arquivo */}
+            {previewLoading && (
+                <div className="bg-primary-soft border border-primary/30 rounded-md p-4 flex items-center gap-3">
+                    <Loader2 className="w-4 h-4 animate-spin text-primary shrink-0" />
+                    <p className="text-sm text-primary font-medium">Lendo arquivo...</p>
+                </div>
+            )}
+            {preview && !previewLoading && !result && (
+                <div className="bg-surface rounded-lg border border-primary/30 shadow-sm p-5">
+                    <p className="text-sm font-bold text-ink mb-3">Encontrado no arquivo</p>
+                    <div className="grid grid-cols-3 gap-3 mb-4">
+                        {[
+                            { label: 'Posts', value: preview.totalPosts },
+                            { label: 'Autores', value: preview.totalAuthors },
+                            { label: 'Categorias', value: preview.totalCategories },
+                        ].map(s => (
+                            <div key={s.label} className="bg-elev rounded-md p-3 text-center">
+                                <p className="text-2xl font-bold text-primary">{s.value}</p>
+                                <p className="text-xs text-ink-muted">{s.label}</p>
+                            </div>
+                        ))}
+                    </div>
+                    <p className="text-xs text-ink-faint">Posts com o mesmo slug já existentes serão ignorados. Pronto para importar.</p>
+                </div>
+            )}
+
             {/* Erro */}
             {error && (
                 <div className="p-4 bg-red-50 text-red-700 border-l-4 border-red-500 text-sm font-medium rounded-r-xl flex gap-2">
                     <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />{error}
+                </div>
+            )}
+
+            {/* Botão importar */}
+            <button
+                type="button"
+                onClick={handleImport}
+                disabled={importing || !file}
+                className="bg-primary hover:bg-primary disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-3 rounded-md text-sm font-bold flex items-center gap-2 transition-all shadow-sm shadow-none/20"
+            >
+                {importing ? (
+                    <><Loader2 className="w-4 h-4 animate-spin" /> Importando...</>
+                ) : (
+                    <><Upload className="w-4 h-4" aria-hidden="true" /> Importar do WordPress</>
+                )}
+            </button>
+
+            {importing && (
+                <div className="bg-primary-soft border border-primary/30 rounded-md p-4">
+                    <p className="text-sm text-primary font-medium">
+                        {progress || 'Importando posts e baixando imagens... Isso pode levar alguns minutos.'}
+                    </p>
                 </div>
             )}
 
@@ -392,12 +465,29 @@ export default function ImportPage() {
 
                     {result.posts.imagesImported > 0 && (
                         <p className="text-sm text-ink-muted mb-3">
-                            🖼️ {result.posts.imagesImported} imagem(ns) importada(s) com sucesso.
+                            {result.posts.imagesImported} imagem(ns) importada(s) com sucesso.
                         </p>
                     )}
 
+                    {/* Próximos passos */}
+                    <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-md">
+                        <p className="text-xs font-bold text-amber-700 uppercase tracking-wider mb-2">Próximos passos</p>
+                        <ul className="space-y-1.5">
+                            {[
+                                'Revise as imagens dos posts importados (podem estar apontando para o WordPress antigo)',
+                                'Ajuste as categorias se necessário',
+                                'Revise o conteúdo que estava em HTML no WordPress',
+                            ].map((step, i) => (
+                                <li key={i} className="flex items-start gap-2 text-xs text-amber-800">
+                                    <span className="w-4 h-4 rounded-full bg-amber-200 text-amber-700 font-bold flex items-center justify-center shrink-0 mt-0.5 text-[10px]">{i + 1}</span>
+                                    {step}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
                     {result.posts.errors.length > 0 && (
-                        <div>
+                        <div className="mt-4">
                             <p className="text-xs font-bold text-red-600 uppercase tracking-wider mb-2">Erros nos posts</p>
                             <div className="max-h-32 overflow-y-auto space-y-1">
                                 {result.posts.errors.map((e, i) => (
@@ -417,30 +507,8 @@ export default function ImportPage() {
                     )}
 
                     <a href="/admin/posts" className="mt-4 inline-block text-sm text-primary hover:underline font-medium">
-                        → Ver posts importados
+                        Ver posts importados
                     </a>
-                </div>
-            )}
-
-            {/* Botão importar */}
-            <button
-                type="button"
-                onClick={handleImport}
-                disabled={importing || !file}
-                className="bg-primary hover:bg-primary disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-3 rounded-md text-sm font-bold flex items-center gap-2 transition-all shadow-sm shadow-none/20"
-            >
-                {importing ? (
-                    <><Loader2 className="w-4 h-4 animate-spin" /> Importando...</>
-                ) : (
-                    <><Upload className="w-4 h-4" aria-hidden="true" /> Importar do WordPress</>
-                )}
-            </button>
-
-            {importing && (
-                <div className="bg-primary-soft border border-primary/30 rounded-md p-4">
-                    <p className="text-sm text-primary font-medium">
-                        {progress || 'Importando posts e baixando imagens... Isso pode levar alguns minutos.'}
-                    </p>
                 </div>
             )}
         </div>

@@ -108,7 +108,7 @@ export default function SettingsCookieConsent() {
       </div>
 
       {/* Texts */}
-      <div className="bg-surface rounded-lg border border-border shadow-sm p-6 space-y-4">
+      <div className={`bg-surface rounded-lg border border-border shadow-sm p-6 space-y-4 ${!enabled ? 'opacity-50 pointer-events-none' : ''}`}>
         <h3 className="font-bold text-ink">Textos do Banner</h3>
 
         <div>
@@ -133,13 +133,33 @@ export default function SettingsCookieConsent() {
         </div>
 
         <div>
-          <label className={labelClass}>URL do Botão Recusar</label>
+          <label className={labelClass}>Link para a Política de Privacidade</label>
           <input type="text" value={rejectUrl} onChange={e => setRejectUrl(e.target.value)} className={inputClass} placeholder="/privacidade" />
+          <p className="text-xs text-ink-faint mt-1.5 ml-1">Você precisa ter uma página /privacidade no seu site antes de ativar o banner.</p>
+        </div>
+
+        {/* Banner preview */}
+        <div>
+          <p className="text-xs font-bold text-ink-muted uppercase tracking-wider mb-2 ml-1">Preview do banner</p>
+          <div className="rounded-md bg-gray-900 px-5 py-4 flex flex-col gap-3">
+            <div>
+              <p className="text-sm font-bold text-white">{headline || 'Privacidade e Cookies'}</p>
+              <p className="text-xs text-gray-300 mt-1 leading-relaxed">{description || 'Utilizamos cookies para melhorar sua experiência.'}</p>
+            </div>
+            <div className="flex gap-2">
+              <span className="bg-primary text-white text-xs font-bold px-3 py-1.5 rounded">
+                {buttonAccept || 'Aceitar'}
+              </span>
+              <span className="bg-transparent border border-gray-500 text-gray-300 text-xs font-semibold px-3 py-1.5 rounded">
+                {buttonReject || 'Ler Política'}
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Position */}
-      <div className="bg-surface rounded-lg border border-border shadow-sm p-6">
+      <div className={`bg-surface rounded-lg border border-border shadow-sm p-6 ${!enabled ? 'opacity-50 pointer-events-none' : ''}`}>
         <h3 className="font-bold text-ink mb-4">Posição do Banner</h3>
         <div className="flex gap-3">
           {(['bottom', 'top'] as const).map(pos => (
@@ -152,7 +172,7 @@ export default function SettingsCookieConsent() {
       </div>
 
       {/* Info */}
-      <div className="bg-blue-50 rounded-lg border border-blue-200 p-5">
+      <div className={`bg-blue-50 rounded-lg border border-blue-200 p-5 ${!enabled ? 'opacity-50 pointer-events-none' : ''}`}>
         <p className="text-xs font-bold text-blue-700 uppercase tracking-widest mb-2">Integração automática</p>
         <p className="text-sm text-blue-800">
           Quando ativado, o Google Analytics e Meta Pixel são bloqueados até o visitante aceitar os cookies.

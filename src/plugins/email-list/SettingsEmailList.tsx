@@ -162,8 +162,40 @@ export default function SettingsEmailList() {
         </div>
     );
 
+    const activeCount = [popupEnabled, sidebarEnabled, inlineEnabled].filter(Boolean).length;
+
     return (
         <div className="max-w-2xl space-y-6">
+
+            {/* Resumo do que está ativo */}
+            <div className="bg-surface rounded-lg border border-border shadow-sm p-5">
+                <p className="text-xs font-bold text-ink-muted uppercase tracking-wider mb-3">O que está ativo agora</p>
+                <div className="flex gap-3 flex-wrap mb-3">
+                    {[
+                        { label: 'Popup', active: popupEnabled },
+                        { label: 'Sidebar', active: sidebarEnabled },
+                        { label: 'Inline', active: inlineEnabled },
+                    ].map(item => (
+                        <div
+                            key={item.label}
+                            className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold border ${
+                                item.active
+                                    ? 'bg-primary-soft border-primary/30 text-primary'
+                                    : 'bg-elev border-border text-ink-faint'
+                            }`}
+                        >
+                            <div className={`w-1.5 h-1.5 rounded-full ${item.active ? 'bg-primary' : 'bg-ink-faint'}`} />
+                            {item.label}: {item.active ? 'ativo' : 'inativo'}
+                        </div>
+                    ))}
+                </div>
+                {activeCount > 1 && (
+                    <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-md text-xs text-amber-800">
+                        <AlertCircle className="w-3.5 h-3.5 shrink-0 mt-0.5 text-amber-500" />
+                        Mais de um ponto de captura ativo pode irritar os visitantes. Considere usar apenas um por vez.
+                    </div>
+                )}
+            </div>
 
             {/* Brevo */}
             <div className="bg-surface rounded-lg border border-border shadow-sm p-6">
@@ -208,7 +240,7 @@ export default function SettingsEmailList() {
                             className={inputClass}
                         />
                         <p className="text-xs text-ink-faint mt-1 ml-1">
-                            Encontre em Brevo → Contatos → Listas → ID da lista.
+                            Todos os novos inscritos serão adicionados a esta lista no Brevo. Encontre o ID em Brevo → Contatos → Listas.
                         </p>
                     </div>
                 </div>
@@ -279,7 +311,7 @@ export default function SettingsEmailList() {
                                 className={inputClass}
                             >
                                 <option value="delay">Após X segundos</option>
-                                <option value="scroll">Ao rolar X%</option>
+                                <option value="scroll">Ao chegar a X% da página</option>
                             </select>
                         </div>
                         <div>
@@ -331,7 +363,10 @@ export default function SettingsEmailList() {
                                 <div className="w-full h-9 rounded-lg" style={{ background: 'linear-gradient(135deg,#7c3aed,#a855f7)' }} />
                             </div>
                             <p className="text-xs text-ink-faint mt-2">
-                                {triggerType === 'delay' ? `Aparece após ${triggerValue}s` : `Aparece ao rolar ${triggerValue}%`}
+                                {triggerType === 'delay'
+                                    ? `Aparece após ${triggerValue}s`
+                                    : `Aparece ao chegar a ${triggerValue}% da página${triggerValue === 50 ? ' — quando o visitante chega ao meio do artigo' : ''}`
+                                }
                             </p>
                         </div>
                     </div>
