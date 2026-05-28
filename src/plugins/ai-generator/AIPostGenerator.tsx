@@ -1,4 +1,4 @@
-/**
+﻿/**
  * AIPostGenerator.tsx — Plugin AI Generator (Walker)
  *
  * UI React para geração de posts com IA.
@@ -64,14 +64,14 @@ export default function AIPostGenerator({ authors, categories }: Props) {
     }, [title, slug]);
 
     if (!isMounted) return (
-        <div className="flex items-center justify-center p-20 text-slate-400">
+        <div className="flex items-center justify-center p-20 text-ink-faint">
             <Loader2 className="w-6 h-6 animate-spin mr-3" />
             Carregando gerador...
         </div>
     );
 
-    const inputClass = 'w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-800 focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all shadow-sm';
-    const labelClass = 'block text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1';
+    const inputClass = 'w-full bg-surface border border-border rounded-md px-4 py-3 text-sm font-medium text-ink focus:outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/20/20 transition-all shadow-sm';
+    const labelClass = 'block text-sm font-bold text-ink-muted uppercase tracking-wider mb-2 ml-1';
 
     // Outline management
     const addOutline = (level: Outline['level']) => setOutlines([...outlines, { level, text: '' }]);
@@ -184,7 +184,7 @@ export default function AIPostGenerator({ authors, categories }: Props) {
     };
 
     const levelColors: Record<string, string> = {
-        h1: 'bg-violet-100 text-violet-700',
+        h1: 'bg-primary-soft text-primary',
         h2: 'bg-blue-100 text-blue-700',
         h3: 'bg-green-100 text-green-700',
         h4: 'bg-amber-100 text-amber-700',
@@ -199,21 +199,21 @@ export default function AIPostGenerator({ authors, categories }: Props) {
     return (
         <div className="max-w-3xl pb-16 space-y-6">
             {/* Header */}
-            <div className="flex items-center justify-between bg-white p-4 px-6 rounded-2xl border border-slate-200 shadow-sm">
+            <div className="flex items-center justify-between bg-surface p-4 px-6 rounded-lg border border-border shadow-sm">
                 <div className="flex items-center gap-3">
-                    <a href="/admin/posts" className="text-slate-400 hover:text-violet-600 transition-colors p-1.5 rounded-lg hover:bg-violet-50">
-                        <ArrowLeft className="w-5 h-5" />
+                    <a href="/admin/posts" className="text-ink-faint hover:text-primary transition-colors p-1.5 rounded-lg hover:bg-primary-soft">
+                        <ArrowLeft className="w-5 h-5" aria-hidden="true" />
                     </a>
                     <div>
-                        <h2 className="text-lg font-bold text-slate-800">Gerar Post com IA</h2>
-                        <p className="text-xs text-slate-400">Conteúdo criado automaticamente por inteligência artificial</p>
+                        <h2 className="text-lg font-bold text-ink">Gerar Post com IA</h2>
+                        <p className="text-xs text-ink-faint">Conteúdo criado automaticamente por inteligência artificial</p>
                     </div>
                 </div>
-                <Sparkles className="w-6 h-6 text-violet-500" />
+                <Sparkles className="w-6 h-6 text-primary" />
             </div>
 
             {/* Tipo de Post */}
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+            <div className="bg-surface rounded-lg border border-border shadow-sm p-6">
                 <p className={labelClass}>Tipo de Post</p>
                 <div className="grid grid-cols-2 gap-3">
                     {[
@@ -224,17 +224,17 @@ export default function AIPostGenerator({ authors, categories }: Props) {
                             key={t.id}
                             type="button"
                             onClick={() => setPostType(t.id as any)}
-                            className={`p-4 rounded-xl border-2 text-left transition-all ${postType === t.id ? 'border-violet-500 bg-violet-50' : 'border-slate-200 hover:border-slate-300'}`}
+                            className={`p-4 rounded-md border-2 text-left transition-all ${postType === t.id ? 'border-primary/80 bg-primary-soft' : 'border-border hover:border-border'}`}
                         >
                             <div className="text-2xl mb-1">{t.icon}</div>
-                            <div className="font-bold text-slate-800 text-sm">{t.label}</div>
-                            <div className="text-xs text-slate-500">{t.desc}</div>
+                            <div className="font-bold text-ink text-sm">{t.label}</div>
+                            <div className="text-xs text-ink-muted">{t.desc}</div>
                         </button>
                     ))}
                 </div>
 
                 {postType === 'commercial' && (
-                    <div className="mt-4 pt-4 border-t border-slate-100">
+                    <div className="mt-4 pt-4 border-t border-border">
                         <p className={labelClass}>Sub-tipo Comercial</p>
                         <div className="grid grid-cols-2 gap-3">
                             {[
@@ -245,11 +245,11 @@ export default function AIPostGenerator({ authors, categories }: Props) {
                                     key={s.id}
                                     type="button"
                                     onClick={() => setCommercialSubType(s.id as CommercialSubType)}
-                                    className={`p-3 rounded-xl border-2 text-left transition-all ${commercialSubType === s.id ? 'border-violet-500 bg-violet-50' : 'border-slate-200 hover:border-slate-300'}`}
+                                    className={`p-3 rounded-md border-2 text-left transition-all ${commercialSubType === s.id ? 'border-primary/80 bg-primary-soft' : 'border-border hover:border-border'}`}
                                 >
                                     <div className="text-xl mb-1">{s.icon}</div>
-                                    <div className="font-bold text-slate-800 text-xs">{s.label}</div>
-                                    <div className="text-xs text-slate-500">{s.desc}</div>
+                                    <div className="font-bold text-ink text-xs">{s.label}</div>
+                                    <div className="text-xs text-ink-muted">{s.desc}</div>
                                 </button>
                             ))}
                         </div>
@@ -258,27 +258,27 @@ export default function AIPostGenerator({ authors, categories }: Props) {
             </div>
 
             {/* Informações básicas */}
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
+            <div className="bg-surface rounded-lg border border-border shadow-sm p-6 space-y-4">
                 <p className={labelClass}>Informações Básicas</p>
                 <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1.5">Título *</label>
+                    <label className="block text-sm font-medium text-ink mb-1.5">Título *</label>
                     <input type="text" value={title} onChange={e => setTitle(e.target.value)} className={inputClass} placeholder="Ex: Como Cuidar da Sua Saúde Mental" />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1.5">Slug *</label>
+                    <label className="block text-sm font-medium text-ink mb-1.5">Slug *</label>
                     <input type="text" value={slug} onChange={e => setSlug(e.target.value)} className={`${inputClass} font-mono`} placeholder="como-cuidar-da-sua-saude-mental" />
-                    <p className="text-xs text-slate-400 mt-1 ml-1">Gerado automaticamente do título — pode editar.</p>
+                    <p className="text-xs text-ink-faint mt-1 ml-1">Gerado automaticamente do título — pode editar.</p>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                     <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1.5">Autor *</label>
+                        <label className="block text-sm font-medium text-ink mb-1.5">Autor *</label>
                         <select value={author} onChange={e => setAuthor(e.target.value)} className={inputClass}>
                             <option value="">Selecione um autor</option>
                             {authors.map(a => <option key={a.slug} value={a.slug}>{a.name}</option>)}
                         </select>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1.5">Categoria *</label>
+                        <label className="block text-sm font-medium text-ink mb-1.5">Categoria *</label>
                         <select value={category} onChange={e => setCategory(e.target.value)} className={inputClass}>
                             <option value="">Selecione uma categoria</option>
                             {categories.map(c => <option key={c.slug} value={c.slug}>{c.name}</option>)}
@@ -289,11 +289,11 @@ export default function AIPostGenerator({ authors, categories }: Props) {
 
             {/* Estrutura — Informacional */}
             {postType === 'informational' && (
-                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+                <div className="bg-surface rounded-lg border border-border shadow-sm p-6">
                     <div className="flex items-center justify-between mb-4">
                         <div>
                             <p className={labelClass}>Estrutura do Post (Outlines)</p>
-                            <p className="text-xs text-slate-400 ml-1">Introdução e conclusão são geradas automaticamente.</p>
+                            <p className="text-xs text-ink-faint ml-1">Introdução e conclusão são geradas automaticamente.</p>
                         </div>
                         <div className="flex gap-1.5">
                             {(['h1','h2','h3','h4'] as Outline['level'][]).map(l => (
@@ -306,22 +306,22 @@ export default function AIPostGenerator({ authors, categories }: Props) {
                     {outlines.length > 0 ? (
                         <div className="space-y-2">
                             {outlines.map((o, i) => (
-                                <div key={i} className="flex items-center gap-2 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                                <div key={i} className="flex items-center gap-2 p-3 bg-elev rounded-md border border-border">
                                     <span className={`px-2 py-1 rounded text-xs font-bold shrink-0 ${levelColors[o.level]}`}>{o.level.toUpperCase()}</span>
-                                    <input type="text" value={o.text} onChange={e => updateOutline(i, { text: e.target.value })} className="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-violet-500" placeholder={`Título do ${o.level.toUpperCase()}...`} />
-                                    <input type="number" min={50} max={2000} value={o.minWords ?? ''} onChange={e => { const v = parseInt(e.target.value); updateOutline(i, { minWords: isNaN(v) ? undefined : Math.max(50, Math.min(2000, v)) }); }} className="w-20 bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs text-center focus:outline-none focus:border-violet-500" placeholder="100-150" title="Palavras alvo" />
+                                    <input type="text" value={o.text} onChange={e => updateOutline(i, { text: e.target.value })} className="flex-1 bg-surface border border-border rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-primary/80" placeholder={`Título do ${o.level.toUpperCase()}...`} />
+                                    <input type="number" min={50} max={2000} value={o.minWords ?? ''} onChange={e => { const v = parseInt(e.target.value); updateOutline(i, { minWords: isNaN(v) ? undefined : Math.max(50, Math.min(2000, v)) }); }} className="w-20 bg-surface border border-border rounded-lg px-2 py-1.5 text-xs text-center focus:outline-none focus:border-primary/80" placeholder="100-150" title="Palavras alvo" />
                                     <div className="flex flex-col gap-0.5">
-                                        <button type="button" onClick={() => moveOutline(i, 'up')} disabled={i === 0} className="text-slate-300 hover:text-slate-600 disabled:opacity-20"><ChevronUp className="w-3.5 h-3.5" /></button>
-                                        <button type="button" onClick={() => moveOutline(i, 'down')} disabled={i === outlines.length - 1} className="text-slate-300 hover:text-slate-600 disabled:opacity-20"><ChevronDown className="w-3.5 h-3.5" /></button>
+                                        <button type="button" onClick={() => moveOutline(i, 'up')} disabled={i === 0} className="text-ink-faint hover:text-ink-muted disabled:opacity-20"><ChevronUp className="w-3.5 h-3.5" /></button>
+                                        <button type="button" onClick={() => moveOutline(i, 'down')} disabled={i === outlines.length - 1} className="text-ink-faint hover:text-ink-muted disabled:opacity-20"><ChevronDown className="w-3.5 h-3.5" /></button>
                                     </div>
-                                    <button type="button" onClick={() => removeOutline(i)} className="text-red-400 hover:text-red-600 transition-colors"><Trash2 className="w-4 h-4" /></button>
+                                    <button type="button" onClick={() => removeOutline(i)} className="text-red-400 hover:text-red-600 transition-colors"><Trash2 className="w-4 h-4" aria-hidden="true" /></button>
                                 </div>
                             ))}
                         </div>
                     ) : (
-                        <div className="text-center py-8 border-2 border-dashed border-slate-200 rounded-xl">
-                            <p className="text-slate-400 text-sm mb-1">Nenhuma outline adicionada</p>
-                            <p className="text-slate-300 text-xs">Clique nos botões acima para adicionar títulos</p>
+                        <div className="text-center py-8 border-2 border-dashed border-border rounded-md">
+                            <p className="text-ink-faint text-sm mb-1">Nenhuma outline adicionada</p>
+                            <p className="text-ink-faint text-xs">Clique nos botões acima para adicionar títulos</p>
                         </div>
                     )}
                 </div>
@@ -329,11 +329,11 @@ export default function AIPostGenerator({ authors, categories }: Props) {
 
             {/* Estrutura — Comercial */}
             {postType === 'commercial' && (
-                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+                <div className="bg-surface rounded-lg border border-border shadow-sm p-6">
                     <div className="flex items-center justify-between mb-4">
                         <div>
                             <p className={labelClass}>Estrutura do Post</p>
-                            <p className="text-xs text-slate-400 ml-1">Adicione outlines e produtos na ordem desejada.</p>
+                            <p className="text-xs text-ink-faint ml-1">Adicione outlines e produtos na ordem desejada.</p>
                         </div>
                         <div className="flex gap-1.5 flex-wrap justify-end">
                             {(['h1','h2','h3','h4'] as Outline['level'][]).map(l => (
@@ -342,41 +342,41 @@ export default function AIPostGenerator({ authors, categories }: Props) {
                                 </button>
                             ))}
                             <button type="button" onClick={() => addCommercialItem('product')} className="px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-100 text-amber-700 hover:opacity-80 transition-opacity flex items-center gap-1">
-                                <Plus className="w-3 h-3" /> Produto
+                                <Plus className="w-3 h-3" aria-hidden="true" /> Produto
                             </button>
                         </div>
                     </div>
                     {commercialItems.length > 0 ? (
                         <div className="space-y-2">
                             {commercialItems.map((item, i) => (
-                                <div key={i} className="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                                <div key={i} className="p-3 bg-elev rounded-md border border-border">
                                     <div className="flex items-center gap-2">
                                         {item.type === 'outline' ? (
                                             <>
-                                                <select value={item.level} onChange={e => updateCommercialItem(i, { level: e.target.value })} className="w-16 bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-violet-500 shrink-0">
+                                                <select value={item.level} onChange={e => updateCommercialItem(i, { level: e.target.value })} className="w-16 bg-surface border border-border rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-primary/80 shrink-0">
                                                     {['h1','h2','h3','h4'].map(l => <option key={l} value={l}>{l.toUpperCase()}</option>)}
                                                 </select>
-                                                <input type="text" value={item.text} onChange={e => updateCommercialItem(i, { text: e.target.value })} className="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-violet-500" placeholder="Título da seção..." />
-                                                <input type="number" min={50} max={2000} value={item.minWords ?? ''} onChange={e => { const v = parseInt(e.target.value); updateCommercialItem(i, { minWords: isNaN(v) ? undefined : Math.max(50, Math.min(2000, v)) }); }} className="w-20 bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-xs text-center focus:outline-none focus:border-violet-500" placeholder="100-150" />
+                                                <input type="text" value={item.text} onChange={e => updateCommercialItem(i, { text: e.target.value })} className="flex-1 bg-surface border border-border rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-primary/80" placeholder="Título da seção..." />
+                                                <input type="number" min={50} max={2000} value={item.minWords ?? ''} onChange={e => { const v = parseInt(e.target.value); updateCommercialItem(i, { minWords: isNaN(v) ? undefined : Math.max(50, Math.min(2000, v)) }); }} className="w-20 bg-surface border border-border rounded-lg px-2 py-1.5 text-xs text-center focus:outline-none focus:border-primary/80" placeholder="100-150" />
                                             </>
                                         ) : (
                                             <span className="px-2 py-1 rounded text-xs font-bold shrink-0 bg-amber-100 text-amber-700">Produto</span>
                                         )}
                                         <div className="flex flex-col gap-0.5 shrink-0">
-                                            <button type="button" onClick={() => moveCommercialItem(i, 'up')} disabled={i === 0} className="text-slate-300 hover:text-slate-600 disabled:opacity-20"><ChevronUp className="w-3.5 h-3.5" /></button>
-                                            <button type="button" onClick={() => moveCommercialItem(i, 'down')} disabled={i === commercialItems.length - 1} className="text-slate-300 hover:text-slate-600 disabled:opacity-20"><ChevronDown className="w-3.5 h-3.5" /></button>
+                                            <button type="button" onClick={() => moveCommercialItem(i, 'up')} disabled={i === 0} className="text-ink-faint hover:text-ink-muted disabled:opacity-20"><ChevronUp className="w-3.5 h-3.5" /></button>
+                                            <button type="button" onClick={() => moveCommercialItem(i, 'down')} disabled={i === commercialItems.length - 1} className="text-ink-faint hover:text-ink-muted disabled:opacity-20"><ChevronDown className="w-3.5 h-3.5" /></button>
                                         </div>
-                                        <button type="button" onClick={() => removeCommercialItem(i)} className="text-red-400 hover:text-red-600 transition-colors shrink-0"><Trash2 className="w-4 h-4" /></button>
+                                        <button type="button" onClick={() => removeCommercialItem(i)} className="text-red-400 hover:text-red-600 transition-colors shrink-0"><Trash2 className="w-4 h-4" aria-hidden="true" /></button>
                                     </div>
                                     {item.type === 'product' && (
                                         <div className="grid grid-cols-2 gap-3 mt-3">
                                             <div>
-                                                <label className="block text-xs font-semibold text-slate-500 mb-1">Nome do produto *</label>
-                                                <input type="text" value={item.name} onChange={e => updateCommercialItem(i, { name: e.target.value })} className="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-violet-500" placeholder="Ex: Produto X Pro" />
+                                                <label className="block text-xs font-semibold text-ink-muted mb-1">Nome do produto *</label>
+                                                <input type="text" value={item.name} onChange={e => updateCommercialItem(i, { name: e.target.value })} className="w-full bg-surface border border-border rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-primary/80" placeholder="Ex: Produto X Pro" />
                                             </div>
                                             <div>
-                                                <label className="block text-xs font-semibold text-slate-500 mb-1">URL da imagem</label>
-                                                <input type="url" value={item.imageUrl} onChange={e => updateCommercialItem(i, { imageUrl: e.target.value })} className="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-violet-500" placeholder="https://exemplo.com/img.jpg" />
+                                                <label className="block text-xs font-semibold text-ink-muted mb-1">URL da imagem</label>
+                                                <input type="url" value={item.imageUrl} onChange={e => updateCommercialItem(i, { imageUrl: e.target.value })} className="w-full bg-surface border border-border rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-primary/80" placeholder="https://exemplo.com/img.jpg" />
                                             </div>
                                         </div>
                                     )}
@@ -384,9 +384,9 @@ export default function AIPostGenerator({ authors, categories }: Props) {
                             ))}
                         </div>
                     ) : (
-                        <div className="text-center py-8 border-2 border-dashed border-slate-200 rounded-xl">
-                            <p className="text-slate-400 text-sm">Nenhum item adicionado</p>
-                            <p className="text-slate-300 text-xs mt-1">Use os botões acima para adicionar outlines ou produtos</p>
+                        <div className="text-center py-8 border-2 border-dashed border-border rounded-md">
+                            <p className="text-ink-faint text-sm">Nenhum item adicionado</p>
+                            <p className="text-ink-faint text-xs mt-1">Use os botões acima para adicionar outlines ou produtos</p>
                         </div>
                     )}
                 </div>
@@ -401,15 +401,15 @@ export default function AIPostGenerator({ authors, categories }: Props) {
 
             {/* Progresso */}
             {progress && (
-                <div className="bg-white rounded-2xl border-2 border-violet-200 shadow-sm p-6">
+                <div className="bg-surface rounded-lg border-2 border-primary/30 shadow-sm p-6">
                     <div className="flex items-start gap-4">
-                        <div className="w-11 h-11 rounded-full bg-violet-100 flex items-center justify-center shrink-0">
-                            {isGenerating ? <Sparkles className="w-5 h-5 text-violet-600 animate-pulse" /> : <span>✅</span>}
+                        <div className="w-11 h-11 rounded-full bg-primary-soft flex items-center justify-center shrink-0">
+                            {isGenerating ? <Sparkles className="w-5 h-5 text-primary animate-pulse" /> : <span>✅</span>}
                         </div>
                         <div>
-                            <p className="font-bold text-slate-800">{isGenerating ? 'Criando seu post...' : 'Concluído!'}</p>
-                            <p className="text-sm text-slate-500 mt-1">{progress}</p>
-                            <p className="text-xs text-slate-400 mt-1.5">
+                            <p className="font-bold text-ink">{isGenerating ? 'Criando seu post...' : 'Concluído!'}</p>
+                            <p className="text-sm text-ink-muted mt-1">{progress}</p>
+                            <p className="text-xs text-ink-faint mt-1.5">
                                 {isGenerating ? 'Aguarde enquanto a IA escreve cada seção. Isso pode levar alguns minutos.' : 'Redirecionando para a lista de posts...'}
                             </p>
                         </div>
@@ -419,19 +419,19 @@ export default function AIPostGenerator({ authors, categories }: Props) {
 
             {/* Botão Gerar */}
             <div className="flex items-center justify-end gap-3">
-                <a href="/admin/posts" className="px-4 py-2.5 border border-slate-200 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors">
+                <a href="/admin/posts" className="px-4 py-2.5 border border-border rounded-md text-sm font-medium text-ink-muted hover:bg-elev transition-colors">
                     Cancelar
                 </a>
                 <button
                     type="button"
                     onClick={handleGenerate}
                     disabled={isGenerating || !canGenerate}
-                    className="bg-violet-600 hover:bg-violet-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all shadow-sm shadow-violet-600/20"
+                    className="bg-primary hover:bg-primary disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-2.5 rounded-md text-sm font-bold flex items-center gap-2 transition-all shadow-sm shadow-none/20"
                 >
                     {isGenerating ? (
                         <><Loader2 className="w-4 h-4 animate-spin" /> Gerando...</>
                     ) : (
-                        <><Sparkles className="w-4 h-4" /> Gerar e Publicar Post</>
+                        <><Sparkles className="w-4 h-4" aria-hidden="true" /> Gerar e Publicar Post</>
                     )}
                 </button>
             </div>

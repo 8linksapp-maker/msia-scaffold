@@ -1,4 +1,4 @@
-/**
+﻿/**
  * SettingsGoogleTag.tsx — Plugin Google Tag (unified)
  *
  * UI to manage ALL Google tag IDs (Analytics G-, Ads AW-, Tag Manager GTM-, Display DC-)
@@ -19,7 +19,7 @@ function getTagType(id: string): { label: string; color: string; bg: string } {
     if (id.startsWith('AW-'))  return { label: 'Google Ads', color: 'text-amber-700', bg: 'bg-amber-100' };
     if (id.startsWith('GTM-')) return { label: 'Tag Manager', color: 'text-blue-700', bg: 'bg-blue-100' };
     if (id.startsWith('DC-'))  return { label: 'Display', color: 'text-purple-700', bg: 'bg-purple-100' };
-    return { label: 'Outro', color: 'text-slate-700', bg: 'bg-slate-100' };
+    return { label: 'Outro', color: 'text-ink', bg: 'bg-elev' };
 }
 
 export default function SettingsGoogleTag() {
@@ -105,11 +105,11 @@ export default function SettingsGoogleTag() {
         }
     };
 
-    const inputClass = 'flex-1 bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-800 focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all shadow-sm font-mono';
+    const inputClass = 'flex-1 bg-surface border border-border rounded-md px-4 py-3 text-sm font-medium text-ink focus:outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/20/20 transition-all shadow-sm font-mono';
 
     if (loading) return (
-        <div className="flex flex-col items-center justify-center p-20 text-slate-400 bg-white rounded-3xl border border-slate-200">
-            <Loader2 className="w-8 h-8 animate-spin mb-4 text-violet-500" />
+        <div className="flex flex-col items-center justify-center p-20 text-ink-faint bg-surface rounded-3xl border border-border">
+            <Loader2 className="w-8 h-8 animate-spin mb-4 text-primary" />
             <p className="font-medium animate-pulse">Carregando configuracao...</p>
         </div>
     );
@@ -124,14 +124,14 @@ export default function SettingsGoogleTag() {
     return (
         <div className="max-w-2xl space-y-6">
             {/* Tags list */}
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-                <h3 className="font-bold text-slate-800 mb-1">Tags Configuradas</h3>
-                <p className="text-sm text-slate-500 mb-4">
+            <div className="bg-surface rounded-lg border border-border shadow-sm p-6">
+                <h3 className="font-bold text-ink mb-1">Tags Configuradas</h3>
+                <p className="text-sm text-ink-muted mb-4">
                     Adicione todos os IDs de tags do Google que deseja carregar no site.
                 </p>
 
                 {tags.length === 0 ? (
-                    <div className="text-center py-8 text-slate-400">
+                    <div className="text-center py-8 text-ink-faint">
                         <Tag className="w-8 h-8 mx-auto mb-2 opacity-50" />
                         <p className="text-sm">Nenhuma tag configurada</p>
                     </div>
@@ -140,19 +140,19 @@ export default function SettingsGoogleTag() {
                         {tags.map(id => {
                             const type = getTagType(id);
                             return (
-                                <div key={id} className="flex items-center justify-between bg-slate-50 rounded-xl px-4 py-3 border border-slate-100">
+                                <div key={id} className="flex items-center justify-between bg-elev rounded-md px-4 py-3 border border-border">
                                     <div className="flex items-center gap-3">
-                                        <span className="font-mono font-bold text-sm text-slate-800">{id}</span>
+                                        <span className="font-mono font-bold text-sm text-ink">{id}</span>
                                         <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${type.bg} ${type.color}`}>
                                             {type.label}
                                         </span>
                                     </div>
                                     <button
                                         onClick={() => removeTag(id)}
-                                        className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                                        className="p-1.5 text-ink-faint hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
                                         title="Remover tag"
                                     >
-                                        <Trash2 className="w-4 h-4" />
+                                        <Trash2 className="w-4 h-4" aria-hidden="true" />
                                     </button>
                                 </div>
                             );
@@ -172,9 +172,9 @@ export default function SettingsGoogleTag() {
                     />
                     <button
                         onClick={addTag}
-                        className="bg-violet-600 hover:bg-violet-700 text-white px-4 py-3 rounded-xl text-sm font-bold flex items-center gap-2 transition-all shadow-sm shadow-violet-600/20 shrink-0"
+                        className="bg-primary hover:bg-primary text-white px-4 py-3 rounded-md text-sm font-bold flex items-center gap-2 transition-all shadow-sm shadow-none/20 shrink-0"
                     >
-                        <Plus className="w-4 h-4" />
+                        <Plus className="w-4 h-4" aria-hidden="true" />
                         Adicionar
                     </button>
                 </div>
@@ -184,15 +184,15 @@ export default function SettingsGoogleTag() {
             </div>
 
             {/* Status */}
-            <div className="bg-slate-50 rounded-2xl border border-slate-200 p-4">
+            <div className="bg-elev rounded-lg border border-border p-4">
                 <div className="flex items-center justify-between text-sm">
-                    <span className="text-slate-500">Status</span>
+                    <span className="text-ink-muted">Status</span>
                     {tags.length > 0 ? (
                         <span className="flex items-center gap-1.5 text-green-600 font-semibold">
-                            <CheckCircle className="w-4 h-4" /> {tags.length} tag{tags.length !== 1 ? 's' : ''} configurada{tags.length !== 1 ? 's' : ''}
+                            <CheckCircle className="w-4 h-4" aria-hidden="true" /> {tags.length} tag{tags.length !== 1 ? 's' : ''} configurada{tags.length !== 1 ? 's' : ''}
                         </span>
                     ) : (
-                        <span className="text-slate-400">Nenhuma tag configurada</span>
+                        <span className="text-ink-faint">Nenhuma tag configurada</span>
                     )}
                 </div>
             </div>
@@ -207,14 +207,14 @@ export default function SettingsGoogleTag() {
             <button
                 onClick={handleSave}
                 disabled={saving}
-                className="bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white px-6 py-3 rounded-xl text-sm font-bold flex items-center gap-2 transition-all shadow-sm shadow-violet-600/20"
+                className="bg-primary hover:bg-primary disabled:opacity-50 text-white px-6 py-3 rounded-md text-sm font-bold flex items-center gap-2 transition-all shadow-sm shadow-none/20"
             >
-                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : saved ? <CheckCircle className="w-4 h-4" /> : <Save className="w-4 h-4" />}
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : saved ? <CheckCircle className="w-4 h-4" aria-hidden="true" /> : <Save className="w-4 h-4" aria-hidden="true" />}
                 {saving ? 'Salvando...' : saved ? 'Salvo!' : 'Salvar Configuracao'}
             </button>
 
             {/* Instructions */}
-            <div className="bg-blue-50 rounded-2xl border border-blue-200 p-5">
+            <div className="bg-blue-50 rounded-lg border border-blue-200 p-5">
                 <p className="text-xs font-bold text-blue-700 uppercase tracking-widest mb-3">Tipos de tag aceitos</p>
                 <div className="space-y-2">
                     {[

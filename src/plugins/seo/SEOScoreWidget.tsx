@@ -1,4 +1,4 @@
-/**
+﻿/**
  * SEOScoreWidget.tsx — Plugin SEO Toolkit
  *
  * Checklist de SEO embutido no PostEditor.
@@ -84,14 +84,14 @@ export default function SEOScoreWidget({ title, description, heroImage, content 
     'text-red-700';
 
   return (
-    <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-      <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
-        <h3 className="font-bold text-slate-700 text-sm">Score SEO</h3>
+    <div className="bg-surface p-5 rounded-lg border border-border shadow-sm">
+      <div className="flex items-center justify-between border-b border-border pb-3 mb-4">
+        <h3 className="font-bold text-ink text-sm">Score SEO</h3>
         <span className={`text-lg font-black ${scoreText}`}>{score}%</span>
       </div>
 
       {/* Progress bar */}
-      <div className="h-2 bg-slate-100 rounded-full mb-4 overflow-hidden">
+      <div className="h-2 bg-elev rounded-full mb-4 overflow-hidden">
         <div
           className={`h-full rounded-full transition-all duration-500 ${scoreColor}`}
           style={{ width: `${score}%` }}
@@ -107,10 +107,10 @@ export default function SEOScoreWidget({ title, description, heroImage, content 
               <XCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
             )}
             <div className="min-w-0">
-              <p className={`text-xs font-semibold ${check.pass ? 'text-slate-700' : 'text-slate-500'}`}>
+              <p className={`text-xs font-semibold ${check.pass ? 'text-ink' : 'text-ink-muted'}`}>
                 {check.label}
               </p>
-              <p className={`text-xs ${check.pass ? 'text-green-600' : 'text-slate-400'}`}>
+              <p className={`text-xs ${check.pass ? 'text-green-600' : 'text-ink-faint'}`}>
                 {check.hint}
               </p>
             </div>

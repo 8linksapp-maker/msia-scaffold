@@ -1,4 +1,4 @@
-/**
+﻿/**
  * SettingsCookieConsent.tsx — Plugin Cookie Consent / LGPD
  *
  * Configura o banner de consentimento de cookies.
@@ -72,12 +72,12 @@ export default function SettingsCookieConsent() {
     }
   };
 
-  const inputClass = 'w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-800 focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all shadow-sm';
-  const labelClass = 'block text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1';
+  const inputClass = 'w-full bg-surface border border-border rounded-md px-4 py-3 text-sm font-medium text-ink focus:outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/20/20 transition-all shadow-sm';
+  const labelClass = 'block text-sm font-bold text-ink-muted uppercase tracking-wider mb-2 ml-1';
 
   if (loading) return (
-    <div className="flex flex-col items-center justify-center p-20 text-slate-400 bg-white rounded-3xl border border-slate-200">
-      <Loader2 className="w-8 h-8 animate-spin mb-4 text-violet-500" />
+    <div className="flex flex-col items-center justify-center p-20 text-ink-faint bg-surface rounded-3xl border border-border">
+      <Loader2 className="w-8 h-8 animate-spin mb-4 text-primary" />
       <p className="font-medium animate-pulse">Carregando configuração...</p>
     </div>
   );
@@ -92,24 +92,24 @@ export default function SettingsCookieConsent() {
   return (
     <div className="max-w-2xl space-y-6">
       {/* Enable toggle */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+      <div className="bg-surface rounded-lg border border-border shadow-sm p-6">
         <label className="flex items-center justify-between cursor-pointer">
           <div>
-            <h3 className="font-bold text-slate-800">Ativar Banner de Cookies</h3>
-            <p className="text-sm text-slate-500 mt-0.5">Exibe o aviso de cookies para novos visitantes (LGPD)</p>
+            <h3 className="font-bold text-ink">Ativar Banner de Cookies</h3>
+            <p className="text-sm text-ink-muted mt-0.5">Exibe o aviso de cookies para novos visitantes (LGPD)</p>
           </div>
           <div
             onClick={() => setEnabled(!enabled)}
-            className={`relative w-12 h-6 rounded-full transition-colors cursor-pointer ${enabled ? 'bg-violet-600' : 'bg-slate-200'}`}
+            className={`relative w-12 h-6 rounded-full transition-colors cursor-pointer ${enabled ? 'bg-primary' : 'bg-elev'}`}
           >
-            <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all ${enabled ? 'left-7' : 'left-1'}`} />
+            <div className={`absolute top-1 w-4 h-4 bg-surface rounded-full shadow transition-all ${enabled ? 'left-7' : 'left-1'}`} />
           </div>
         </label>
       </div>
 
       {/* Texts */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
-        <h3 className="font-bold text-slate-800">Textos do Banner</h3>
+      <div className="bg-surface rounded-lg border border-border shadow-sm p-6 space-y-4">
+        <h3 className="font-bold text-ink">Textos do Banner</h3>
 
         <div>
           <label className={labelClass}>Título</label>
@@ -139,11 +139,11 @@ export default function SettingsCookieConsent() {
       </div>
 
       {/* Position */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-        <h3 className="font-bold text-slate-800 mb-4">Posição do Banner</h3>
+      <div className="bg-surface rounded-lg border border-border shadow-sm p-6">
+        <h3 className="font-bold text-ink mb-4">Posição do Banner</h3>
         <div className="flex gap-3">
           {(['bottom', 'top'] as const).map(pos => (
-            <label key={pos} className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-xl border cursor-pointer transition-all ${position === pos ? 'border-violet-300 bg-violet-50 text-violet-700' : 'border-slate-200 text-slate-600 hover:bg-slate-50'}`}>
+            <label key={pos} className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-md border cursor-pointer transition-all ${position === pos ? 'border-primary/40 bg-primary-soft text-primary' : 'border-border text-ink-muted hover:bg-elev'}`}>
               <input type="radio" name="position" value={pos} checked={position === pos} onChange={() => setPosition(pos)} className="sr-only" />
               <span className="text-sm font-semibold capitalize">{pos === 'bottom' ? 'Rodapé' : 'Topo'}</span>
             </label>
@@ -152,7 +152,7 @@ export default function SettingsCookieConsent() {
       </div>
 
       {/* Info */}
-      <div className="bg-blue-50 rounded-2xl border border-blue-200 p-5">
+      <div className="bg-blue-50 rounded-lg border border-blue-200 p-5">
         <p className="text-xs font-bold text-blue-700 uppercase tracking-widest mb-2">Integração automática</p>
         <p className="text-sm text-blue-800">
           Quando ativado, o Google Analytics e Meta Pixel são bloqueados até o visitante aceitar os cookies.
@@ -169,9 +169,9 @@ export default function SettingsCookieConsent() {
       <button
         onClick={handleSave}
         disabled={saving}
-        className="bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white px-6 py-3 rounded-xl text-sm font-bold flex items-center gap-2 transition-all shadow-sm shadow-violet-600/20"
+        className="bg-primary hover:bg-primary disabled:opacity-50 text-white px-6 py-3 rounded-md text-sm font-bold flex items-center gap-2 transition-all shadow-sm shadow-none/20"
       >
-        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" aria-hidden="true" />}
         {saving ? 'Salvando...' : 'Salvar Configuração'}
       </button>
     </div>

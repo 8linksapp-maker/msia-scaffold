@@ -33,14 +33,14 @@ const defaultTab = hasApiKey ? 'generate' : 'settings';
                 onclick="showTab('generate')"
                 class={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${defaultTab === 'generate' ? 'bg-surface text-primary shadow-sm' : 'text-ink-muted hover:text-ink'}`}
             >
-                ✨ Gerar Post
+                Gerar Post
             </button>
             <button
                 id="tab-settings"
                 onclick="showTab('settings')"
                 class={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${defaultTab === 'settings' ? 'bg-surface text-primary shadow-sm' : 'text-ink-muted hover:text-ink'}`}
             >
-                ⚙️ Configurações{!hasApiKey && <span class="ml-1.5 w-2 h-2 bg-amber-400 rounded-full inline-block"></span>}
+                Configurações{!hasApiKey && <span class="ml-1.5 w-2 h-2 bg-amber-500 rounded-full inline-block"></span>}
             </button>
         </div>
     </div>

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * AffiliateManager.tsx — Plugin Amazon Affiliates Manager
  *
  * CRUD de produtos afiliados + configurações do plugin.
@@ -96,10 +96,10 @@ const BADGE_STYLES: Record<string, { bg: string; text: string; icon: string }> =
   'Melhor Escolha':          { bg: 'bg-amber-100',   text: 'text-amber-800',  icon: '🏆' },
   'Mais Vendido':            { bg: 'bg-green-100',   text: 'text-green-800',  icon: '🔥' },
   'Melhor Custo-Benefício':  { bg: 'bg-blue-100',    text: 'text-blue-800',   icon: '💡' },
-  'Recomendado':             { bg: 'bg-violet-100',  text: 'text-violet-800', icon: '⭐' },
+  'Recomendado':             { bg: 'bg-primary-soft',  text: 'text-violet-800', icon: '⭐' },
   "Editor's Choice":         { bg: 'bg-rose-100',    text: 'text-rose-800',   icon: '✍️' },
   'Premium':                 { bg: 'bg-purple-100',  text: 'text-purple-800', icon: '💎' },
-  'Orçamento':               { bg: 'bg-slate-100',   text: 'text-slate-700',  icon: '💰' },
+  'Orçamento':               { bg: 'bg-elev',   text: 'text-ink',  icon: '💰' },
 };
 
 function slugify(text: string): string {
@@ -131,7 +131,7 @@ function StarRating({ rating }: { rating: number }) {
           ★
         </span>
       ))}
-      <span className="ml-1 text-slate-500 text-xs font-bold tabular-nums">
+      <span className="ml-1 text-ink-muted text-xs font-bold tabular-nums">
         {Number(rating).toFixed(1)}
       </span>
     </div>
@@ -160,17 +160,17 @@ function LivePreview({
   if (!hasContent) {
     return (
       <div className="flex flex-col items-center justify-center h-56 text-center px-4">
-        <div className="w-14 h-14 rounded-2xl bg-amber-50 flex items-center justify-center mb-3">
+        <div className="w-14 h-14 rounded-lg bg-amber-50 flex items-center justify-center mb-3">
           <Eye className="w-6 h-6 text-amber-300" />
         </div>
-        <p className="text-sm font-semibold text-slate-400">Preencha os dados</p>
-        <p className="text-xs text-slate-300 mt-1">A prévia do card aparece aqui</p>
+        <p className="text-sm font-semibold text-ink-faint">Preencha os dados</p>
+        <p className="text-xs text-ink-faint mt-1">A prévia do card aparece aqui</p>
       </div>
     );
   }
 
   return (
-    <div className="rounded-xl border border-slate-200 overflow-hidden bg-white shadow-sm">
+    <div className="rounded-md border border-border overflow-hidden bg-surface shadow-sm">
       {form.badge && badgeInfo && (
         <div className={`px-3 py-1.5 ${badgeInfo.bg} ${badgeInfo.text} font-bold uppercase tracking-wider flex items-center gap-1.5`} style={{ fontSize: '10px' }}>
           <span>{badgeInfo.icon}</span>
@@ -179,7 +179,7 @@ function LivePreview({
       )}
       <div className="flex gap-3 p-3">
         {form.image && (
-          <div className="w-16 h-16 shrink-0 rounded-lg bg-slate-50 border border-slate-100 overflow-hidden">
+          <div className="w-16 h-16 shrink-0 rounded-lg bg-elev border border-border overflow-hidden">
             <img
               src={form.image}
               alt=""
@@ -189,15 +189,15 @@ function LivePreview({
           </div>
         )}
         <div className="flex-1 min-w-0">
-          <p className="font-bold text-slate-800 leading-tight mb-1 line-clamp-2" style={{ fontSize: '12px' }}>
-            {form.title || <span className="text-slate-300 font-normal">Título do produto...</span>}
+          <p className="font-bold text-ink leading-tight mb-1 line-clamp-2" style={{ fontSize: '12px' }}>
+            {form.title || <span className="text-ink-faint font-normal">Título do produto...</span>}
           </p>
           {form.rating > 0 && <StarRating rating={form.rating} />}
           {form.price && (
             <div className="flex items-baseline gap-1.5 mt-1">
               <span className="font-bold text-amber-700" style={{ fontSize: '13px' }}>{form.price}</span>
               {form.originalPrice && (
-                <span className="text-slate-400 line-through" style={{ fontSize: '10px' }}>{form.originalPrice}</span>
+                <span className="text-ink-faint line-through" style={{ fontSize: '10px' }}>{form.originalPrice}</span>
               )}
             </div>
           )}
@@ -208,7 +208,7 @@ function LivePreview({
         <div className="px-3 pb-2 grid grid-cols-2 gap-x-2">
           <div className="space-y-0.5">
             {pros.map((p, i) => (
-              <div key={i} className="flex items-start gap-1 text-slate-600" style={{ fontSize: '11px' }}>
+              <div key={i} className="flex items-start gap-1 text-ink-muted" style={{ fontSize: '11px' }}>
                 <span className="text-green-500 shrink-0 mt-0.5 font-bold">✓</span>
                 <span className="leading-tight">{p}</span>
               </div>
@@ -216,7 +216,7 @@ function LivePreview({
           </div>
           <div className="space-y-0.5">
             {cons.map((c, i) => (
-              <div key={i} className="flex items-start gap-1 text-slate-600" style={{ fontSize: '11px' }}>
+              <div key={i} className="flex items-start gap-1 text-ink-muted" style={{ fontSize: '11px' }}>
                 <span className="text-red-400 shrink-0 mt-0.5 font-bold">✗</span>
                 <span className="leading-tight">{c}</span>
               </div>
@@ -238,8 +238,8 @@ function LivePreview({
 }
 
 const inputClass =
-  'w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-800 focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all shadow-sm';
-const labelClass = 'block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-0.5';
+  'w-full bg-surface border border-border rounded-md px-4 py-3 text-sm font-medium text-ink focus:outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/20/20 transition-all shadow-sm';
+const labelClass = 'block text-xs font-bold text-ink-muted uppercase tracking-wider mb-2 ml-0.5';
 
 export default function AffiliateManager() {
   const [tab, setTab] = useState<'products' | 'settings'>('products');
@@ -435,7 +435,7 @@ export default function AffiliateManager() {
   };
 
   if (loading) return (
-    <div className="flex flex-col items-center justify-center p-20 text-slate-400 bg-white rounded-3xl border border-slate-200">
+    <div className="flex flex-col items-center justify-center p-20 text-ink-faint bg-surface rounded-3xl border border-border">
       <Loader2 className="w-8 h-8 animate-spin mb-4 text-amber-500" />
       <p className="font-medium animate-pulse">Carregando produtos...</p>
     </div>
@@ -446,7 +446,7 @@ export default function AffiliateManager() {
 
       {/* ── PLUGIN HEADER ── */}
       <div
-        className="rounded-2xl overflow-hidden p-6 text-white"
+        className="rounded-lg overflow-hidden p-6 text-white"
         style={{
           background: 'linear-gradient(135deg, #f59e0b 0%, #f97316 50%, #ea580c 100%)',
           boxShadow: '0 8px 32px -4px rgba(245, 158, 11, 0.35)',
@@ -455,8 +455,8 @@ export default function AffiliateManager() {
         <div className="flex items-start justify-between mb-5">
           <div>
             <div className="flex items-center gap-3 mb-1">
-              <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm border border-white/30">
-                <ShoppingCart className="w-4 h-4" />
+              <div className="w-9 h-9 bg-surface/20 rounded-md flex items-center justify-center backdrop-blur-sm border border-white/30">
+                <ShoppingCart className="w-4 h-4" aria-hidden="true" />
               </div>
               <h2 className="font-black text-xl tracking-tight">Afiliados</h2>
             </div>
@@ -467,11 +467,11 @@ export default function AffiliateManager() {
           <div
             className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold border ${
               config.enabled
-                ? 'bg-white/15 border-white/30 text-white'
+                ? 'bg-surface/15 border-white/30 text-white'
                 : 'bg-black/20 border-black/20 text-white/50'
             }`}
           >
-            <div className={`w-1.5 h-1.5 rounded-full ${config.enabled ? 'bg-green-300 animate-pulse' : 'bg-white/30'}`} />
+            <div className={`w-1.5 h-1.5 rounded-full ${config.enabled ? 'bg-green-300 animate-pulse' : 'bg-surface/30'}`} />
             {config.enabled ? 'Plugin ativo' : 'Desativado'}
           </div>
         </div>
@@ -511,7 +511,7 @@ export default function AffiliateManager() {
           ].map((stat, i) => (
             <div
               key={i}
-              className="flex items-center gap-2.5 bg-white/10 backdrop-blur-sm rounded-xl px-4 py-2.5 border border-white/20"
+              className="flex items-center gap-2.5 bg-surface/10 backdrop-blur-sm rounded-md px-4 py-2.5 border border-white/20"
             >
               {stat.icon}
               <div>
@@ -529,35 +529,35 @@ export default function AffiliateManager() {
 
       {/* ── TABS + NEW BUTTON ── */}
       <div className="flex items-center justify-between">
-        <div className="flex gap-1 bg-slate-100 p-1 rounded-xl">
+        <div className="flex gap-1 bg-elev p-1 rounded-md">
           <button
             onClick={() => setTab('products')}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${
-              tab === 'products' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+              tab === 'products' ? 'bg-surface text-ink shadow-sm' : 'text-ink-muted hover:text-ink'
             }`}
           >
-            <Package className="w-4 h-4" /> Produtos
+            <Package className="w-4 h-4" aria-hidden="true" /> Produtos
           </button>
           <button
             onClick={() => setTab('settings')}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${
-              tab === 'settings' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+              tab === 'settings' ? 'bg-surface text-ink shadow-sm' : 'text-ink-muted hover:text-ink'
             }`}
           >
-            <Settings className="w-4 h-4" /> Configurações
+            <Settings className="w-4 h-4" aria-hidden="true" /> Configurações
           </button>
         </div>
 
         {tab === 'products' && !showForm && (
           <button
             onClick={handleAdd}
-            className="text-white px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all active:scale-95"
+            className="text-white px-5 py-2.5 rounded-md text-sm font-bold flex items-center gap-2 transition-all active:scale-95"
             style={{
               background: 'linear-gradient(135deg, #f59e0b, #f97316)',
               boxShadow: '0 4px 12px -2px rgba(245, 158, 11, 0.4)',
             }}
           >
-            <Plus className="w-4 h-4" /> Novo Produto
+            <Plus className="w-4 h-4" aria-hidden="true" /> Novo Produto
           </button>
         )}
       </div>
@@ -573,40 +573,40 @@ export default function AffiliateManager() {
         <>
           {/* Form with live preview */}
           {showForm && (
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm">
+            <div className="bg-surface rounded-lg border border-border shadow-sm">
               {/* Form header */}
-              <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-slate-50 to-amber-50/40 rounded-t-2xl">
+              <div className="px-6 py-4 border-b border-border flex items-center justify-between bg-gradient-to-r from-slate-50 to-amber-50/40 rounded-t-2xl">
                 <div>
-                  <h3 className="font-bold text-slate-800">
+                  <h3 className="font-bold text-ink">
                     {editingId ? '✏️ Editar Produto' : '✨ Novo Produto'}
                   </h3>
-                  <p className="text-xs text-slate-500 mt-0.5">
+                  <p className="text-xs text-ink-muted mt-0.5">
                     Preencha os dados — a prévia ao vivo atualiza instantaneamente →
                   </p>
                 </div>
                 <button
                   onClick={() => { setShowForm(false); setEditingId(null); }}
-                  className="text-xs text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg font-medium transition-colors"
+                  className="text-xs text-ink-faint hover:text-ink-muted bg-elev hover:bg-elev px-3 py-1.5 rounded-lg font-medium transition-colors"
                 >
                   Cancelar
                 </button>
               </div>
 
               {/* 2-column layout: form | live preview */}
-              <div className="grid lg:grid-cols-[1fr_300px] divide-y lg:divide-y-0 lg:divide-x divide-slate-100">
+              <div className="grid lg:grid-cols-[1fr_300px] divide-y lg:divide-y-0 lg:divide-x divide-border">
 
                 {/* Left — form fields */}
                 <div className="p-6 space-y-4">
 
                   {/* Amazon import */}
-                  <div className="flex gap-2 p-3 bg-amber-50 border border-amber-200 rounded-xl">
+                  <div className="flex gap-2 p-3 bg-amber-50 border border-amber-200 rounded-md">
                     <div className="flex-1">
                       <input
                         type="text"
                         value={asinInput}
                         onChange={e => setAsinInput(e.target.value)}
                         onKeyDown={e => e.key === 'Enter' && importFromAmazon()}
-                        className="w-full bg-white border border-amber-200 rounded-lg px-3 py-2 text-sm font-mono text-slate-800 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition-all"
+                        className="w-full bg-surface border border-amber-200 rounded-lg px-3 py-2 text-sm font-mono text-ink focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition-all"
                         placeholder="ASIN (ex: B09XS7JWHH)"
                       />
                     </div>
@@ -675,7 +675,7 @@ export default function AffiliateManager() {
                       <img
                         src={form.image}
                         alt="preview"
-                        className="w-14 h-14 object-contain rounded-xl border border-slate-200 bg-slate-50 shadow-sm"
+                        className="w-14 h-14 object-contain rounded-md border border-border bg-elev shadow-sm"
                         onError={e => { (e.target as HTMLImageElement).style.opacity = '0'; }}
                       />
                     )}
@@ -683,7 +683,7 @@ export default function AffiliateManager() {
 
                   <div>
                     <label className={labelClass}>
-                      URL principal <span className="text-slate-400 font-normal normal-case tracking-normal">— Amazon ou outra loja (opcional se houver lojas adicionais abaixo)</span>
+                      URL principal <span className="text-ink-faint font-normal normal-case tracking-normal">— Amazon ou outra loja (opcional se houver lojas adicionais abaixo)</span>
                     </label>
                     <input
                       type="url"
@@ -695,7 +695,7 @@ export default function AffiliateManager() {
                   </div>
 
                   {/* Extra links */}
-                  <div className="border-t border-slate-100 pt-4">
+                  <div className="border-t border-border pt-4">
                     <div className="flex items-center justify-between mb-2">
                       <label className={`${labelClass} mb-0`}>Links adicionais</label>
                       <button
@@ -703,21 +703,21 @@ export default function AffiliateManager() {
                         onClick={() => setExtraLinks(l => [...l, { label: '', url: '' }])}
                         className="flex items-center gap-1 text-xs font-bold text-amber-600 hover:text-amber-700 bg-amber-50 hover:bg-amber-100 px-2.5 py-1.5 rounded-lg transition-colors"
                       >
-                        <Plus className="w-3 h-3" /> Adicionar loja
+                        <Plus className="w-3 h-3" aria-hidden="true" /> Adicionar loja
                       </button>
                     </div>
                     {extraLinks.length === 0 ? (
-                      <p className="text-xs text-slate-400">Mercado Livre, Magalu, Shopee...</p>
+                      <p className="text-xs text-ink-faint">Mercado Livre, Magalu, Shopee...</p>
                     ) : (
                       <div className="space-y-3">
                         {extraLinks.map((link, i) => (
-                          <div key={i} className="bg-white border border-slate-200 rounded-lg p-3">
+                          <div key={i} className="bg-surface border border-border rounded-lg p-3">
                             <div className="flex items-center gap-2 mb-2">
-                              <label className="text-xs font-bold text-slate-500 flex-1">Loja {i + 1}</label>
+                              <label className="text-xs font-bold text-ink-muted flex-1">Loja {i + 1}</label>
                               <button
                                 type="button"
                                 onClick={() => setExtraLinks(ls => ls.filter((_, j) => j !== i))}
-                                className="p-1 text-slate-300 hover:text-red-500 rounded transition-colors"
+                                className="p-1 text-ink-faint hover:text-red-500 rounded transition-colors"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
                               </button>
@@ -744,7 +744,7 @@ export default function AffiliateManager() {
                     )}
                   </div>
 
-                  <div className="border-t border-slate-100 pt-4">
+                  <div className="border-t border-border pt-4">
                     <div className="grid grid-cols-3 gap-4">
                       <div>
                         <label className={labelClass}>Preço</label>
@@ -781,7 +781,7 @@ export default function AffiliateManager() {
                     </div>
                   </div>
 
-                  <div className="border-t border-slate-100 pt-4">
+                  <div className="border-t border-border pt-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className={labelClass}>Prós (1 por linha)</label>
@@ -806,7 +806,7 @@ export default function AffiliateManager() {
                     </div>
                   </div>
 
-                  <div className="border-t border-slate-100 pt-4">
+                  <div className="border-t border-border pt-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className={labelClass}>Badge</label>
@@ -833,29 +833,29 @@ export default function AffiliateManager() {
                     </div>
                   </div>
 
-                  <label className="flex items-center gap-3 cursor-pointer p-3 bg-slate-50 rounded-xl hover:bg-amber-50 transition-colors w-fit">
+                  <label className="flex items-center gap-3 cursor-pointer p-3 bg-elev rounded-md hover:bg-amber-50 transition-colors w-fit">
                     <input
                       type="checkbox"
                       checked={form.enabled}
                       onChange={e => setForm(f => ({ ...f, enabled: e.target.checked }))}
-                      className="rounded border-slate-300 text-amber-500 focus:ring-amber-400"
+                      className="rounded border-border text-amber-500 focus:ring-amber-400"
                     />
-                    <span className="text-sm font-medium text-slate-700">Produto ativo (visível nos posts)</span>
+                    <span className="text-sm font-medium text-ink">Produto ativo (visível nos posts)</span>
                   </label>
 
-                  <div className="flex gap-3 pt-2 border-t border-slate-100">
+                  <div className="flex gap-3 pt-2 border-t border-border">
                     <button
                       onClick={handleFormSave}
                       disabled={saving}
-                      className="disabled:opacity-50 text-white px-6 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all active:scale-95"
+                      className="disabled:opacity-50 text-white px-6 py-2.5 rounded-md text-sm font-bold flex items-center gap-2 transition-all active:scale-95"
                       style={{ background: 'linear-gradient(135deg, #f59e0b, #f97316)' }}
                     >
-                      {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                      {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" aria-hidden="true" />}
                       {saving ? 'Salvando...' : editingId ? 'Salvar alterações' : 'Criar produto'}
                     </button>
                     <button
                       onClick={() => { setShowForm(false); setEditingId(null); }}
-                      className="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-all"
+                      className="px-5 py-2.5 rounded-md text-sm font-bold text-ink-muted bg-elev hover:bg-elev transition-all"
                     >
                       Cancelar
                     </button>
@@ -867,7 +867,7 @@ export default function AffiliateManager() {
                   <div className="sticky top-6">
                     <div className="flex items-center gap-2 mb-3">
                       <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
-                      <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Prévia ao vivo</p>
+                      <p className="text-xs font-bold text-ink-muted uppercase tracking-wider">Prévia ao vivo</p>
                     </div>
 
                     <LivePreview
@@ -879,12 +879,12 @@ export default function AffiliateManager() {
                     />
 
                     {(form.slug || form.title) && (
-                      <div className="mt-4 p-3 bg-amber-50 border border-amber-100 rounded-xl">
+                      <div className="mt-4 p-3 bg-amber-50 border border-amber-100 rounded-md">
                         <p className="text-[10px] text-amber-600 font-bold uppercase tracking-wider mb-2">
                           Shortcode para usar no post
                         </p>
                         <div className="flex items-center gap-2">
-                          <code className="text-xs bg-white border border-amber-200 rounded-lg px-2 py-1.5 font-mono text-amber-800 flex-1 truncate">
+                          <code className="text-xs bg-surface border border-amber-200 rounded-lg px-2 py-1.5 font-mono text-amber-800 flex-1 truncate">
                             [affiliate:{form.slug || slugify(form.title) || 'seu-produto'}]
                           </code>
                           <button
@@ -908,23 +908,23 @@ export default function AffiliateManager() {
 
           {/* Products list */}
           {!showForm && products.length === 0 && (
-            <div className="bg-white rounded-2xl border border-dashed border-slate-200 p-16 text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-amber-100 to-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <div className="bg-surface rounded-lg border border-dashed border-border p-16 text-center">
+              <div className="w-16 h-16 bg-gradient-to-br from-amber-100 to-orange-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                 <ShoppingCart className="w-7 h-7 text-amber-400" />
               </div>
-              <h3 className="font-bold text-slate-700 mb-2 text-lg">Nenhum produto ainda</h3>
-              <p className="text-slate-400 text-sm mb-6 max-w-xs mx-auto leading-relaxed">
+              <h3 className="font-bold text-ink mb-2 text-lg">Nenhum produto ainda</h3>
+              <p className="text-ink-faint text-sm mb-6 max-w-xs mx-auto leading-relaxed">
                 Cadastre produtos da Amazon e insira-os nos seus posts com um shortcode simples
               </p>
               <button
                 onClick={handleAdd}
-                className="text-white px-6 py-3 rounded-xl text-sm font-bold inline-flex items-center gap-2 transition-all active:scale-95"
+                className="text-white px-6 py-3 rounded-md text-sm font-bold inline-flex items-center gap-2 transition-all active:scale-95"
                 style={{
                   background: 'linear-gradient(135deg, #f59e0b, #f97316)',
                   boxShadow: '0 4px 16px -2px rgba(245, 158, 11, 0.45)',
                 }}
               >
-                <Plus className="w-4 h-4" /> Cadastrar primeiro produto
+                <Plus className="w-4 h-4" aria-hidden="true" /> Cadastrar primeiro produto
               </button>
             </div>
           )}
@@ -936,15 +936,15 @@ export default function AffiliateManager() {
                 return (
                   <div
                     key={p.id}
-                    className={`bg-white rounded-2xl border transition-all group ${
+                    className={`bg-surface rounded-lg border transition-all group ${
                       !p.enabled
-                        ? 'border-slate-100 opacity-60'
-                        : 'border-slate-200 hover:border-amber-200 hover:shadow-sm hover:shadow-amber-50'
+                        ? 'border-border opacity-60'
+                        : 'border-border hover:border-amber-200 hover:shadow-sm hover:shadow-amber-50'
                     }`}
                   >
                     <div className="flex items-center gap-4 p-4">
                       {/* Image */}
-                      <div className="w-16 h-16 rounded-xl border border-slate-100 bg-slate-50 flex items-center justify-center overflow-hidden shrink-0">
+                      <div className="w-16 h-16 rounded-md border border-border bg-elev flex items-center justify-center overflow-hidden shrink-0">
                         {p.image ? (
                           <img src={p.image} alt={p.title} className="w-full h-full object-contain" />
                         ) : (
@@ -955,14 +955,14 @@ export default function AffiliateManager() {
                       {/* Info */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                          <p className="font-bold text-slate-800 leading-tight">{p.title}</p>
+                          <p className="font-bold text-ink leading-tight">{p.title}</p>
                           {p.badge && badgeInfo && (
                             <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${badgeInfo.bg} ${badgeInfo.text}`}>
                               {badgeInfo.icon} {p.badge}
                             </span>
                           )}
                           {!p.enabled && (
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-400">
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-elev text-ink-faint">
                               Inativo
                             </span>
                           )}
@@ -974,10 +974,10 @@ export default function AffiliateManager() {
                             <span className="text-sm font-bold text-amber-700">{p.price}</span>
                           )}
                           {p.originalPrice && (
-                            <span className="text-xs text-slate-400 line-through">{p.originalPrice}</span>
+                            <span className="text-xs text-ink-faint line-through">{p.originalPrice}</span>
                           )}
                           {p.extraLinks && p.extraLinks.length > 0 && (
-                            <span className="text-xs text-slate-400 font-medium">
+                            <span className="text-xs text-ink-faint font-medium">
                               +{p.extraLinks.length} loja{p.extraLinks.length > 1 ? 's' : ''}
                             </span>
                           )}
@@ -992,7 +992,7 @@ export default function AffiliateManager() {
                             title="Copiar shortcode"
                             className="p-1 text-amber-400 hover:text-amber-600 transition-colors rounded"
                           >
-                            <Copy className="w-3 h-3" />
+                            <Copy className="w-3 h-3" aria-hidden="true" />
                           </button>
                         </div>
                       </div>
@@ -1002,9 +1002,9 @@ export default function AffiliateManager() {
                         <button
                           onClick={() => handleEdit(p)}
                           title="Editar"
-                          className="p-2 text-slate-300 hover:text-violet-600 hover:bg-violet-50 rounded-xl transition-colors"
+                          className="p-2 text-ink-faint hover:text-primary hover:bg-primary-soft rounded-md transition-colors"
                         >
-                          <Edit2 className="w-4 h-4" />
+                          <Edit2 className="w-4 h-4" aria-hidden="true" />
                         </button>
                         <button
                           onClick={() => handleToggle(p.id)}
@@ -1013,15 +1013,15 @@ export default function AffiliateManager() {
                         >
                           {p.enabled
                             ? <ToggleRight className="w-5 h-5 text-amber-500" />
-                            : <ToggleLeft className="w-5 h-5 text-slate-300" />
+                            : <ToggleLeft className="w-5 h-5 text-ink-faint" />
                           }
                         </button>
                         <button
                           onClick={() => handleDelete(p.id)}
                           title="Remover"
-                          className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors"
+                          className="p-2 text-ink-faint hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-4 h-4" aria-hidden="true" />
                         </button>
                       </div>
                     </div>
@@ -1033,7 +1033,7 @@ export default function AffiliateManager() {
 
           {/* Shortcode help */}
           {!showForm && (
-            <div className="rounded-2xl border border-amber-100 p-5 bg-gradient-to-br from-amber-50 to-orange-50/60">
+            <div className="rounded-lg border border-amber-100 p-5 bg-gradient-to-br from-amber-50 to-orange-50/60">
               <p className="text-xs font-bold text-amber-700 uppercase tracking-widest mb-3 flex items-center gap-2">
                 <TrendingUp className="w-3.5 h-3.5" />
                 Como usar nos artigos
@@ -1045,9 +1045,9 @@ export default function AffiliateManager() {
                 ].map(item => (
                   <div
                     key={item.code}
-                    className="flex items-start gap-3 bg-white/70 rounded-xl p-3 border border-amber-100"
+                    className="flex items-start gap-3 bg-surface/70 rounded-md p-3 border border-amber-100"
                   >
-                    <code className="text-xs bg-white border border-amber-200 rounded-lg px-2 py-1 font-mono text-amber-800 shrink-0 shadow-sm whitespace-nowrap">
+                    <code className="text-xs bg-surface border border-amber-200 rounded-lg px-2 py-1 font-mono text-amber-800 shrink-0 shadow-sm whitespace-nowrap">
                       {item.code}
                     </code>
                     <span className="text-xs text-amber-800 font-medium pt-1">{item.desc}</span>
@@ -1064,7 +1064,7 @@ export default function AffiliateManager() {
 
       {/* ── SETTINGS TAB ── */}
       {tab === 'settings' && (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-6">
+        <div className="bg-surface rounded-lg border border-border shadow-sm p-6 space-y-6">
 
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -1076,7 +1076,7 @@ export default function AffiliateManager() {
                 className={`${inputClass} font-mono`}
                 placeholder="meublog-20"
               />
-              <p className="text-xs text-slate-400 mt-1.5 ml-1">
+              <p className="text-xs text-ink-faint mt-1.5 ml-1">
                 Adicionado automaticamente em todos os links (<code className="font-mono">?tag=...</code>)
               </p>
             </div>
@@ -1099,7 +1099,7 @@ export default function AffiliateManager() {
                 type="color"
                 value={config.buttonColor}
                 onChange={e => setConfig(c => ({ ...c, buttonColor: e.target.value }))}
-                className="w-12 h-12 rounded-xl border border-slate-200 cursor-pointer p-1 shadow-sm"
+                className="w-12 h-12 rounded-md border border-border cursor-pointer p-1 shadow-sm"
               />
               <input
                 type="text"
@@ -1110,7 +1110,7 @@ export default function AffiliateManager() {
               />
               {/* Live button preview */}
               <div
-                className="shrink-0 px-4 py-2.5 rounded-xl text-white text-sm font-bold whitespace-nowrap shadow-sm"
+                className="shrink-0 px-4 py-2.5 rounded-md text-white text-sm font-bold whitespace-nowrap shadow-sm"
                 style={{ background: config.buttonColor }}
               >
                 {config.defaultButtonText} →
@@ -1130,11 +1130,11 @@ export default function AffiliateManager() {
           </div>
 
           {/* PA-API credentials */}
-          <div className="border border-slate-200 rounded-2xl p-5 space-y-4">
+          <div className="border border-border rounded-lg p-5 space-y-4">
             <div className="flex items-center gap-2 mb-1">
               <KeyRound className="w-4 h-4 text-amber-500" />
-              <p className="text-sm font-bold text-slate-700">Credenciais PA-API 5.0</p>
-              <span className="ml-auto text-xs text-slate-400">Necessário para "Importar da Amazon"</span>
+              <p className="text-sm font-bold text-ink">Credenciais PA-API 5.0</p>
+              <span className="ml-auto text-xs text-ink-faint">Necessário para "Importar da Amazon"</span>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -1162,19 +1162,19 @@ export default function AffiliateManager() {
                   <button
                     type="button"
                     onClick={() => setShowSecretKey(v => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-faint hover:text-ink-muted"
                   >
-                    {showSecretKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    {showSecretKey ? <EyeOff className="w-4 h-4" aria-hidden="true" /> : <Eye className="w-4 h-4" aria-hidden="true" />}
                   </button>
                 </div>
               </div>
             </div>
-            <p className="text-xs text-slate-400 mt-1 ml-0.5">
+            <p className="text-xs text-ink-faint mt-1 ml-0.5">
               As chaves são salvas no <code className="font-mono">pluginsConfig.json</code> do seu repositório. Mantenha-o privado.
             </p>
           </div>
 
-          <div className="border-t border-slate-100 pt-5">
+          <div className="border-t border-border pt-5">
             <p className={labelClass}>Visibilidade dos elementos</p>
             <div className="grid grid-cols-2 gap-2">
               {([
@@ -1187,15 +1187,15 @@ export default function AffiliateManager() {
               ] as [keyof AffiliateConfig, string][]).map(([key, label]) => (
                 <label
                   key={key}
-                  className="flex items-center gap-3 cursor-pointer p-3 bg-slate-50 rounded-xl hover:bg-amber-50 transition-colors"
+                  className="flex items-center gap-3 cursor-pointer p-3 bg-elev rounded-md hover:bg-amber-50 transition-colors"
                 >
                   <input
                     type="checkbox"
                     checked={!!config[key]}
                     onChange={e => setConfig(c => ({ ...c, [key]: e.target.checked }))}
-                    className="rounded border-slate-300 text-amber-500 focus:ring-amber-400"
+                    className="rounded border-border text-amber-500 focus:ring-amber-400"
                   />
-                  <span className="text-sm font-medium text-slate-700">{label}</span>
+                  <span className="text-sm font-medium text-ink">{label}</span>
                 </label>
               ))}
             </div>
@@ -1204,10 +1204,10 @@ export default function AffiliateManager() {
           <button
             onClick={saveConfig}
             disabled={savingConfig}
-            className="disabled:opacity-50 text-white px-6 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all active:scale-95"
+            className="disabled:opacity-50 text-white px-6 py-2.5 rounded-md text-sm font-bold flex items-center gap-2 transition-all active:scale-95"
             style={{ background: 'linear-gradient(135deg, #f59e0b, #f97316)' }}
           >
-            {savingConfig ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+            {savingConfig ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" aria-hidden="true" />}
             {savingConfig ? 'Salvando...' : 'Salvar Configurações'}
           </button>
         </div>

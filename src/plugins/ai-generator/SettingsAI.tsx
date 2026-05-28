@@ -1,4 +1,4 @@
-/**
+﻿/**
  * SettingsAI.tsx — Plugin AI Generator (Walker)
  *
  * UI para configurar provedor de IA e API Keys.
@@ -120,12 +120,12 @@ export default function SettingsAI() {
         }
     };
 
-    const inputClass = 'w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-800 focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all shadow-sm';
-    const labelClass = 'block text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1';
+    const inputClass = 'w-full bg-surface border border-border rounded-md px-4 py-3 text-sm font-medium text-ink focus:outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/20/20 transition-all shadow-sm';
+    const labelClass = 'block text-sm font-bold text-ink-muted uppercase tracking-wider mb-2 ml-1';
 
     if (loading) return (
-        <div className="flex flex-col items-center justify-center p-20 text-slate-400 bg-white rounded-3xl border border-slate-200">
-            <Loader2 className="w-8 h-8 animate-spin mb-4 text-violet-500" />
+        <div className="flex flex-col items-center justify-center p-20 text-ink-faint bg-surface rounded-3xl border border-border">
+            <Loader2 className="w-8 h-8 animate-spin mb-4 text-primary" />
             <p className="font-medium animate-pulse">Carregando configurações...</p>
         </div>
     );
@@ -142,7 +142,7 @@ export default function SettingsAI() {
     return (
         <div className="max-w-2xl space-y-6">
             {/* Aviso de segurança */}
-            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex gap-3">
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex gap-3">
                 <span className="text-xl shrink-0">⚠️</span>
                 <div>
                     <p className="font-bold text-amber-800 text-sm">Repositório Privado Obrigatório</p>
@@ -154,7 +154,7 @@ export default function SettingsAI() {
             </div>
 
             {/* Seleção de provedor */}
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+            <div className="bg-surface rounded-lg border border-border shadow-sm p-6">
                 <p className={labelClass}>Provedor de IA</p>
                 <div className="grid grid-cols-2 gap-3">
                     {PROVIDERS.map(p => (
@@ -162,24 +162,24 @@ export default function SettingsAI() {
                             key={p.id}
                             type="button"
                             onClick={() => { setProvider(p.id); setTestResult(null); }}
-                            className={`p-4 rounded-xl border-2 text-left transition-all ${provider === p.id ? 'border-violet-500 bg-violet-50' : 'border-slate-200 hover:border-slate-300'}`}
+                            className={`p-4 rounded-md border-2 text-left transition-all ${provider === p.id ? 'border-primary/80 bg-primary-soft' : 'border-border hover:border-border'}`}
                         >
                             <div className="flex items-center gap-2 mb-1">
                                 <span className="text-lg">{p.icon}</span>
-                                <span className="font-bold text-slate-800 text-sm">{p.name}</span>
+                                <span className="font-bold text-ink text-sm">{p.name}</span>
                                 <span className={`ml-auto text-xs font-bold px-2 py-0.5 rounded-full ${p.badgeClass}`}>{p.badge}</span>
                             </div>
-                            <p className="text-xs text-slate-500">{p.description}</p>
+                            <p className="text-xs text-ink-muted">{p.description}</p>
                         </button>
                     ))}
                 </div>
             </div>
 
             {/* API Key */}
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+            <div className="bg-surface rounded-lg border border-border shadow-sm p-6">
                 <div className="flex items-center justify-between mb-2">
                     <p className={labelClass}>API Key — {currentProvider.name}</p>
-                    <a href={currentProvider.docsUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-violet-600 hover:underline">
+                    <a href={currentProvider.docsUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline">
                         {currentProvider.docsLabel} ↗
                     </a>
                 </div>
@@ -194,18 +194,18 @@ export default function SettingsAI() {
                     <button
                         type="button"
                         onClick={() => setShowKey(v => !v)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-faint hover:text-ink-muted transition-colors"
                     >
-                        {showKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        {showKey ? <EyeOff className="w-4 h-4" aria-hidden="true" /> : <Eye className="w-4 h-4" aria-hidden="true" />}
                     </button>
                 </div>
                 {apiKey && (
-                    <p className="text-xs text-slate-400 mt-1 ml-1">{apiKey.length} caracteres</p>
+                    <p className="text-xs text-ink-faint mt-1 ml-1">{apiKey.length} caracteres</p>
                 )}
             </div>
 
             {/* Pexels API Key */}
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+            <div className="bg-surface rounded-lg border border-border shadow-sm p-6">
                 <div className="flex items-center justify-between mb-2">
                     <p className={labelClass}>API Key — Pexels (imagens)</p>
                     <a href="https://www.pexels.com/api/" target="_blank" rel="noopener noreferrer" className="text-xs text-emerald-600 hover:underline">
@@ -223,19 +223,19 @@ export default function SettingsAI() {
                     <button
                         type="button"
                         onClick={() => setShowPexelsKey(v => !v)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-faint hover:text-ink-muted transition-colors"
                     >
-                        {showPexelsKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        {showPexelsKey ? <EyeOff className="w-4 h-4" aria-hidden="true" /> : <Eye className="w-4 h-4" aria-hidden="true" />}
                     </button>
                 </div>
-                <p className="text-xs text-slate-400 mt-1 ml-1">
+                <p className="text-xs text-ink-faint mt-1 ml-1">
                     Usada para inserir fotos automaticamente nos posts (1 a cada ~400 palavras, máx. 5).
                 </p>
             </div>
 
             {/* Resultado do teste */}
             {testResult && (
-                <div className={`p-4 rounded-xl border flex items-start gap-3 text-sm ${testResult.ok ? 'bg-green-50 border-green-200 text-green-700' : 'bg-red-50 border-red-200 text-red-700'}`}>
+                <div className={`p-4 rounded-md border flex items-start gap-3 text-sm ${testResult.ok ? 'bg-green-50 border-green-200 text-green-700' : 'bg-red-50 border-red-200 text-red-700'}`}>
                     {testResult.ok ? <CheckCircle className="w-4 h-4 shrink-0 mt-0.5" /> : <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />}
                     {testResult.message}
                 </div>
@@ -248,16 +248,16 @@ export default function SettingsAI() {
             )}
 
             {/* Status atual */}
-            <div className="bg-slate-50 rounded-2xl border border-slate-200 p-4">
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Status atual</p>
+            <div className="bg-elev rounded-lg border border-border p-4">
+                <p className="text-xs font-bold text-ink-faint uppercase tracking-widest mb-3">Status atual</p>
                 <div className="space-y-2 text-sm">
                     {[
-                        { label: 'Provedor', value: currentProvider.name, color: 'text-slate-700 font-semibold' },
+                        { label: 'Provedor', value: currentProvider.name, color: 'text-ink font-semibold' },
                         { label: 'API Key IA', value: apiKey ? '● Configurada' : '○ Não configurada', color: apiKey ? 'text-green-600 font-semibold' : 'text-red-500 font-semibold' },
-                        { label: 'Pexels (imagens)', value: pexelsApiKey ? '● Configurada' : '○ Opcional', color: pexelsApiKey ? 'text-green-600 font-semibold' : 'text-slate-400' },
+                        { label: 'Pexels (imagens)', value: pexelsApiKey ? '● Configurada' : '○ Opcional', color: pexelsApiKey ? 'text-green-600 font-semibold' : 'text-ink-faint' },
                     ].map(row => (
                         <div key={row.label} className="flex justify-between">
-                            <span className="text-slate-500">{row.label}</span>
+                            <span className="text-ink-muted">{row.label}</span>
                             <span className={row.color}>{row.value}</span>
                         </div>
                     ))}
@@ -270,7 +270,7 @@ export default function SettingsAI() {
                     type="button"
                     onClick={handleTest}
                     disabled={testing || !apiKey.trim()}
-                    className="px-5 py-2.5 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+                    className="px-5 py-2.5 border border-border rounded-md text-sm font-medium text-ink hover:bg-elev disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
                 >
                     {testing ? <Loader2 className="w-4 h-4 animate-spin" /> : '🧪'}
                     {testing ? 'Testando...' : 'Testar Chave'}
@@ -279,9 +279,9 @@ export default function SettingsAI() {
                     type="button"
                     onClick={handleSave}
                     disabled={saving}
-                    className="bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white px-6 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all shadow-sm shadow-violet-600/20"
+                    className="bg-primary hover:bg-primary disabled:opacity-50 text-white px-6 py-2.5 rounded-md text-sm font-bold flex items-center gap-2 transition-all shadow-sm shadow-none/20"
                 >
-                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : saved ? <CheckCircle className="w-4 h-4" /> : <Save className="w-4 h-4" />}
+                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : saved ? <CheckCircle className="w-4 h-4" aria-hidden="true" /> : <Save className="w-4 h-4" aria-hidden="true" />}
                     {saving ? 'Salvando...' : saved ? 'Salvo!' : 'Salvar Configurações'}
                 </button>
             </div>

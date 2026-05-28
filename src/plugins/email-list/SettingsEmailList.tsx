@@ -1,4 +1,4 @@
-/**
+﻿/**
  * SettingsEmailList.tsx — Configurações do plugin Email List
  *
  * Segue o padrão do SettingsGSC.tsx:
@@ -145,12 +145,12 @@ export default function SettingsEmailList() {
         }
     };
 
-    const inputClass = 'w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-800 focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all shadow-sm';
-    const labelClass = 'block text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1';
+    const inputClass = 'w-full bg-surface border border-border rounded-md px-4 py-3 text-sm font-medium text-ink focus:outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/20/20 transition-all shadow-sm';
+    const labelClass = 'block text-sm font-bold text-ink-muted uppercase tracking-wider mb-2 ml-1';
 
     if (loading) return (
-        <div className="flex flex-col items-center justify-center p-20 text-slate-400 bg-white rounded-3xl border border-slate-200">
-            <Loader2 className="w-8 h-8 animate-spin mb-4 text-violet-500" />
+        <div className="flex flex-col items-center justify-center p-20 text-ink-faint bg-surface rounded-3xl border border-border">
+            <Loader2 className="w-8 h-8 animate-spin mb-4 text-primary" />
             <p className="font-medium animate-pulse">Carregando configurações...</p>
         </div>
     );
@@ -166,10 +166,10 @@ export default function SettingsEmailList() {
         <div className="max-w-2xl space-y-6">
 
             {/* Brevo */}
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+            <div className="bg-surface rounded-lg border border-border shadow-sm p-6">
                 <div className="flex items-center gap-2 mb-5">
-                    <Mail className="w-5 h-5 text-violet-600" />
-                    <h3 className="font-bold text-slate-800">Integração Brevo</h3>
+                    <Mail className="w-5 h-5 text-primary" />
+                    <h3 className="font-bold text-ink">Integração Brevo</h3>
                 </div>
 
                 <div className="space-y-4">
@@ -187,12 +187,12 @@ export default function SettingsEmailList() {
                             <button
                                 type="button"
                                 onClick={() => setShowApiKey(v => !v)}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-faint hover:text-ink-muted transition-colors"
                             >
-                                {showApiKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                {showApiKey ? <EyeOff className="w-4 h-4" aria-hidden="true" /> : <Eye className="w-4 h-4" aria-hidden="true" />}
                             </button>
                         </div>
-                        <p className="text-xs text-slate-400 mt-1 ml-1">
+                        <p className="text-xs text-ink-faint mt-1 ml-1">
                             Encontre em Brevo → Configurações → API Keys.
                         </p>
                     </div>
@@ -207,7 +207,7 @@ export default function SettingsEmailList() {
                             placeholder="Ex: 3"
                             className={inputClass}
                         />
-                        <p className="text-xs text-slate-400 mt-1 ml-1">
+                        <p className="text-xs text-ink-faint mt-1 ml-1">
                             Encontre em Brevo → Contatos → Listas → ID da lista.
                         </p>
                     </div>
@@ -215,7 +215,7 @@ export default function SettingsEmailList() {
 
                 {/* Resultado do teste */}
                 {testResult && (
-                    <div className={`mt-4 p-3 rounded-xl border flex items-start gap-3 text-sm ${testResult.ok ? 'bg-green-50 border-green-200 text-green-700' : 'bg-red-50 border-red-200 text-red-700'}`}>
+                    <div className={`mt-4 p-3 rounded-md border flex items-start gap-3 text-sm ${testResult.ok ? 'bg-green-50 border-green-200 text-green-700' : 'bg-red-50 border-red-200 text-red-700'}`}>
                         {testResult.ok
                             ? <CheckCircle className="w-4 h-4 shrink-0 mt-0.5" />
                             : <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />}
@@ -227,7 +227,7 @@ export default function SettingsEmailList() {
                     type="button"
                     onClick={handleTestBrevo}
                     disabled={testing || !brevoApiKey.trim()}
-                    className="mt-4 flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="mt-4 flex items-center gap-2 px-4 py-2 border border-border rounded-md text-sm font-medium text-ink hover:bg-elev disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                     {testing ? <Loader2 className="w-4 h-4 animate-spin" /> : '🔌'}
                     {testing ? 'Testando...' : 'Testar Conexão'}
@@ -235,17 +235,17 @@ export default function SettingsEmailList() {
             </div>
 
             {/* Popup config */}
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+            <div className="bg-surface rounded-lg border border-border shadow-sm p-6">
                 <div className="flex items-center justify-between mb-5">
-                    <h3 className="font-bold text-slate-800">Popup de Captura</h3>
+                    <h3 className="font-bold text-ink">Popup de Captura</h3>
                     <button
                         type="button"
                         onClick={() => setPopupEnabled(v => !v)}
                         className="flex items-center gap-2 text-sm font-semibold transition-colors"
                     >
                         {popupEnabled
-                            ? <><ToggleRight className="w-8 h-8 text-violet-600" /><span className="text-violet-700">Ativo</span></>
-                            : <><ToggleLeft className="w-8 h-8 text-slate-400" /><span className="text-slate-500">Inativo</span></>
+                            ? <><ToggleRight className="w-8 h-8 text-primary" /><span className="text-primary">Ativo</span></>
+                            : <><ToggleLeft className="w-8 h-8 text-ink-faint" /><span className="text-ink-muted">Inativo</span></>
                         }
                     </button>
                 </div>
@@ -288,8 +288,8 @@ export default function SettingsEmailList() {
                             </label>
                             <div className="relative">
                                 {triggerType === 'delay'
-                                    ? <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                    : <ArrowDown className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                    ? <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-faint" />
+                                    : <ArrowDown className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-faint" />
                                 }
                                 <input
                                     type="number"
@@ -310,7 +310,7 @@ export default function SettingsEmailList() {
                             onChange={e => setShowOnce(e.target.checked)}
                             className="w-4 h-4 accent-violet-600 rounded"
                         />
-                        <span className="text-sm font-medium text-slate-700">
+                        <span className="text-sm font-medium text-ink">
                             Mostrar apenas uma vez por visitante
                         </span>
                     </label>
@@ -318,19 +318,19 @@ export default function SettingsEmailList() {
 
                 {/* Preview do popup */}
                 {popupEnabled && (
-                    <div className="mt-5 p-4 bg-slate-50 rounded-xl border border-slate-200">
-                        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Preview</p>
-                        <div className="bg-white rounded-xl p-5 shadow-sm max-w-xs mx-auto text-center border border-slate-100">
+                    <div className="mt-5 p-4 bg-elev rounded-md border border-border">
+                        <p className="text-xs font-bold text-ink-faint uppercase tracking-wider mb-3">Preview</p>
+                        <div className="bg-surface rounded-md p-5 shadow-sm max-w-xs mx-auto text-center border border-border">
                             <div style={{ width: 40, height: 40, background: 'linear-gradient(135deg,#7c3aed,#a855f7)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
                                 <Mail className="w-5 h-5 text-white" />
                             </div>
-                            <p className="font-bold text-slate-800 text-sm mb-1">{headline || '...'}</p>
-                            <p className="text-slate-500 text-xs leading-relaxed mb-3">{subheadline || '...'}</p>
+                            <p className="font-bold text-ink text-sm mb-1">{headline || '...'}</p>
+                            <p className="text-ink-muted text-xs leading-relaxed mb-3">{subheadline || '...'}</p>
                             <div className="space-y-2">
-                                <div className="w-full h-9 bg-slate-100 rounded-lg" />
+                                <div className="w-full h-9 bg-elev rounded-lg" />
                                 <div className="w-full h-9 rounded-lg" style={{ background: 'linear-gradient(135deg,#7c3aed,#a855f7)' }} />
                             </div>
-                            <p className="text-xs text-slate-400 mt-2">
+                            <p className="text-xs text-ink-faint mt-2">
                                 {triggerType === 'delay' ? `Aparece após ${triggerValue}s` : `Aparece ao rolar ${triggerValue}%`}
                             </p>
                         </div>
@@ -339,11 +339,11 @@ export default function SettingsEmailList() {
             </div>
 
             {/* Sidebar widget config */}
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+            <div className="bg-surface rounded-lg border border-border shadow-sm p-6">
                 <div className="flex items-center justify-between mb-5">
                     <div className="flex items-center gap-2">
-                        <PanelRight className="w-5 h-5 text-violet-600" />
-                        <h3 className="font-bold text-slate-800">Widget da Sidebar</h3>
+                        <PanelRight className="w-5 h-5 text-primary" />
+                        <h3 className="font-bold text-ink">Widget da Sidebar</h3>
                     </div>
                     <button
                         type="button"
@@ -351,8 +351,8 @@ export default function SettingsEmailList() {
                         className="flex items-center gap-2 text-sm font-semibold transition-colors"
                     >
                         {sidebarEnabled
-                            ? <><ToggleRight className="w-8 h-8 text-violet-600" /><span className="text-violet-700">Ativo</span></>
-                            : <><ToggleLeft className="w-8 h-8 text-slate-400" /><span className="text-slate-500">Inativo</span></>
+                            ? <><ToggleRight className="w-8 h-8 text-primary" /><span className="text-primary">Ativo</span></>
+                            : <><ToggleLeft className="w-8 h-8 text-ink-faint" /><span className="text-ink-muted">Inativo</span></>
                         }
                     </button>
                 </div>
@@ -379,13 +379,13 @@ export default function SettingsEmailList() {
                 </div>
 
                 {sidebarEnabled && (
-                    <div className="mt-5 p-4 bg-slate-50 rounded-xl border border-slate-200">
-                        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Preview</p>
-                        <div className="bg-white rounded-xl p-4 shadow-sm max-w-xs mx-auto text-center border border-slate-100">
-                            <p className="font-bold text-slate-800 text-sm mb-1">{sidebarHeadline || '...'}</p>
-                            <p className="text-slate-500 text-xs mb-3">{sidebarSubheadline || '...'}</p>
+                    <div className="mt-5 p-4 bg-elev rounded-md border border-border">
+                        <p className="text-xs font-bold text-ink-faint uppercase tracking-wider mb-3">Preview</p>
+                        <div className="bg-surface rounded-md p-4 shadow-sm max-w-xs mx-auto text-center border border-border">
+                            <p className="font-bold text-ink text-sm mb-1">{sidebarHeadline || '...'}</p>
+                            <p className="text-ink-muted text-xs mb-3">{sidebarSubheadline || '...'}</p>
                             <div className="space-y-2">
-                                <div className="w-full h-8 bg-slate-100 rounded-lg" />
+                                <div className="w-full h-8 bg-elev rounded-lg" />
                                 <div className="w-full h-8 rounded-lg" style={{ background: 'linear-gradient(135deg,#7c3aed,#a855f7)' }} />
                             </div>
                         </div>
@@ -394,11 +394,11 @@ export default function SettingsEmailList() {
             </div>
 
             {/* Inline banner config */}
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+            <div className="bg-surface rounded-lg border border-border shadow-sm p-6">
                 <div className="flex items-center justify-between mb-5">
                     <div className="flex items-center gap-2">
-                        <FileText className="w-5 h-5 text-violet-600" />
-                        <h3 className="font-bold text-slate-800">Banner Inline nos Posts</h3>
+                        <FileText className="w-5 h-5 text-primary" />
+                        <h3 className="font-bold text-ink">Banner Inline nos Posts</h3>
                     </div>
                     <button
                         type="button"
@@ -406,8 +406,8 @@ export default function SettingsEmailList() {
                         className="flex items-center gap-2 text-sm font-semibold transition-colors"
                     >
                         {inlineEnabled
-                            ? <><ToggleRight className="w-8 h-8 text-violet-600" /><span className="text-violet-700">Ativo</span></>
-                            : <><ToggleLeft className="w-8 h-8 text-slate-400" /><span className="text-slate-500">Inativo</span></>
+                            ? <><ToggleRight className="w-8 h-8 text-primary" /><span className="text-primary">Ativo</span></>
+                            : <><ToggleLeft className="w-8 h-8 text-ink-faint" /><span className="text-ink-muted">Inativo</span></>
                         }
                     </button>
                 </div>
@@ -441,25 +441,25 @@ export default function SettingsEmailList() {
                             onChange={e => setInlinePosition(Number(e.target.value))}
                             className={inputClass}
                         />
-                        <p className="text-xs text-slate-400 mt-1 ml-1">
+                        <p className="text-xs text-ink-faint mt-1 ml-1">
                             O banner aparecerá após o {inlinePosition}º parágrafo do post.
                         </p>
                     </div>
                 </div>
 
                 {inlineEnabled && (
-                    <div className="mt-5 p-4 bg-slate-50 rounded-xl border border-slate-200">
-                        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Preview</p>
-                        <div className="bg-violet-50 border border-violet-200 rounded-xl p-4 flex items-center gap-3">
+                    <div className="mt-5 p-4 bg-elev rounded-md border border-border">
+                        <p className="text-xs font-bold text-ink-faint uppercase tracking-wider mb-3">Preview</p>
+                        <div className="bg-primary-soft border border-primary/30 rounded-md p-4 flex items-center gap-3">
                             <div style={{ flexShrink: 0, width: 36, height: 36, background: 'linear-gradient(135deg,#7c3aed,#a855f7)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 <Mail className="w-4 h-4 text-white" />
                             </div>
                             <div className="flex-1 min-w-0">
-                                <p className="font-bold text-slate-800 text-sm truncate">{inlineHeadline || '...'}</p>
-                                <p className="text-violet-700 text-xs truncate">{inlineSubheadline || '...'}</p>
+                                <p className="font-bold text-ink text-sm truncate">{inlineHeadline || '...'}</p>
+                                <p className="text-primary text-xs truncate">{inlineSubheadline || '...'}</p>
                             </div>
                             <div className="flex gap-2 shrink-0">
-                                <div className="h-8 w-28 bg-white border border-violet-200 rounded-lg" />
+                                <div className="h-8 w-28 bg-surface border border-primary/30 rounded-lg" />
                                 <div className="h-8 w-20 rounded-lg" style={{ background: 'linear-gradient(135deg,#7c3aed,#a855f7)' }} />
                             </div>
                         </div>
@@ -478,9 +478,9 @@ export default function SettingsEmailList() {
                 type="button"
                 onClick={handleSave}
                 disabled={saving}
-                className="bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white px-6 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all shadow-sm shadow-violet-600/20"
+                className="bg-primary hover:bg-primary disabled:opacity-50 text-white px-6 py-2.5 rounded-md text-sm font-bold flex items-center gap-2 transition-all shadow-sm shadow-none/20"
             >
-                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : saved ? <CheckCircle className="w-4 h-4" /> : <Save className="w-4 h-4" />}
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : saved ? <CheckCircle className="w-4 h-4" aria-hidden="true" /> : <Save className="w-4 h-4" aria-hidden="true" />}
                 {saving ? 'Salvando...' : saved ? 'Salvo!' : 'Salvar Configurações'}
             </button>
         </div>

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * RedirectsManager.tsx — Plugin Redirects Manager
  *
  * CRUD de redirects 301/302.
@@ -141,12 +141,12 @@ export default function RedirectsManager() {
     saveRedirects(redirects.map(r => r.id === id ? { ...r, enabled: !r.enabled } : r));
   };
 
-  const inputClass = 'w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-800 focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all shadow-sm font-mono';
-  const labelClass = 'block text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1';
+  const inputClass = 'w-full bg-surface border border-border rounded-md px-4 py-3 text-sm font-medium text-ink focus:outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/20/20 transition-all shadow-sm font-mono';
+  const labelClass = 'block text-sm font-bold text-ink-muted uppercase tracking-wider mb-2 ml-1';
 
   if (loading) return (
-    <div className="flex flex-col items-center justify-center p-20 text-slate-400 bg-white rounded-3xl border border-slate-200">
-      <Loader2 className="w-8 h-8 animate-spin mb-4 text-violet-500" />
+    <div className="flex flex-col items-center justify-center p-20 text-ink-faint bg-surface rounded-3xl border border-border">
+      <Loader2 className="w-8 h-8 animate-spin mb-4 text-primary" />
       <p className="font-medium animate-pulse">Carregando redirects...</p>
     </div>
   );
@@ -156,20 +156,20 @@ export default function RedirectsManager() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm text-slate-500">{redirects.length} redirect{redirects.length !== 1 ? 's' : ''} configurado{redirects.length !== 1 ? 's' : ''}</p>
+          <p className="text-sm text-ink-muted">{redirects.length} redirect{redirects.length !== 1 ? 's' : ''} configurado{redirects.length !== 1 ? 's' : ''}</p>
         </div>
         <button
           onClick={handleAdd}
-          className="bg-violet-600 hover:bg-violet-700 text-white px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all"
+          className="bg-primary hover:bg-primary text-white px-4 py-2.5 rounded-md text-sm font-bold flex items-center gap-2 transition-all"
         >
-          <Plus className="w-4 h-4" /> Novo Redirect
+          <Plus className="w-4 h-4" aria-hidden="true" /> Novo Redirect
         </button>
       </div>
 
       {/* Add/Edit Form */}
       {showForm && (
-        <div className="bg-white rounded-2xl border border-violet-200 shadow-sm p-6">
-          <h3 className="font-bold text-slate-800 mb-4">{editingId ? 'Editar Redirect' : 'Novo Redirect'}</h3>
+        <div className="bg-surface rounded-lg border border-primary/30 shadow-sm p-6">
+          <h3 className="font-bold text-ink mb-4">{editingId ? 'Editar Redirect' : 'Novo Redirect'}</h3>
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -218,28 +218,28 @@ export default function RedirectsManager() {
               </div>
             </div>
 
-            <label className="flex items-center gap-3 cursor-pointer p-3 bg-slate-50 rounded-xl hover:bg-violet-50 transition-colors w-fit">
+            <label className="flex items-center gap-3 cursor-pointer p-3 bg-elev rounded-md hover:bg-primary-soft transition-colors w-fit">
               <input
                 type="checkbox"
                 checked={form.enabled}
                 onChange={e => setForm(f => ({ ...f, enabled: e.target.checked }))}
-                className="rounded border-slate-300 text-violet-600 focus:ring-violet-500"
+                className="rounded border-border text-primary focus:ring-primary/20"
               />
-              <span className="text-sm font-medium text-slate-700">Ativo</span>
+              <span className="text-sm font-medium text-ink">Ativo</span>
             </label>
 
             <div className="flex gap-3 pt-2">
               <button
                 onClick={handleFormSave}
                 disabled={saving}
-                className="bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all"
+                className="bg-primary hover:bg-primary disabled:opacity-50 text-white px-5 py-2.5 rounded-md text-sm font-bold flex items-center gap-2 transition-all"
               >
-                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" aria-hidden="true" />}
                 {saving ? 'Salvando...' : 'Salvar'}
               </button>
               <button
                 onClick={() => { setShowForm(false); setEditingId(null); }}
-                className="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-all"
+                className="px-5 py-2.5 rounded-md text-sm font-bold text-ink-muted bg-elev hover:bg-elev transition-all"
               >
                 Cancelar
               </button>
@@ -256,31 +256,31 @@ export default function RedirectsManager() {
 
       {/* Redirects list */}
       {redirects.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
+        <div className="bg-surface rounded-lg border border-border p-12 text-center">
           <ArrowRight className="w-12 h-12 text-slate-200 mx-auto mb-4" />
-          <p className="text-slate-500 font-medium">Nenhum redirect configurado</p>
-          <p className="text-slate-400 text-sm mt-1">Clique em "Novo Redirect" para começar</p>
+          <p className="text-ink-muted font-medium">Nenhum redirect configurado</p>
+          <p className="text-ink-faint text-sm mt-1">Clique em "Novo Redirect" para começar</p>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="bg-surface rounded-lg border border-border shadow-sm overflow-hidden">
           <table className="w-full text-sm">
-            <thead className="bg-slate-50 border-b border-slate-200">
+            <thead className="bg-elev border-b border-border">
               <tr>
-                <th className="text-left px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">De → Para</th>
-                <th className="text-left px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider w-20">Tipo</th>
-                <th className="text-left px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Nota</th>
-                <th className="text-center px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider w-24">Ativo</th>
+                <th className="text-left px-4 py-3 text-xs font-bold text-ink-muted uppercase tracking-wider">De → Para</th>
+                <th className="text-left px-4 py-3 text-xs font-bold text-ink-muted uppercase tracking-wider w-20">Tipo</th>
+                <th className="text-left px-4 py-3 text-xs font-bold text-ink-muted uppercase tracking-wider">Nota</th>
+                <th className="text-center px-4 py-3 text-xs font-bold text-ink-muted uppercase tracking-wider w-24">Ativo</th>
                 <th className="px-4 py-3 w-20"></th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-border">
               {redirects.map(r => (
-                <tr key={r.id} className={`${!r.enabled ? 'opacity-40' : ''} hover:bg-slate-50 transition-colors`}>
+                <tr key={r.id} className={`${!r.enabled ? 'opacity-40' : ''} hover:bg-elev transition-colors`}>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
-                      <code className="text-xs bg-slate-100 px-2 py-0.5 rounded text-slate-700">{r.from}</code>
-                      <ArrowRight className="w-3 h-3 text-slate-400 shrink-0" />
-                      <code className="text-xs bg-violet-50 px-2 py-0.5 rounded text-violet-700 truncate max-w-48">{r.to}</code>
+                      <code className="text-xs bg-elev px-2 py-0.5 rounded text-ink">{r.from}</code>
+                      <ArrowRight className="w-3 h-3 text-ink-faint shrink-0" />
+                      <code className="text-xs bg-primary-soft px-2 py-0.5 rounded text-primary truncate max-w-48">{r.to}</code>
                     </div>
                   </td>
                   <td className="px-4 py-3">
@@ -288,12 +288,12 @@ export default function RedirectsManager() {
                       {r.type}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-slate-500 text-xs truncate max-w-40">{r.note || '—'}</td>
+                  <td className="px-4 py-3 text-ink-muted text-xs truncate max-w-40">{r.note || '—'}</td>
                   <td className="px-4 py-3 text-center">
-                    <button onClick={() => handleToggle(r.id)} className="text-slate-400 hover:text-violet-600 transition-colors">
+                    <button onClick={() => handleToggle(r.id)} className="text-ink-faint hover:text-primary transition-colors">
                       {r.enabled
-                        ? <ToggleRight className="w-5 h-5 text-violet-600" />
-                        : <ToggleLeft className="w-5 h-5" />
+                        ? <ToggleRight className="w-5 h-5 text-primary" />
+                        : <ToggleLeft className="w-5 h-5" aria-hidden="true" />
                       }
                     </button>
                   </td>
@@ -302,21 +302,21 @@ export default function RedirectsManager() {
                       <button
                         onClick={() => handleTest(r)}
                         disabled={testingId === r.id || !r.enabled}
-                        className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-30"
+                        className="p-1.5 text-ink-faint hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-30"
                         title="Testar redirect"
                       >
                         {testingId === r.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ExternalLink className="w-3.5 h-3.5" />}
                       </button>
-                      <button onClick={() => handleEdit(r)} className="p-1.5 text-slate-400 hover:text-violet-600 hover:bg-violet-50 rounded-lg transition-colors">
+                      <button onClick={() => handleEdit(r)} className="p-1.5 text-ink-faint hover:text-primary hover:bg-primary-soft rounded-lg transition-colors">
                         <Edit2 className="w-3.5 h-3.5" />
                       </button>
-                      <button onClick={() => handleDelete(r.id)} className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+                      <button onClick={() => handleDelete(r.id)} className="p-1.5 text-ink-faint hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                     {testResult[r.id] && (
                       <div className={`mt-1 flex items-center gap-1 text-[10px] font-bold ${testResult[r.id].ok ? 'text-emerald-600' : 'text-red-500'}`}>
-                        {testResult[r.id].ok ? <CheckCircle className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
+                        {testResult[r.id].ok ? <CheckCircle className="w-3 h-3" aria-hidden="true" /> : <XCircle className="w-3 h-3" aria-hidden="true" />}
                         {testResult[r.id].ok ? `${testResult[r.id].status} → OK` : testResult[r.id].status ? `${testResult[r.id].status} — Falhou` : 'Erro de rede'}
                       </div>
                     )}
@@ -330,7 +330,7 @@ export default function RedirectsManager() {
 
       {/* Status */}
       {redirects.length > 0 && (
-        <div className="bg-emerald-50 rounded-2xl border border-emerald-200 p-4 flex items-center gap-3">
+        <div className="bg-emerald-50 rounded-lg border border-emerald-200 p-4 flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-emerald-200 flex items-center justify-center shrink-0">
             <svg className="w-4 h-4 text-emerald-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
           </div>
@@ -342,7 +342,7 @@ export default function RedirectsManager() {
       )}
 
       {/* Info */}
-      <div className="bg-blue-50 rounded-2xl border border-blue-200 p-5">
+      <div className="bg-blue-50 rounded-lg border border-blue-200 p-5">
         <p className="text-xs font-bold text-blue-700 uppercase tracking-widest mb-2">Como funciona</p>
         <ul className="space-y-1 text-sm text-blue-800">
           <li>• Use quando renomear ou mover uma página — quem acessar o endereço antigo chega ao novo automaticamente</li>

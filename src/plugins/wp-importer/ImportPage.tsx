@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ImportPage.tsx — Plugin WP Importer
  *
  * Parseia XML do WordPress NO BROWSER (sem limite de upload do Vercel 4.5MB)
@@ -289,7 +289,7 @@ export default function ImportPage() {
     return (
         <div className="max-w-2xl space-y-6">
             {/* Instruções */}
-            <div className="bg-blue-50 rounded-2xl border border-blue-200 p-5">
+            <div className="bg-blue-50 rounded-lg border border-blue-200 p-5">
                 <p className="text-xs font-bold text-blue-700 uppercase tracking-widest mb-3">Como exportar do WordPress</p>
                 <ol className="space-y-1.5">
                     {[
@@ -307,8 +307,8 @@ export default function ImportPage() {
             </div>
 
             {/* O que será importado */}
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
-                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">O que será importado</p>
+            <div className="bg-surface rounded-lg border border-border shadow-sm p-5">
+                <p className="text-xs font-bold text-ink-muted uppercase tracking-widest mb-3">O que será importado</p>
                 <div className="grid grid-cols-2 gap-3">
                     {[
                         { icon: '📝', label: 'Posts publicados e rascunhos' },
@@ -316,36 +316,36 @@ export default function ImportPage() {
                         { icon: '🏷️', label: 'Categorias' },
                         { icon: '🖼️', label: 'Imagens (quando disponíveis)' },
                     ].map(item => (
-                        <div key={item.label} className="flex items-center gap-2 text-sm text-slate-600">
+                        <div key={item.label} className="flex items-center gap-2 text-sm text-ink-muted">
                             <span>{item.icon}</span>
                             {item.label}
                         </div>
                     ))}
                 </div>
-                <p className="text-xs text-slate-400 mt-3">
+                <p className="text-xs text-ink-faint mt-3">
                     Posts com o mesmo slug já existentes serão ignorados. Autores e categorias duplicados também.
                 </p>
             </div>
 
             {/* Upload */}
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-                <p className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Arquivo de Exportação (.xml)</p>
+            <div className="bg-surface rounded-lg border border-border shadow-sm p-6">
+                <p className="text-sm font-bold text-ink-muted uppercase tracking-wider mb-4">Arquivo de Exportação (.xml)</p>
 
                 <div
-                    className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors ${file ? 'border-violet-300 bg-violet-50' : 'border-slate-200 hover:border-violet-300 hover:bg-violet-50/50'}`}
+                    className={`border-2 border-dashed rounded-md p-8 text-center cursor-pointer transition-colors ${file ? 'border-primary/40 bg-primary-soft' : 'border-border hover:border-primary/40 hover:bg-primary-soft/50'}`}
                     onClick={() => fileInputRef.current?.click()}
                 >
                     {file ? (
                         <>
-                            <FileText className="w-8 h-8 text-violet-500 mx-auto mb-2" />
-                            <p className="font-medium text-slate-800 text-sm">{file.name}</p>
-                            <p className="text-xs text-slate-400 mt-1">{(file.size / 1024 / 1024).toFixed(2)} MB · Clique para trocar</p>
+                            <FileText className="w-8 h-8 text-primary mx-auto mb-2" />
+                            <p className="font-medium text-ink text-sm">{file.name}</p>
+                            <p className="text-xs text-ink-faint mt-1">{(file.size / 1024 / 1024).toFixed(2)} MB · Clique para trocar</p>
                         </>
                     ) : (
                         <>
-                            <Upload className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-                            <p className="font-medium text-slate-500 text-sm">Clique para selecionar o arquivo XML</p>
-                            <p className="text-xs text-slate-400 mt-1">Arquivo exportado do WordPress (.xml) — sem limite de tamanho</p>
+                            <Upload className="w-8 h-8 text-ink-faint mx-auto mb-2" />
+                            <p className="font-medium text-ink-muted text-sm">Clique para selecionar o arquivo XML</p>
+                            <p className="text-xs text-ink-faint mt-1">Arquivo exportado do WordPress (.xml) — sem limite de tamanho</p>
                         </>
                     )}
                 </div>
@@ -368,10 +368,10 @@ export default function ImportPage() {
 
             {/* Resultado */}
             {result && (
-                <div className={`bg-white rounded-2xl border shadow-sm p-6 ${result.success ? 'border-green-200' : 'border-amber-200'}`}>
+                <div className={`bg-surface rounded-lg border shadow-sm p-6 ${result.success ? 'border-green-200' : 'border-amber-200'}`}>
                     <div className="flex items-center gap-2 mb-4">
                         <CheckCircle className={`w-5 h-5 ${result.success ? 'text-green-500' : 'text-amber-500'}`} />
-                        <p className="font-bold text-slate-800">
+                        <p className="font-bold text-ink">
                             {result.success ? 'Importação concluída!' : 'Importação concluída com erros'}
                         </p>
                     </div>
@@ -382,16 +382,16 @@ export default function ImportPage() {
                             { label: 'Autores', imported: result.authors.imported, skipped: result.authors.skipped },
                             { label: 'Categorias', imported: result.categories.imported, skipped: result.categories.skipped },
                         ].map(s => (
-                            <div key={s.label} className="bg-slate-50 rounded-xl p-3 text-center">
-                                <p className="text-2xl font-bold text-violet-600">{s.imported}</p>
-                                <p className="text-xs text-slate-500">{s.label} importados</p>
-                                {s.skipped > 0 && <p className="text-xs text-slate-400">{s.skipped} ignorados</p>}
+                            <div key={s.label} className="bg-elev rounded-md p-3 text-center">
+                                <p className="text-2xl font-bold text-primary">{s.imported}</p>
+                                <p className="text-xs text-ink-muted">{s.label} importados</p>
+                                {s.skipped > 0 && <p className="text-xs text-ink-faint">{s.skipped} ignorados</p>}
                             </div>
                         ))}
                     </div>
 
                     {result.posts.imagesImported > 0 && (
-                        <p className="text-sm text-slate-600 mb-3">
+                        <p className="text-sm text-ink-muted mb-3">
                             🖼️ {result.posts.imagesImported} imagem(ns) importada(s) com sucesso.
                         </p>
                     )}
@@ -416,7 +416,7 @@ export default function ImportPage() {
                         </div>
                     )}
 
-                    <a href="/admin/posts" className="mt-4 inline-block text-sm text-violet-600 hover:underline font-medium">
+                    <a href="/admin/posts" className="mt-4 inline-block text-sm text-primary hover:underline font-medium">
                         → Ver posts importados
                     </a>
                 </div>
@@ -427,18 +427,18 @@ export default function ImportPage() {
                 type="button"
                 onClick={handleImport}
                 disabled={importing || !file}
-                className="bg-violet-600 hover:bg-violet-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-3 rounded-xl text-sm font-bold flex items-center gap-2 transition-all shadow-sm shadow-violet-600/20"
+                className="bg-primary hover:bg-primary disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-3 rounded-md text-sm font-bold flex items-center gap-2 transition-all shadow-sm shadow-none/20"
             >
                 {importing ? (
                     <><Loader2 className="w-4 h-4 animate-spin" /> Importando...</>
                 ) : (
-                    <><Upload className="w-4 h-4" /> Importar do WordPress</>
+                    <><Upload className="w-4 h-4" aria-hidden="true" /> Importar do WordPress</>
                 )}
             </button>
 
             {importing && (
-                <div className="bg-violet-50 border border-violet-200 rounded-xl p-4">
-                    <p className="text-sm text-violet-700 font-medium">
+                <div className="bg-primary-soft border border-primary/30 rounded-md p-4">
+                    <p className="text-sm text-primary font-medium">
                         {progress || 'Importando posts e baixando imagens... Isso pode levar alguns minutos.'}
                     </p>
                 </div>

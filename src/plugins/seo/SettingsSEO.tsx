@@ -1,4 +1,4 @@
-/**
+﻿/**
  * SettingsSEO.tsx — Plugin SEO Toolkit
  *
  * Configura dados da organização e schemas JSON-LD.
@@ -77,12 +77,12 @@ export default function SettingsSEO() {
     }
   };
 
-  const inputClass = 'w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-800 focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all shadow-sm';
-  const labelClass = 'block text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1';
+  const inputClass = 'w-full bg-surface border border-border rounded-md px-4 py-3 text-sm font-medium text-ink focus:outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/20/20 transition-all shadow-sm';
+  const labelClass = 'block text-sm font-bold text-ink-muted uppercase tracking-wider mb-2 ml-1';
 
   if (loading) return (
-    <div className="flex flex-col items-center justify-center p-20 text-slate-400 bg-white rounded-3xl border border-slate-200">
-      <Loader2 className="w-8 h-8 animate-spin mb-4 text-violet-500" />
+    <div className="flex flex-col items-center justify-center p-20 text-ink-faint bg-surface rounded-3xl border border-border">
+      <Loader2 className="w-8 h-8 animate-spin mb-4 text-primary" />
       <p className="font-medium animate-pulse">Carregando configuração...</p>
     </div>
   );
@@ -97,25 +97,25 @@ export default function SettingsSEO() {
   return (
     <div className="max-w-2xl space-y-6">
       {/* Enable */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+      <div className="bg-surface rounded-lg border border-border shadow-sm p-6">
         <label className="flex items-center justify-between cursor-pointer">
           <div>
-            <h3 className="font-bold text-slate-800">Ativar SEO Toolkit</h3>
-            <p className="text-sm text-slate-500 mt-0.5">Injeta JSON-LD structured data nos artigos</p>
+            <h3 className="font-bold text-ink">Ativar SEO Toolkit</h3>
+            <p className="text-sm text-ink-muted mt-0.5">Injeta JSON-LD structured data nos artigos</p>
           </div>
           <div
             onClick={() => setEnabled(!enabled)}
-            className={`relative w-12 h-6 rounded-full transition-colors cursor-pointer ${enabled ? 'bg-violet-600' : 'bg-slate-200'}`}
+            className={`relative w-12 h-6 rounded-full transition-colors cursor-pointer ${enabled ? 'bg-primary' : 'bg-elev'}`}
           >
-            <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all ${enabled ? 'left-7' : 'left-1'}`} />
+            <div className={`absolute top-1 w-4 h-4 bg-surface rounded-full shadow transition-all ${enabled ? 'left-7' : 'left-1'}`} />
           </div>
         </label>
       </div>
 
       {/* Organization */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
-        <h3 className="font-bold text-slate-800">Dados da Organização</h3>
-        <p className="text-sm text-slate-500 -mt-2">Usados nos schemas Publisher e WebSite</p>
+      <div className="bg-surface rounded-lg border border-border shadow-sm p-6 space-y-4">
+        <h3 className="font-bold text-ink">Dados da Organização</h3>
+        <p className="text-sm text-ink-muted -mt-2">Usados nos schemas Publisher e WebSite</p>
 
         <div>
           <label className={labelClass}>Nome da Organização / Site</label>
@@ -129,7 +129,7 @@ export default function SettingsSEO() {
 
         <div>
           <label className={labelClass}>Perfis Sociais (sameAs)</label>
-          <p className="text-xs text-slate-400 mb-3">URLs dos perfis sociais da organização</p>
+          <p className="text-xs text-ink-faint mb-3">URLs dos perfis sociais da organização</p>
           <div className="space-y-2">
             {sameAs.map((url, i) => (
               <div key={i} className="flex gap-2">
@@ -141,34 +141,34 @@ export default function SettingsSEO() {
                   placeholder="https://facebook.com/seuperfil"
                 />
                 {sameAs.length > 1 && (
-                  <button onClick={() => removeSameAs(i)} className="p-3 text-red-500 hover:bg-red-50 rounded-xl transition-colors">
-                    <Trash2 className="w-4 h-4" />
+                  <button onClick={() => removeSameAs(i)} className="p-3 text-red-500 hover:bg-red-50 rounded-md transition-colors">
+                    <Trash2 className="w-4 h-4" aria-hidden="true" />
                   </button>
                 )}
               </div>
             ))}
           </div>
-          <button onClick={addSameAs} className="mt-2 flex items-center gap-2 text-sm text-violet-600 hover:text-violet-700 font-medium">
-            <Plus className="w-4 h-4" /> Adicionar perfil
+          <button onClick={addSameAs} className="mt-2 flex items-center gap-2 text-sm text-primary hover:text-primary font-medium">
+            <Plus className="w-4 h-4" aria-hidden="true" /> Adicionar perfil
           </button>
         </div>
       </div>
 
       {/* Schema toggles */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-        <h3 className="font-bold text-slate-800 mb-4">Tipos de Schema</h3>
+      <div className="bg-surface rounded-lg border border-border shadow-sm p-6">
+        <h3 className="font-bold text-ink mb-4">Tipos de Schema</h3>
         <div className="space-y-3">
           {[
             { label: 'Article Schema', desc: 'Dados do artigo, autor e editor', val: articleSchema, set: setArticleSchema },
             { label: 'BreadcrumbList Schema', desc: 'Trilha de navegação (Home > Categoria > Post)', val: breadcrumbSchema, set: setBreadcrumbSchema },
             { label: 'WebSite Schema', desc: 'Dados do site com SearchAction', val: websiteSchema, set: setWebsiteSchema },
           ].map(({ label, desc, val, set }) => (
-            <label key={label} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 cursor-pointer hover:bg-violet-50 transition-colors">
+            <label key={label} className="flex items-center justify-between p-3 rounded-md bg-elev cursor-pointer hover:bg-primary-soft transition-colors">
               <div>
-                <p className="text-sm font-semibold text-slate-800">{label}</p>
-                <p className="text-xs text-slate-500">{desc}</p>
+                <p className="text-sm font-semibold text-ink">{label}</p>
+                <p className="text-xs text-ink-muted">{desc}</p>
               </div>
-              <input type="checkbox" checked={val} onChange={e => set(e.target.checked)} className="rounded border-slate-300 text-violet-600 focus:ring-violet-500 w-4 h-4" />
+              <input type="checkbox" checked={val} onChange={e => set(e.target.checked)} className="rounded border-border text-primary focus:ring-primary/20 w-4 h-4" />
             </label>
           ))}
         </div>
@@ -183,9 +183,9 @@ export default function SettingsSEO() {
       <button
         onClick={handleSave}
         disabled={saving}
-        className="bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white px-6 py-3 rounded-xl text-sm font-bold flex items-center gap-2 transition-all shadow-sm shadow-violet-600/20"
+        className="bg-primary hover:bg-primary disabled:opacity-50 text-white px-6 py-3 rounded-md text-sm font-bold flex items-center gap-2 transition-all shadow-sm shadow-none/20"
       >
-        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" aria-hidden="true" />}
         {saving ? 'Salvando...' : 'Salvar Configuração'}
       </button>
     </div>

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * SettingsGSC.tsx — Plugin Google Search Console (Walker)
  *
  * UI para configurar verificação de propriedade e service account.
@@ -96,12 +96,12 @@ export default function SettingsGSC() {
         }
     };
 
-    const inputClass = 'w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-800 focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all shadow-sm';
-    const labelClass = 'block text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1';
+    const inputClass = 'w-full bg-surface border border-border rounded-md px-4 py-3 text-sm font-medium text-ink focus:outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/20/20 transition-all shadow-sm';
+    const labelClass = 'block text-sm font-bold text-ink-muted uppercase tracking-wider mb-2 ml-1';
 
     if (loading) return (
-        <div className="flex flex-col items-center justify-center p-20 text-slate-400 bg-white rounded-3xl border border-slate-200">
-            <Loader2 className="w-8 h-8 animate-spin mb-4 text-violet-500" />
+        <div className="flex flex-col items-center justify-center p-20 text-ink-faint bg-surface rounded-3xl border border-border">
+            <Loader2 className="w-8 h-8 animate-spin mb-4 text-primary" />
             <p className="font-medium animate-pulse">Carregando configurações...</p>
         </div>
     );
@@ -119,7 +119,7 @@ export default function SettingsGSC() {
         <div className="max-w-2xl space-y-6">
 
             {/* Aviso */}
-            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex gap-3">
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex gap-3">
                 <span className="text-xl shrink-0">⚠️</span>
                 <div>
                     <p className="font-bold text-amber-800 text-sm">Repositório Privado Obrigatório</p>
@@ -131,13 +131,13 @@ export default function SettingsGSC() {
             </div>
 
             {/* Passo 1: Verificação */}
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+            <div className="bg-surface rounded-lg border border-border shadow-sm p-6">
                 <div className="flex items-center gap-2 mb-4">
-                    <span className="w-6 h-6 bg-violet-100 text-violet-700 rounded-full flex items-center justify-center text-xs font-bold shrink-0">1</span>
-                    <h3 className="font-bold text-slate-800">Verificação de Propriedade</h3>
+                    <span className="w-6 h-6 bg-primary-soft text-primary rounded-full flex items-center justify-center text-xs font-bold shrink-0">1</span>
+                    <h3 className="font-bold text-ink">Verificação de Propriedade</h3>
                 </div>
-                <p className="text-sm text-slate-500 mb-4 leading-relaxed">
-                    No Search Console, vá em <strong>Configurações → Verificação de propriedade → Tag HTML</strong> e copie a tag <code className="bg-slate-100 px-1 rounded font-mono text-xs">&lt;meta name="google-site-verification" ...&gt;</code>.
+                <p className="text-sm text-ink-muted mb-4 leading-relaxed">
+                    No Search Console, vá em <strong>Configurações → Verificação de propriedade → Tag HTML</strong> e copie a tag <code className="bg-elev px-1 rounded font-mono text-xs">&lt;meta name="google-site-verification" ...&gt;</code>.
                 </p>
                 <label className={labelClass}>Meta Tag de Verificação</label>
                 <input
@@ -147,14 +147,14 @@ export default function SettingsGSC() {
                     placeholder='<meta name="google-site-verification" content="XXXXX" />'
                     className={`${inputClass} font-mono text-xs`}
                 />
-                <p className="text-xs text-slate-400 mt-1 ml-1">Cole a tag inteira ou apenas o valor do atributo content.</p>
+                <p className="text-xs text-ink-faint mt-1 ml-1">Cole a tag inteira ou apenas o valor do atributo content.</p>
             </div>
 
             {/* Passo 2: URL do site */}
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+            <div className="bg-surface rounded-lg border border-border shadow-sm p-6">
                 <div className="flex items-center gap-2 mb-4">
-                    <span className="w-6 h-6 bg-violet-100 text-violet-700 rounded-full flex items-center justify-center text-xs font-bold shrink-0">2</span>
-                    <h3 className="font-bold text-slate-800">URL da Propriedade</h3>
+                    <span className="w-6 h-6 bg-primary-soft text-primary rounded-full flex items-center justify-center text-xs font-bold shrink-0">2</span>
+                    <h3 className="font-bold text-ink">URL da Propriedade</h3>
                 </div>
                 <label className={labelClass}>URL do Site no Search Console</label>
                 <input
@@ -164,31 +164,31 @@ export default function SettingsGSC() {
                     placeholder="https://seusite.com.br"
                     className={inputClass}
                 />
-                <p className="text-xs text-slate-400 mt-1 ml-1">
+                <p className="text-xs text-ink-faint mt-1 ml-1">
                     Deve ser exatamente como aparece no Search Console (com ou sem www, com ou sem barra final).
                 </p>
             </div>
 
             {/* Passo 3: Service Account */}
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+            <div className="bg-surface rounded-lg border border-border shadow-sm p-6">
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
-                        <span className="w-6 h-6 bg-violet-100 text-violet-700 rounded-full flex items-center justify-center text-xs font-bold shrink-0">3</span>
-                        <h3 className="font-bold text-slate-800">Service Account (Google Cloud)</h3>
+                        <span className="w-6 h-6 bg-primary-soft text-primary rounded-full flex items-center justify-center text-xs font-bold shrink-0">3</span>
+                        <h3 className="font-bold text-ink">Service Account (Google Cloud)</h3>
                     </div>
                     <a
                         href="https://console.cloud.google.com/iam-admin/serviceaccounts"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-1 text-xs text-violet-600 hover:underline"
+                        className="flex items-center gap-1 text-xs text-primary hover:underline"
                     >
-                        Google Cloud Console <ExternalLink className="w-3 h-3" />
+                        Google Cloud Console <ExternalLink className="w-3 h-3" aria-hidden="true" />
                     </a>
                 </div>
 
                 {/* Mini guia */}
-                <div className="bg-slate-50 rounded-xl p-4 mb-4 text-xs text-slate-600 space-y-1.5 leading-relaxed">
-                    <p className="font-semibold text-slate-700 mb-2">Como obter o JSON:</p>
+                <div className="bg-elev rounded-md p-4 mb-4 text-xs text-ink-muted space-y-1.5 leading-relaxed">
+                    <p className="font-semibold text-ink mb-2">Como obter o JSON:</p>
                     <p>① No Google Cloud, crie um projeto (ou use um existente)</p>
                     <p>② Ative a API <strong>Google Search Console API</strong></p>
                     <p>③ Crie um Service Account → gere uma chave JSON → baixe o arquivo</p>
@@ -201,7 +201,7 @@ export default function SettingsGSC() {
                     <button
                         type="button"
                         onClick={() => setShowJson(v => !v)}
-                        className="flex items-center gap-1 text-xs text-slate-400 hover:text-slate-600 transition-colors"
+                        className="flex items-center gap-1 text-xs text-ink-faint hover:text-ink-muted transition-colors"
                     >
                         {showJson ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                         {showJson ? 'Ocultar' : 'Mostrar'}
@@ -216,13 +216,13 @@ export default function SettingsGSC() {
                     style={{ filter: showJson ? 'none' : 'blur(3px)' }}
                 />
                 {serviceAccountJson && (
-                    <p className="text-xs text-slate-400 mt-1 ml-1">{serviceAccountJson.length} caracteres</p>
+                    <p className="text-xs text-ink-faint mt-1 ml-1">{serviceAccountJson.length} caracteres</p>
                 )}
             </div>
 
             {/* Resultado do teste */}
             {testResult && (
-                <div className={`p-4 rounded-xl border flex items-start gap-3 text-sm ${testResult.ok ? 'bg-green-50 border-green-200 text-green-700' : 'bg-red-50 border-red-200 text-red-700'}`}>
+                <div className={`p-4 rounded-md border flex items-start gap-3 text-sm ${testResult.ok ? 'bg-green-50 border-green-200 text-green-700' : 'bg-red-50 border-red-200 text-red-700'}`}>
                     {testResult.ok
                         ? <CheckCircle className="w-4 h-4 shrink-0 mt-0.5" />
                         : <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />}
@@ -237,8 +237,8 @@ export default function SettingsGSC() {
             )}
 
             {/* Status */}
-            <div className="bg-slate-50 rounded-2xl border border-slate-200 p-4">
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Status atual</p>
+            <div className="bg-elev rounded-lg border border-border p-4">
+                <p className="text-xs font-bold text-ink-faint uppercase tracking-widest mb-3">Status atual</p>
                 <div className="space-y-2 text-sm">
                     {[
                         { label: 'Verificação', value: verificationTag ? '● Configurada' : '○ Não configurada', ok: !!verificationTag },
@@ -246,7 +246,7 @@ export default function SettingsGSC() {
                         { label: 'Service Account', value: serviceAccountJson ? '● JSON carregado' : '○ Não configurado', ok: !!serviceAccountJson },
                     ].map(row => (
                         <div key={row.label} className="flex justify-between">
-                            <span className="text-slate-500">{row.label}</span>
+                            <span className="text-ink-muted">{row.label}</span>
                             <span className={row.ok ? 'text-green-600 font-semibold' : 'text-red-500 font-semibold'}>{row.value}</span>
                         </div>
                     ))}
@@ -259,7 +259,7 @@ export default function SettingsGSC() {
                     type="button"
                     onClick={handleTest}
                     disabled={testing || !serviceAccountJson.trim() || !siteUrl.trim()}
-                    className="px-5 py-2.5 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+                    className="px-5 py-2.5 border border-border rounded-md text-sm font-medium text-ink hover:bg-elev disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
                 >
                     {testing ? <Loader2 className="w-4 h-4 animate-spin" /> : '🔌'}
                     {testing ? 'Testando...' : 'Testar Conexão'}
@@ -268,9 +268,9 @@ export default function SettingsGSC() {
                     type="button"
                     onClick={handleSave}
                     disabled={saving}
-                    className="bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white px-6 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all shadow-sm shadow-violet-600/20"
+                    className="bg-primary hover:bg-primary disabled:opacity-50 text-white px-6 py-2.5 rounded-md text-sm font-bold flex items-center gap-2 transition-all shadow-sm shadow-none/20"
                 >
-                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : saved ? <CheckCircle className="w-4 h-4" /> : <Save className="w-4 h-4" />}
+                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : saved ? <CheckCircle className="w-4 h-4" aria-hidden="true" /> : <Save className="w-4 h-4" aria-hidden="true" />}
                     {saving ? 'Salvando...' : saved ? 'Salvo!' : 'Salvar Configurações'}
                 </button>
             </div>

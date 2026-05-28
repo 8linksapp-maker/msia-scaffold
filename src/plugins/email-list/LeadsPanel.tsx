@@ -1,4 +1,4 @@
-/**
+﻿/**
  * LeadsPanel.tsx — Painel de subscribers da newsletter
  */
 
@@ -63,20 +63,20 @@ export default function LeadsPanel() {
     };
 
     const sourceBadge: Record<string, string> = {
-        popup: 'bg-violet-100 text-violet-700',
+        popup: 'bg-primary-soft text-primary',
         widget: 'bg-blue-100 text-blue-700',
-        api: 'bg-slate-100 text-slate-600',
+        api: 'bg-elev text-ink-muted',
     };
 
     if (loading) return (
-        <div className="flex flex-col items-center justify-center p-16 text-slate-400">
-            <Loader2 className="w-7 h-7 animate-spin mb-3 text-violet-500" />
+        <div className="flex flex-col items-center justify-center p-16 text-ink-faint">
+            <Loader2 className="w-7 h-7 animate-spin mb-3 text-primary" />
             <p className="text-sm font-medium animate-pulse">Carregando leads...</p>
         </div>
     );
 
     if (error) return (
-        <div className="bg-red-50 text-red-700 p-6 rounded-2xl border border-red-200 flex gap-3 items-start">
+        <div className="bg-red-50 text-red-700 p-6 rounded-lg border border-red-200 flex gap-3 items-start">
             <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
             <p className="text-sm">{error}</p>
         </div>
@@ -87,61 +87,61 @@ export default function LeadsPanel() {
             {/* Header */}
             <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 bg-violet-100 rounded-xl flex items-center justify-center">
-                        <Users className="w-5 h-5 text-violet-600" />
+                    <div className="w-9 h-9 bg-primary-soft rounded-md flex items-center justify-center">
+                        <Users className="w-5 h-5 text-primary" />
                     </div>
                     <div>
-                        <p className="font-bold text-slate-800">{subscribers.length} inscritos</p>
-                        <p className="text-xs text-slate-500">total na lista</p>
+                        <p className="font-bold text-ink">{subscribers.length} inscritos</p>
+                        <p className="text-xs text-ink-muted">total na lista</p>
                     </div>
                 </div>
                 <button
                     onClick={exportCsv}
                     disabled={subscribers.length === 0}
-                    className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+                    className="flex items-center gap-2 px-4 py-2 bg-surface border border-border rounded-md text-sm font-medium text-ink hover:bg-elev disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
                 >
-                    <Download className="w-4 h-4" />
+                    <Download className="w-4 h-4" aria-hidden="true" />
                     Exportar CSV
                 </button>
             </div>
 
             {/* Busca */}
             <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-faint" />
                 <input
                     type="text"
                     placeholder="Buscar por email ou nome..."
                     value={search}
                     onChange={e => setSearch(e.target.value)}
-                    className="w-full pl-9 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all"
+                    className="w-full pl-9 pr-4 py-2.5 bg-surface border border-border rounded-md text-sm focus:outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/20/20 transition-all"
                 />
             </div>
 
             {/* Tabela */}
             {filtered.length === 0 ? (
-                <div className="text-center py-16 text-slate-400">
+                <div className="text-center py-16 text-ink-faint">
                     <Users className="w-10 h-10 mx-auto mb-3 opacity-40" />
                     <p className="text-sm font-medium">
                         {subscribers.length === 0 ? 'Nenhum inscrito ainda.' : 'Nenhum resultado para sua busca.'}
                     </p>
                 </div>
             ) : (
-                <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+                <div className="bg-surface rounded-lg border border-border overflow-hidden shadow-sm">
                     <table className="w-full text-sm">
                         <thead>
-                            <tr className="border-b border-slate-100 bg-slate-50">
-                                <th className="text-left px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Email</th>
-                                <th className="text-left px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Nome</th>
-                                <th className="text-left px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Data</th>
-                                <th className="text-left px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Fonte</th>
+                            <tr className="border-b border-border bg-elev">
+                                <th className="text-left px-4 py-3 text-xs font-bold text-ink-muted uppercase tracking-wider">Email</th>
+                                <th className="text-left px-4 py-3 text-xs font-bold text-ink-muted uppercase tracking-wider">Nome</th>
+                                <th className="text-left px-4 py-3 text-xs font-bold text-ink-muted uppercase tracking-wider">Data</th>
+                                <th className="text-left px-4 py-3 text-xs font-bold text-ink-muted uppercase tracking-wider">Fonte</th>
                             </tr>
                         </thead>
                         <tbody>
                             {filtered.map((sub, i) => (
-                                <tr key={sub.email} className={`border-b border-slate-50 hover:bg-slate-50/50 transition-colors ${i === filtered.length - 1 ? 'border-0' : ''}`}>
-                                    <td className="px-4 py-3 font-medium text-slate-800">{sub.email}</td>
-                                    <td className="px-4 py-3 text-slate-600">{sub.name || <span className="text-slate-300">—</span>}</td>
-                                    <td className="px-4 py-3 text-slate-500 text-xs whitespace-nowrap">
+                                <tr key={sub.email} className={`border-b border-slate-50 hover:bg-elev/50 transition-colors ${i === filtered.length - 1 ? 'border-0' : ''}`}>
+                                    <td className="px-4 py-3 font-medium text-ink">{sub.email}</td>
+                                    <td className="px-4 py-3 text-ink-muted">{sub.name || <span className="text-ink-faint">—</span>}</td>
+                                    <td className="px-4 py-3 text-ink-muted text-xs whitespace-nowrap">
                                         {new Date(sub.subscribedAt).toLocaleDateString('pt-BR', {
                                             day: '2-digit',
                                             month: 'short',
@@ -149,7 +149,7 @@ export default function LeadsPanel() {
                                         })}
                                     </td>
                                     <td className="px-4 py-3">
-                                        <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold ${sourceBadge[sub.source] || 'bg-slate-100 text-slate-600'}`}>
+                                        <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold ${sourceBadge[sub.source] || 'bg-elev text-ink-muted'}`}>
                                             {sourceLabel[sub.source] || sub.source}
                                         </span>
                                     </td>
