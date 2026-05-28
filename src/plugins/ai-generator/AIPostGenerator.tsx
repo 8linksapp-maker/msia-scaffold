@@ -5,9 +5,12 @@ import { triggerToast } from '../../components/admin/CmsToaster';
 interface Author   { slug: string; name: string; }
 interface Category { slug: string; name: string; }
 
+type HeadingLevel = 'h1' | 'h2' | 'h3' | 'h4';
+
 interface Section {
-    text: string;
-    size: 'short' | 'medium' | 'long';
+    text:  string;
+    size:  'short' | 'medium' | 'long';
+    level: HeadingLevel;
 }
 
 interface CommercialOutline { type: 'outline'; text: string; }
@@ -19,6 +22,20 @@ type CommercialSub   = 'guia-melhores' | 'review';
 
 // Mapeamento de tamanho → minWords para o back-end
 const SIZE_WORDS: Record<Section['size'], number> = { short: 150, medium: 350, long: 650 };
+
+const HEADING_LEVELS: { id: HeadingLevel; label: string; hint: string }[] = [
+    { id: 'h1', label: 'H1', hint: 'Título principal' },
+    { id: 'h2', label: 'H2', hint: 'Seção principal' },
+    { id: 'h3', label: 'H3', hint: 'Subseção' },
+    { id: 'h4', label: 'H4', hint: 'Sub-subseção' },
+];
+
+const LEVEL_STYLE: Record<HeadingLevel, string> = {
+    h1: 'bg-primary text-surface',
+    h2: 'bg-blue-100 text-blue-800',
+    h3: 'bg-green-100 text-green-800',
+    h4: 'bg-amber-100 text-amber-800',
+};
 
 const SIZE_OPTIONS: { id: Section['size']; label: string; hint: string }[] = [
     { id: 'short',  label: 'Curto',  hint: '~150 palavras' },
@@ -62,6 +79,7 @@ export default function AIPostGenerator({ authors, categories, hasApiKey = true 
     const [progressMsg,     setProgressMsg]     = useState('');
     const [progressSec,     setProgressSec]     = useState<{ current: number; total: number; name: string } | null>(null);
     const [fieldErrors,     setFieldErrors]     = useState<Record<string, string>>({});
+    const [publishMode,     setPublishMode]     = useState<'publish' | 'draft'>('draft');
     const [showTemplates,   setShowTemplates]   = useState(false);
     const [showAdvanced,    setShowAdvanced]    = useState(false);
 
@@ -91,11 +109,11 @@ export default function AIPostGenerator({ authors, categories, hasApiKey = true 
     const labelClass = 'block text-xs font-semibold text-ink-faint uppercase tracking-widest mb-2';
 
     // ── Seções ─────────────────────────────────────────────────────────────────
-    const addSection = (text = '') =>
-        setSections(s => [...s, { text, size: 'medium' }]);
+    const addSection = (text = '', level: HeadingLevel = 'h2') =>
+        setSections(s => [...s, { text, size: 'medium', level }]);
 
     const applyTemplate = (tmpl: typeof STRUCTURE_TEMPLATES[number]) => {
-        setSections(tmpl.sections.map(t => ({ text: t, size: 'medium' as const })));
+        setSections(tmpl.sections.map(t => ({ text: t, size: 'medium' as const, level: 'h2' as HeadingLevel })));
         setShowTemplates(false);
     };
 
@@ -164,10 +182,9 @@ export default function AIPostGenerator({ authors, categories, hasApiKey = true 
         setProgressMsg('Iniciando geração...');
         setProgressSec(null);
 
-        // Converte sections para o formato de outline esperado pelo back-end
         const outlines = sections.map(s => ({
-            level: 'h2' as const,
-            text: s.text,
+            level: s.level,
+            text:  s.text,
             minWords: SIZE_WORDS[s.size],
         }));
 
@@ -178,12 +195,13 @@ export default function AIPostGenerator({ authors, categories, hasApiKey = true 
                 body: JSON.stringify({
                     postType,
                     commercialSubType: postType === 'commercial' ? commercialSub : undefined,
-                    title: title.trim(),
-                    slug: slug.trim(),
+                    title:  title.trim(),
+                    slug:   slug.trim(),
                     author,
                     category,
-                    outlines:         postType === 'informational' ? outlines : undefined,
-                    commercialItems:  postType === 'commercial' ? commercialItems : undefined,
+                    draft: publishMode === 'draft',
+                    outlines:        postType === 'informational' ? outlines : undefined,
+                    commercialItems: postType === 'commercial' ? commercialItems : undefined,
                 }),
             });
 
@@ -214,9 +232,13 @@ export default function AIPostGenerator({ authors, categories, hasApiKey = true 
                                 }
                             }
                             if (data.step === 'done') {
-                                setProgressMsg('Artigo publicado!');
-                                triggerToast(`"${data.title}" publicado com sucesso.`, 'success');
-                                setTimeout(() => { window.location.href = '/admin/posts'; }, 2000);
+                                const doneMsg  = publishMode === 'draft' ? 'Rascunho salvo!' : 'Artigo publicado!';
+                                const toastMsg = publishMode === 'draft'
+                                    ? `Rascunho "${data.title}" salvo. Revise e publique quando quiser.`
+                                    : `"${data.title}" publicado com sucesso.`;
+                                setProgressMsg(doneMsg);
+                                triggerToast(toastMsg, 'success');
+                                setTimeout(() => { window.location.href = '/admin/posts'; }, 2500);
                                 return;
                             }
                             if (data.step === 'error') throw new Error(data.error);
@@ -498,10 +520,25 @@ export default function AIPostGenerator({ authors, categories, hasApiKey = true 
                                             </button>
                                         </div>
 
-                                        {/* Número */}
-                                        <span className="w-6 h-6 rounded-full bg-surface text-ink-faint text-xs font-bold flex items-center justify-center shrink-0 font-mono">
-                                            {i + 1}
-                                        </span>
+                                        {/* Nível H1–H4 */}
+                                        <div className="flex gap-0.5 shrink-0" role="group" aria-label={`Nível de título da seção ${i + 1}`}>
+                                            {HEADING_LEVELS.map(h => (
+                                                <button
+                                                    key={h.id}
+                                                    type="button"
+                                                    onClick={() => updateSection(i, { level: h.id })}
+                                                    title={h.hint}
+                                                    aria-pressed={sec.level === h.id}
+                                                    className={`w-8 h-8 rounded text-xs font-bold transition-colors ${
+                                                        sec.level === h.id
+                                                            ? LEVEL_STYLE[h.id]
+                                                            : 'bg-surface border border-border text-ink-faint hover:border-primary/40'
+                                                    }`}
+                                                >
+                                                    {h.label}
+                                                </button>
+                                            ))}
+                                        </div>
 
                                         {/* Título da seção */}
                                         <input
@@ -524,7 +561,7 @@ export default function AIPostGenerator({ authors, categories, hasApiKey = true 
                                                     aria-pressed={sec.size === opt.id}
                                                     className={`px-2 py-1 rounded text-xs font-semibold transition-colors ${
                                                         sec.size === opt.id
-                                                            ? 'bg-primary text-surface'
+                                                            ? 'bg-ink text-surface'
                                                             : 'bg-surface border border-border text-ink-muted hover:border-primary/40'
                                                     }`}
                                                 >
@@ -693,6 +730,36 @@ export default function AIPostGenerator({ authors, categories, hasApiKey = true 
                 </div>
             )}
 
+            {/* Modo de publicação */}
+            <div className="bg-surface rounded-lg border border-border p-5" style={{ boxShadow: '0 1px 2px rgba(80,40,20,0.04)' }}>
+                <p className={labelClass}>4. O que fazer após gerar?</p>
+                <div className="grid grid-cols-2 gap-3 mt-3">
+                    {[
+                        {
+                            id: 'draft' as const,
+                            label: 'Salvar como rascunho',
+                            desc: 'Você revisa o conteúdo antes de publicar. Recomendado.',
+                        },
+                        {
+                            id: 'publish' as const,
+                            label: 'Publicar diretamente',
+                            desc: 'O artigo vai ao ar imediatamente, sem revisão.',
+                        },
+                    ].map(opt => (
+                        <button
+                            key={opt.id}
+                            type="button"
+                            onClick={() => setPublishMode(opt.id)}
+                            aria-pressed={publishMode === opt.id}
+                            className={`p-4 rounded-md border-2 text-left transition-all ${publishMode === opt.id ? 'border-primary bg-primary-soft' : 'border-border hover:border-primary/40'}`}
+                        >
+                            <p className="font-semibold text-ink text-sm">{opt.label}</p>
+                            <p className="text-xs text-ink-muted mt-1 leading-relaxed">{opt.desc}</p>
+                        </button>
+                    ))}
+                </div>
+            </div>
+
             {/* Ações */}
             <div className="flex items-center justify-between pt-2">
                 <a
@@ -701,24 +768,21 @@ export default function AIPostGenerator({ authors, categories, hasApiKey = true 
                 >
                     Cancelar
                 </a>
-                <div className="flex flex-col items-end gap-1.5">
-                    <button
-                        type="button"
-                        onClick={handleGenerate}
-                        disabled={isGenerating || !canGenerate}
-                        className="bg-primary hover:brightness-90 disabled:opacity-50 disabled:cursor-not-allowed text-surface px-7 py-3 min-h-[48px] rounded-md text-sm font-semibold flex items-center gap-2 transition-all"
-                        style={{ boxShadow: '0 2px 8px rgba(80,40,20,0.14)' }}
-                    >
-                        {isGenerating ? (
-                            <><Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" /> Gerando...</>
-                        ) : (
-                            'Gerar e publicar artigo'
-                        )}
-                    </button>
-                    <p className="text-xs text-ink-faint">
-                        O artigo será publicado diretamente. Você pode editá-lo depois em Artigos.
-                    </p>
-                </div>
+                <button
+                    type="button"
+                    onClick={handleGenerate}
+                    disabled={isGenerating || !canGenerate}
+                    className="bg-primary hover:brightness-90 disabled:opacity-50 disabled:cursor-not-allowed text-surface px-7 py-3 min-h-[48px] rounded-md text-sm font-semibold flex items-center gap-2 transition-all"
+                    style={{ boxShadow: '0 2px 8px rgba(80,40,20,0.14)' }}
+                >
+                    {isGenerating ? (
+                        <><Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" /> Gerando...</>
+                    ) : publishMode === 'draft' ? (
+                        'Gerar e salvar rascunho'
+                    ) : (
+                        'Gerar e publicar artigo'
+                    )}
+                </button>
             </div>
         </div>
     );
