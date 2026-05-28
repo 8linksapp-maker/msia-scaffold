@@ -2,7 +2,7 @@ import React from 'react';
 import {
     LayoutDashboard, FileText, Tag, Users, Info, Phone,
     Shield, Settings, LogOut, ChevronRight, ExternalLink, Navigation,
-    Sparkles, Package, FileArchive,
+    Package, FileArchive,
 } from 'lucide-react';
 
 interface NavItem {
@@ -27,7 +27,7 @@ const pageItems: NavItem[] = [
 ];
 
 const pluginItems: NavItem[] = [
-    { label: 'Plugins', href: '/admin/plugins', icon: Sparkles, section: 'plugins' },
+    { label: 'Plugins', href: '/admin/plugins', icon: Package, section: 'plugins' },
     { label: 'Google Tag', href: '/admin/google-tag', icon: Tag, section: 'google-tag' },
 ];
 
@@ -40,67 +40,67 @@ export default function AdminNav({ activeSection = '', extraItems = [] }: AdminN
     const allMainItems = [...mainItems, ...extraItems];
 
     return (
-        <aside className="fixed inset-y-0 left-0 w-64 bg-white border-r border-slate-100 flex flex-col z-50 shadow-sm">
+        <aside className="fixed inset-y-0 left-0 w-64 bg-surface border-r border-border flex flex-col z-50" style={{ boxShadow: '1px 0 0 0 rgb(224 218 206)' }}>
             {/* Logo */}
-            <div className="h-16 flex items-center px-6 border-b border-slate-100">
-                <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center">
-                        <LayoutDashboard className="w-4 h-4 text-white" />
+            <div className="h-16 flex items-center px-5 border-b border-border">
+                <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 bg-primary rounded flex items-center justify-center shrink-0">
+                        <LayoutDashboard className="w-3.5 h-3.5 text-surface" />
                     </div>
-                    <span className="font-bold text-slate-800">Admin CMS</span>
+                    <span className="font-semibold text-ink text-sm">Admin CMS</span>
                 </div>
             </div>
 
             {/* Nav */}
             <nav className="flex-1 overflow-y-auto py-4 px-3">
-                {/* Seção Principal */}
-                <div className="mb-6">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-3 mb-2">Principal</p>
+                {/* Principal */}
+                <div className="mb-5">
+                    <p className="text-[10px] font-bold text-ink-faint uppercase tracking-widest px-3 mb-1.5">Principal</p>
                     {allMainItems.map(item => (
                         <NavLink key={item.href} item={item} active={activeSection === item.section} />
                     ))}
                 </div>
 
                 {/* Páginas */}
-                <div className="mb-6">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-3 mb-2">Páginas</p>
+                <div className="mb-5">
+                    <p className="text-[10px] font-bold text-ink-faint uppercase tracking-widest px-3 mb-1.5">Páginas</p>
                     {pageItems.map(item => (
                         <NavLink key={item.href} item={item} active={activeSection === item.section} />
                     ))}
                 </div>
 
                 {/* Plugins */}
-                <div className="mb-6">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-3 mb-2">Plugins</p>
+                <div className="mb-5">
+                    <p className="text-[10px] font-bold text-ink-faint uppercase tracking-widest px-3 mb-1.5">Plugins</p>
                     {pluginItems.map(item => (
                         <NavLink key={item.href} item={item} active={activeSection === item.section} />
                     ))}
                 </div>
 
-                {/* Configurações */}
+                {/* Sistema */}
                 <div>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-3 mb-2">Sistema</p>
+                    <p className="text-[10px] font-bold text-ink-faint uppercase tracking-widest px-3 mb-1.5">Sistema</p>
                     <NavLink item={{ label: 'Configurações', href: '/admin/config', icon: Settings, section: 'config' }} active={activeSection === 'config'} />
                     <NavLink item={{ label: 'Backup', href: '/admin/backup', icon: FileArchive, section: 'backup' }} active={activeSection === 'backup'} />
                 </div>
             </nav>
 
             {/* Ver site + Logout */}
-            <div className="p-3 border-t border-slate-100 space-y-1">
+            <div className="p-3 border-t border-border space-y-0.5">
                 <a
                     href="/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-500 hover:text-violet-700 hover:bg-violet-50 transition-all group"
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded text-ink-muted hover:text-primary hover:bg-primary-soft transition-colors group"
                 >
-                    <ExternalLink className="w-4 h-4 shrink-0 group-hover:text-violet-600" />
+                    <ExternalLink className="w-4 h-4 shrink-0" />
                     <span className="text-sm font-medium">Ver site</span>
                 </a>
                 <a
                     href="/api/admin/logout"
-                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-500 hover:text-red-600 hover:bg-red-50 transition-all group"
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded text-ink-muted hover:text-red-700 hover:bg-red-50 transition-colors group"
                 >
-                    <LogOut className="w-4 h-4 shrink-0 group-hover:text-red-500" />
+                    <LogOut className="w-4 h-4 shrink-0" />
                     <span className="text-sm font-medium">Sair</span>
                 </a>
             </div>
@@ -113,15 +113,15 @@ function NavLink({ item, active }: { item: NavItem; active: boolean }) {
     return (
         <a
             href={item.href}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl mb-0.5 transition-all group ${
+            className={`flex items-center gap-3 px-3 py-2.5 rounded mb-0.5 transition-colors group ${
                 active
-                    ? 'bg-violet-50 text-violet-700'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                    ? 'bg-primary-soft text-primary'
+                    : 'text-ink-muted hover:text-ink hover:bg-elev'
             }`}
         >
-            <Icon className={`w-4 h-4 shrink-0 ${active ? 'text-violet-600' : 'text-slate-400 group-hover:text-slate-600'}`} />
-            <span className={`text-sm font-medium flex-1 ${active ? 'font-semibold' : ''}`}>{item.label}</span>
-            {active && <ChevronRight className="w-3 h-3 text-violet-400" />}
+            <Icon className={`w-4 h-4 shrink-0 ${active ? 'text-primary' : 'text-ink-faint group-hover:text-ink-muted'}`} />
+            <span className={`text-sm flex-1 ${active ? 'font-semibold' : 'font-medium'}`}>{item.label}</span>
+            {active && <ChevronRight className="w-3 h-3 text-primary/60" />}
         </a>
     );
 }

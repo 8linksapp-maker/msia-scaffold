@@ -30,7 +30,7 @@ export default function CmsDashboard() {
                 let tAuthors = 0;
                 try {
                     const data = await githubApi('read', 'src/data/authors.json');
-                    const parsed = JSON.parse(data?.content || "{}");
+                    const parsed = JSON.parse(data?.content || '{}');
                     tAuthors = Array.isArray(parsed) ? parsed.length : 0;
                 } catch { /* ignora */ }
 
@@ -53,31 +53,37 @@ export default function CmsDashboard() {
 
     return (
         <div>
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-3">Estatísticas</p>
+            <p className="text-[10px] font-bold text-ink-faint uppercase tracking-widest mb-3">Estatísticas</p>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                 {statItems.map(({ label, value, icon: Icon }) => (
-                    <div key={label} className="bg-white rounded-xl border border-slate-100 p-5 flex flex-col gap-3">
+                    <div key={label} className="bg-surface rounded-md border border-border p-5 flex flex-col gap-3" style={{ boxShadow: '0 1px 2px rgba(80,40,20,0.04)' }}>
                         <div className="flex items-center justify-between">
-                            <p className="text-sm font-medium text-slate-400">{label}</p>
-                            <Icon className="w-4 h-4 text-violet-400 shrink-0" />
+                            <p className="text-sm font-medium text-ink-faint">{label}</p>
+                            <Icon className="w-4 h-4 text-primary/60 shrink-0" />
                         </div>
-                        <p className="text-3xl font-bold text-slate-900 leading-none">
-                            {loading ? <Loader2 className="w-5 h-5 animate-spin text-slate-200 mt-1" /> : value}
+                        <p className="text-3xl font-bold text-ink leading-none tabular-nums">
+                            {loading ? <Loader2 className="w-5 h-5 animate-spin text-border mt-1" /> : value}
                         </p>
                     </div>
                 ))}
             </div>
 
-            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {[
-                    { label: 'Novo Artigo', href: '/admin/posts/new', desc: 'Escrever e publicar um novo post', color: 'violet' },
-                    { label: 'Ver Artigos', href: '/admin/posts', desc: 'Gerenciar todos os artigos', color: 'slate' },
-                    { label: 'Configurações', href: '/admin/config', desc: 'Nome do site, cores e fontes', color: 'slate' },
+                    { label: 'Novo Artigo', href: '/admin/posts/new', desc: 'Escrever e publicar um novo post', primary: true },
+                    { label: 'Ver Artigos', href: '/admin/posts', desc: 'Gerenciar todos os artigos', primary: false },
+                    { label: 'Configurações', href: '/admin/config', desc: 'Nome do site, cores e fontes', primary: false },
                 ].map(item => (
                     <a key={item.href} href={item.href}
-                        className={`p-5 rounded-xl border transition-all hover:-translate-y-0.5 ${item.color === 'violet' ? 'bg-violet-600 border-violet-500 text-white hover:bg-violet-700' : 'bg-white border-slate-200 text-slate-700 hover:border-violet-200 hover:shadow-sm'}`}>
-                        <p className={`font-bold text-sm ${item.color === 'violet' ? 'text-white' : 'text-slate-800'}`}>{item.label}</p>
-                        <p className={`text-xs mt-1 ${item.color === 'violet' ? 'text-violet-200' : 'text-slate-500'}`}>{item.desc}</p>
+                        className={`p-5 rounded-md border transition-colors ${
+                            item.primary
+                                ? 'bg-primary border-primary/80 text-surface hover:brightness-90'
+                                : 'bg-surface border-border text-ink-muted hover:border-primary/40 hover:text-ink'
+                        }`}
+                        style={item.primary ? { boxShadow: '0 2px 8px rgba(80,40,20,0.14)' } : {}}
+                    >
+                        <p className={`font-semibold text-sm ${item.primary ? 'text-surface' : 'text-ink'}`}>{item.label}</p>
+                        <p className={`text-xs mt-1 ${item.primary ? 'text-surface/75' : 'text-ink-faint'}`}>{item.desc}</p>
                     </a>
                 ))}
             </div>

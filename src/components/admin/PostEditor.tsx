@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Save, AlertCircle, Loader2, ArrowLeft, Image as ImageIcon, Eye, Edit3, Video, AlertTriangle } from 'lucide-react';
 import { parseVideoUrl } from '../../lib/videoEmbed';
 import { normalizeCategories } from '../../lib/categorySlug';
@@ -233,32 +233,32 @@ export default function PostEditor({ filePath }: PostEditorProps) {
     };
 
     if (loading) return (
-        <div className="flex flex-col items-center justify-center p-20 text-slate-400 bg-white rounded-3xl border border-slate-200">
-            <Loader2 className="w-8 h-8 animate-spin mb-4 text-violet-500" />
+        <div className="flex flex-col items-center justify-center p-20 text-ink-faint bg-surface rounded-3xl border border-border">
+            <Loader2 className="w-8 h-8 animate-spin mb-4 text-primary" />
             <p className="font-medium animate-pulse">Carregando editor...</p>
         </div>
     );
 
-    const inputClass = "w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium text-slate-800 focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all shadow-sm";
-    const labelClass = "block text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1";
+    const inputClass = "w-full bg-surface border border-border rounded-md px-4 py-3 text-sm font-medium text-ink focus:outline-none focus:border-primary/80 focus:ring-2 focus:ring-primary/20/20 transition-all shadow-sm";
+    const labelClass = "block text-sm font-bold text-ink-muted uppercase tracking-wider mb-2 ml-1";
 
     return (
         <div className="max-w-5xl pb-32">
             {/* Fixed header bar */}
-            <div className="flex items-center justify-between bg-white p-4 px-6 rounded-2xl border border-slate-200 shadow-sm mb-6">
+            <div className="flex items-center justify-between bg-surface p-4 px-6 rounded-lg border border-border shadow-sm mb-6">
                 <div className="flex items-center gap-3">
-                    <a href="/admin/posts" className="text-slate-400 hover:text-violet-600 transition-colors p-1.5 rounded-lg hover:bg-violet-50"><ArrowLeft className="w-5 h-5" /></a>
+                    <a href="/admin/posts" className="text-ink-faint hover:text-primary transition-colors p-1.5 rounded-lg hover:bg-primary-soft"><ArrowLeft className="w-5 h-5" /></a>
                     <div>
-                        <h2 className="text-lg font-bold text-slate-800">{isEditing ? 'Editar Artigo' : 'Novo Artigo'}</h2>
-                        {post.slug && <p className="text-xs font-mono text-slate-400">/blog/{post.slug}</p>}
+                        <h2 className="text-lg font-bold text-ink">{isEditing ? 'Editar Artigo' : 'Novo Artigo'}</h2>
+                        {post.slug && <p className="text-xs font-mono text-ink-faint">/blog/{post.slug}</p>}
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
-                    <button type="button" onClick={() => setIsPreview(!isPreview)} className="flex items-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium transition-colors">
+                    <button type="button" onClick={() => setIsPreview(!isPreview)} className="flex items-center gap-1.5 px-3 py-2 bg-elev hover:bg-elev text-ink rounded-lg text-sm font-medium transition-colors">
                         {isPreview ? <Edit3 className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         {isPreview ? 'Editor' : 'Preview'}
                     </button>
-                    <button onClick={handleSave} disabled={saving} className="bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all shadow-sm shadow-violet-600/20">
+                    <button onClick={handleSave} disabled={saving} className="bg-primary hover:bg-primary disabled:opacity-50 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all shadow-sm shadow-none/20">
                         {saving && <Loader2 className="w-4 h-4 animate-spin" />}
                         {saving ? 'Salvando...' : <><Save className="w-4 h-4" /> {isEditing ? 'Salvar' : 'Publicar'}</>}
                     </button>
@@ -271,7 +271,7 @@ export default function PostEditor({ filePath }: PostEditorProps) {
                 {/* Main Editor Area */}
                 <div className="flex-1 min-w-0 space-y-6">
                     {/* Title */}
-                    <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <div className="bg-surface p-6 rounded-lg border border-border shadow-sm">
                         <label className={labelClass}>Título do Artigo *</label>
                         <input type="text" value={post.title} onChange={e => handleTitleChange(e.target.value)} className={inputClass} placeholder="Título do artigo..." />
                         <div className="mt-3">
@@ -285,7 +285,7 @@ export default function PostEditor({ filePath }: PostEditorProps) {
                     </div>
 
                     {/* Content Editor + FAB Vídeo */}
-                    <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <div className="bg-surface p-6 rounded-lg border border-border shadow-sm">
                         <div className="flex items-center justify-between mb-2">
                             <label className={labelClass} style={{ marginBottom: 0 }}>Conteúdo do Artigo</label>
                             {!isPreview && (
@@ -301,7 +301,7 @@ export default function PostEditor({ filePath }: PostEditorProps) {
                             )}
                         </div>
                         {isPreview ? (
-                            <div className="prose prose-slate max-w-none border border-slate-200 rounded-xl p-6 min-h-[300px]" dangerouslySetInnerHTML={{ __html: post.content }} />
+                            <div className="prose prose-slate max-w-none border border-border rounded-md p-6 min-h-[300px]" dangerouslySetInnerHTML={{ __html: post.content }} />
                         ) : QuillEditor ? (
                             <QuillEditor
                                 ref={quillRef}
@@ -313,11 +313,11 @@ export default function PostEditor({ filePath }: PostEditorProps) {
                                 style={{ minHeight: '300px' }}
                             />
                         ) : (
-                            <div className="flex items-center justify-center p-12 text-slate-400"><Loader2 className="w-6 h-6 animate-spin mr-2" />Carregando editor...</div>
+                            <div className="flex items-center justify-center p-12 text-ink-faint"><Loader2 className="w-6 h-6 animate-spin mr-2" />Carregando editor...</div>
                         )}
                         {!isPreview && (
-                            <p className="mt-2 text-[11px] text-slate-400">
-                                💡 Você também pode digitar <code className="bg-slate-100 px-1 rounded">[[video:URL]]</code> direto no editor.
+                            <p className="mt-2 text-[11px] text-ink-faint">
+                                💡 Você também pode digitar <code className="bg-elev px-1 rounded">[[video:URL]]</code> direto no editor.
                             </p>
                         )}
                     </div>
@@ -325,25 +325,25 @@ export default function PostEditor({ filePath }: PostEditorProps) {
                     {/* Modal Inserir Vídeo */}
                     {showVideoModal && (
                         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowVideoModal(false)}>
-                            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md" onClick={e => e.stopPropagation()}>
-                                <div className="flex items-center justify-between p-5 border-b border-slate-100">
-                                    <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                            <div className="bg-surface rounded-lg shadow-2xl w-full max-w-md" onClick={e => e.stopPropagation()}>
+                                <div className="flex items-center justify-between p-5 border-b border-border">
+                                    <h3 className="text-sm font-bold text-ink uppercase tracking-wider flex items-center gap-2">
                                         <Video className="w-4 h-4 text-rose-500" /> Inserir vídeo
                                     </h3>
-                                    <button type="button" onClick={() => setShowVideoModal(false)} className="w-7 h-7 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-full flex items-center justify-center">
+                                    <button type="button" onClick={() => setShowVideoModal(false)} className="w-7 h-7 bg-elev hover:bg-elev text-ink-muted rounded-full flex items-center justify-center">
                                         <span className="text-base leading-none">×</span>
                                     </button>
                                 </div>
                                 <div className="p-5 space-y-3">
                                     <div>
-                                        <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">URL do vídeo</label>
+                                        <label className="block text-[10px] font-bold text-ink-muted uppercase tracking-wider mb-2">URL do vídeo</label>
                                         <input
                                             type="text"
                                             value={videoShortcodeUrl}
                                             onChange={e => setVideoShortcodeUrl(e.target.value)}
                                             onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); insertVideoShortcode(); } }}
                                             placeholder="https://youtube.com/watch?v=… ou https://vimeo.com/…"
-                                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:border-rose-400 focus:ring-2 focus:ring-rose-500/20"
+                                            className="w-full bg-elev border border-border rounded-md px-4 py-3 text-sm font-mono focus:outline-none focus:border-rose-400 focus:ring-2 focus:ring-rose-500/20"
                                             autoFocus
                                         />
                                         {videoShortcodeUrl.trim() && (() => {
@@ -357,13 +357,13 @@ export default function PostEditor({ filePath }: PostEditorProps) {
                                                 <p className="text-[11px] text-emerald-700 mt-2">✓ {info.provider}{info.id ? ` · ${info.id}` : ''}</p>
                                             );
                                         })()}
-                                        <p className="text-[10px] text-slate-400 mt-2 leading-relaxed">
-                                            Suporta YouTube, Vimeo, Loom, Wistia, Twitch e mp4 self-hosted. Será inserido como <code className="bg-slate-100 px-1 rounded">[[video:URL]]</code> no parágrafo atual.
+                                        <p className="text-[10px] text-ink-faint mt-2 leading-relaxed">
+                                            Suporta YouTube, Vimeo, Loom, Wistia, Twitch e mp4 self-hosted. Será inserido como <code className="bg-elev px-1 rounded">[[video:URL]]</code> no parágrafo atual.
                                         </p>
                                     </div>
                                 </div>
-                                <div className="p-5 border-t border-slate-100 flex justify-end gap-2">
-                                    <button type="button" onClick={() => setShowVideoModal(false)} className="px-3 py-1.5 text-xs font-bold text-slate-600 hover:bg-slate-200 rounded-lg">
+                                <div className="p-5 border-t border-border flex justify-end gap-2">
+                                    <button type="button" onClick={() => setShowVideoModal(false)} className="px-3 py-1.5 text-xs font-bold text-ink-muted hover:bg-elev rounded-lg">
                                         Cancelar
                                     </button>
                                     <button
@@ -383,14 +383,14 @@ export default function PostEditor({ filePath }: PostEditorProps) {
                 {/* Sidebar */}
                 <div className="w-72 shrink-0 space-y-4 sticky top-4">
                     {/* Publish Settings */}
-                    <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                        <h3 className="font-bold text-slate-700 text-sm border-b border-slate-100 pb-3 mb-4">Publicação</h3>
+                    <div className="bg-surface p-5 rounded-lg border border-border shadow-sm">
+                        <h3 className="font-bold text-ink text-sm border-b border-border pb-3 mb-4">Publicação</h3>
                         <div className="space-y-4">
                             <div>
                                 <label className={labelClass}>Status</label>
-                                <label className="flex items-center gap-3 cursor-pointer p-3 bg-slate-50 rounded-xl hover:bg-violet-50 transition-colors">
-                                    <input type="checkbox" checked={post.draft} onChange={e => setPost(p => ({ ...p, draft: e.target.checked }))} className="rounded border-slate-300 text-violet-600 focus:ring-violet-500" />
-                                    <span className="text-sm font-medium text-slate-700">Salvar como rascunho</span>
+                                <label className="flex items-center gap-3 cursor-pointer p-3 bg-elev rounded-md hover:bg-primary-soft transition-colors">
+                                    <input type="checkbox" checked={post.draft} onChange={e => setPost(p => ({ ...p, draft: e.target.checked }))} className="rounded border-border text-primary focus:ring-primary/20" />
+                                    <span className="text-sm font-medium text-ink">Salvar como rascunho</span>
                                 </label>
                             </div>
                             <div>
@@ -401,8 +401,8 @@ export default function PostEditor({ filePath }: PostEditorProps) {
                     </div>
 
                     {/* Category & Author */}
-                    <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                        <h3 className="font-bold text-slate-700 text-sm border-b border-slate-100 pb-3 mb-4">Metadados</h3>
+                    <div className="bg-surface p-5 rounded-lg border border-border shadow-sm">
+                        <h3 className="font-bold text-ink text-sm border-b border-border pb-3 mb-4">Metadados</h3>
                         <div className="space-y-4">
                             <div>
                                 <label className={labelClass}>Categoria</label>
@@ -430,20 +430,20 @@ export default function PostEditor({ filePath }: PostEditorProps) {
                     </div>
 
                     {/* Hero Image */}
-                    <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                        <h3 className="font-bold text-slate-700 text-sm border-b border-slate-100 pb-3 mb-4">Imagem de Capa</h3>
-                        <label className="group relative border-2 border-dashed border-slate-200 hover:border-violet-400 bg-slate-50 hover:bg-violet-50 rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all text-center overflow-hidden" style={{ minHeight: '120px' }}>
+                    <div className="bg-surface p-5 rounded-lg border border-border shadow-sm">
+                        <h3 className="font-bold text-ink text-sm border-b border-border pb-3 mb-4">Imagem de Capa</h3>
+                        <label className="group relative border-2 border-dashed border-border hover:border-primary/60 bg-elev hover:bg-primary-soft rounded-md flex flex-col items-center justify-center cursor-pointer transition-all text-center overflow-hidden" style={{ minHeight: '120px' }}>
                             <input type="file" accept="image/*" className="hidden" onChange={e => handleFileSelect(e, 'heroImage')} />
                             {post.heroImage ? (
                                 <>
                                     <img src={post.heroImage} alt="Capa" className="absolute inset-0 w-full h-full object-cover group-hover:opacity-60 transition-opacity" />
-                                    <div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-white/20">
-                                        <ImageIcon className="w-8 h-8 text-slate-800" />
-                                        <span className="text-xs font-bold text-slate-900 mt-1">Trocar imagem</span>
+                                    <div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-surface/20">
+                                        <ImageIcon className="w-8 h-8 text-ink" />
+                                        <span className="text-xs font-bold text-ink mt-1">Trocar imagem</span>
                                     </div>
                                 </>
                             ) : (
-                                <div className="py-6 flex flex-col items-center text-slate-400 group-hover:text-violet-500 transition-colors">
+                                <div className="py-6 flex flex-col items-center text-ink-faint group-hover:text-primary transition-colors">
                                     <ImageIcon className="w-8 h-8 mb-2" />
                                     <span className="text-xs font-bold">Enviar imagem de capa</span>
                                 </div>
@@ -453,25 +453,25 @@ export default function PostEditor({ filePath }: PostEditorProps) {
                     </div>
 
                     {/* Video do post */}
-                    <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                        <h3 className="font-bold text-slate-700 text-sm border-b border-slate-100 pb-3 mb-4 flex items-center gap-2">
+                    <div className="bg-surface p-5 rounded-lg border border-border shadow-sm">
+                        <h3 className="font-bold text-ink text-sm border-b border-border pb-3 mb-4 flex items-center gap-2">
                             <Video className="w-4 h-4 text-rose-500" />
                             Vídeo do artigo
-                            <span className="text-[10px] font-mono text-slate-400 font-normal ml-auto">opcional</span>
+                            <span className="text-[10px] font-mono text-ink-faint font-normal ml-auto">opcional</span>
                         </h3>
                         <div className="space-y-3">
                             <div>
-                                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">URL do vídeo</label>
+                                <label className="block text-[10px] font-bold text-ink-muted uppercase tracking-wider mb-1.5">URL do vídeo</label>
                                 <input
                                     type="text"
                                     value={post.videoUrl}
                                     onChange={e => setPost(p => ({ ...p, videoUrl: e.target.value }))}
                                     placeholder="https://youtube.com/watch?v=… ou https://vimeo.com/…"
-                                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-mono focus:outline-none focus:border-rose-400"
+                                    className="w-full bg-elev border border-border rounded-lg px-3 py-2 text-xs font-mono focus:outline-none focus:border-rose-400"
                                 />
                                 {(() => {
                                     if (!post.videoUrl?.trim()) return (
-                                        <p className="text-[10px] text-slate-400 mt-1.5">YouTube, Vimeo, Loom, Wistia, mp4 self-hosted.</p>
+                                        <p className="text-[10px] text-ink-faint mt-1.5">YouTube, Vimeo, Loom, Wistia, mp4 self-hosted.</p>
                                     );
                                     const info = parseVideoUrl(post.videoUrl);
                                     if (info.provider === 'unknown') return (
@@ -486,7 +486,7 @@ export default function PostEditor({ filePath }: PostEditorProps) {
                             </div>
                             {post.videoUrl?.trim() && parseVideoUrl(post.videoUrl).provider !== 'unknown' && (
                                 <div>
-                                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Posição</label>
+                                    <label className="block text-[10px] font-bold text-ink-muted uppercase tracking-wider mb-1.5">Posição</label>
                                     <div className="grid grid-cols-3 gap-1.5">
                                         {[
                                             { v: 'hero', label: 'Substitui capa' },
@@ -500,7 +500,7 @@ export default function PostEditor({ filePath }: PostEditorProps) {
                                                 className={`px-2 py-2 text-[10px] font-bold rounded-lg transition-all ${
                                                     post.videoPosition === opt.v
                                                         ? 'bg-rose-600 text-white shadow-sm'
-                                                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                                        : 'bg-elev text-ink-muted hover:bg-elev'
                                                 }`}
                                             >
                                                 {opt.label}

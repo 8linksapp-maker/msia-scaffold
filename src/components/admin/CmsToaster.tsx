@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { CheckCircle2, AlertCircle, Loader2, Info, ExternalLink, X } from 'lucide-react';
 
 export interface ToastEvent {
@@ -50,31 +50,31 @@ export default function CmsToaster() {
     return (
         <div className="fixed bottom-6 right-6 z-[9999] flex flex-col gap-3 items-end pointer-events-none">
             {toasts.map(toast => (
-                <div key={toast.id} className="pointer-events-auto bg-white border border-violet-100 shadow-2xl shadow-violet-500/10 rounded-2xl w-80 overflow-hidden transform transition-all duration-300">
+                <div key={toast.id} className="pointer-events-auto bg-surface border border-violet-100 shadow-2xl shadow-none/10 rounded-lg w-80 overflow-hidden transform transition-all duration-300">
                     <div className="p-4 flex items-start gap-4">
                         <div className="shrink-0 mt-0.5">
-                            {toast.type === 'success' && <CheckCircle2 className="w-5 h-5 text-violet-600" />}
+                            {toast.type === 'success' && <CheckCircle2 className="w-5 h-5 text-primary" />}
                             {toast.type === 'error' && <AlertCircle className="w-5 h-5 text-red-500" />}
-                            {toast.type === 'info' && <Info className="w-5 h-5 text-violet-400" />}
-                            {toast.type === 'progress' && <Loader2 className="w-5 h-5 text-violet-600 animate-spin" />}
+                            {toast.type === 'info' && <Info className="w-5 h-5 text-primary" />}
+                            {toast.type === 'progress' && <Loader2 className="w-5 h-5 text-primary animate-spin" />}
                         </div>
                         <div className="flex-1">
-                            <p className="text-sm font-bold text-slate-800 leading-snug">{toast.message}</p>
+                            <p className="text-sm font-bold text-ink leading-snug">{toast.message}</p>
                             {toast.link && (
-                                <a href={toast.link} target="_blank" className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 bg-violet-50 text-violet-700 hover:bg-violet-600 hover:text-white rounded-lg text-xs font-bold transition-colors">
+                                <a href={toast.link} target="_blank" className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary-soft text-primary hover:bg-primary hover:text-white rounded-lg text-xs font-bold transition-colors">
                                     Ver alteração ao vivo <ExternalLink className="w-3 h-3" />
                                 </a>
                             )}
                         </div>
                         {toast.type !== 'progress' && (
-                            <button onClick={() => removeToast(toast.id!)} className="shrink-0 text-slate-400 hover:text-violet-600 transition-colors">
+                            <button onClick={() => removeToast(toast.id!)} className="shrink-0 text-ink-faint hover:text-primary transition-colors">
                                 <X className="w-4 h-4" />
                             </button>
                         )}
                     </div>
                     {toast.type === 'progress' && toast.progress !== undefined && (
-                        <div className="w-full h-1.5 bg-slate-100">
-                            <div className="h-full bg-violet-600 transition-all duration-700 ease-out" style={{ width: `${toast.progress}%` }}></div>
+                        <div className="w-full h-1.5 bg-elev">
+                            <div className="h-full bg-primary transition-all duration-700 ease-out" style={{ width: `${toast.progress}%` }}></div>
                         </div>
                     )}
                 </div>
