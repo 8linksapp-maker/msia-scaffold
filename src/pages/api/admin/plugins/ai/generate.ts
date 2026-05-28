@@ -28,7 +28,7 @@ export const POST: APIRoute = async ({ request }) => {
         }
 
         const body = await request.json();
-        const { postType = 'informational', commercialSubType, title, slug, author, category } = body;
+        const { postType = 'informational', commercialSubType, title, slug, author, category, draft = false } = body;
 
         if (!title || !slug) {
             return new Response(JSON.stringify({ success: false, error: 'Título e slug são obrigatórios' }), {
@@ -42,8 +42,8 @@ export const POST: APIRoute = async ({ request }) => {
             });
         }
 
-        if (postType === 'commercial' && !['guia-melhores', 'spr'].includes(commercialSubType)) {
-            return new Response(JSON.stringify({ success: false, error: 'Posts comerciais exigem sub-tipo: guia-melhores ou spr' }), {
+        if (postType === 'commercial' && !['guia-melhores', 'review', 'spr'].includes(commercialSubType)) {
+            return new Response(JSON.stringify({ success: false, error: 'Posts comerciais exigem sub-tipo: guia-melhores ou review' }), {
                 status: 400, headers: { 'Content-Type': 'application/json' },
             });
         }
@@ -133,7 +133,7 @@ export const POST: APIRoute = async ({ request }) => {
                         category,
                         author,
                         pubDate: new Date().toISOString().split('T')[0],
-                        draft: false,
+                        draft: !!draft,
                     });
 
                     const success = await writeFileToRepo(postPath(slug), postContent, {

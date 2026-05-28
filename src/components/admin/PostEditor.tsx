@@ -23,6 +23,7 @@ export default function PostEditor({ filePath }: PostEditorProps) {
     const [isPreview, setIsPreview] = useState(false);
     const [pendingUploads, setPendingUploads] = useState<Record<string, File>>({});
     const [QuillEditor, setQuillEditor] = useState<any>(null);
+    const [quillFailed, setQuillFailed] = useState(false);
     const quillRef = React.useRef<any>(null);
     const [showVideoModal, setShowVideoModal] = useState(false);
     const [videoShortcodeUrl, setVideoShortcodeUrl] = useState('');
@@ -111,8 +112,10 @@ export default function PostEditor({ filePath }: PostEditorProps) {
 
     // Load Quill dynamically
     useEffect(() => {
-        import('react-quill-new').then(mod => setQuillEditor(() => mod.default));
-        import('react-quill-new/dist/quill.snow.css' as any);
+        import('react-quill-new')
+            .then(mod => setQuillEditor(() => mod.default))
+            .catch(() => setQuillFailed(true));
+        import('react-quill-new/dist/quill.snow.css' as any).catch(() => {});
     }, []);
 
     useEffect(() => {
@@ -312,8 +315,24 @@ export default function PostEditor({ filePath }: PostEditorProps) {
                                 formats={quillFormats}
                                 style={{ minHeight: '300px' }}
                             />
+                        ) : quillFailed ? (
+                            <div className="space-y-2">
+                                <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-3 py-2">
+                                    O editor visual não carregou. Use o campo de texto abaixo (HTML ou Markdown são aceitos).
+                                </p>
+                                <textarea
+                                    value={post.content}
+                                    onChange={e => setPost(p => ({ ...p, content: e.target.value }))}
+                                    className="w-full bg-surface border border-border rounded-md px-4 py-3 text-sm text-ink font-mono focus:outline-none focus:border-primary/80 resize-y"
+                                    style={{ minHeight: '300px' }}
+                                    aria-label="Conteúdo do artigo"
+                                />
+                            </div>
                         ) : (
-                            <div className="flex items-center justify-center p-12 text-ink-faint"><Loader2 className="w-6 h-6 animate-spin mr-2" />Carregando editor...</div>
+                            <div className="flex items-center justify-center p-12 text-ink-faint">
+                                <Loader2 className="w-6 h-6 animate-spin mr-2" aria-hidden="true" />
+                                Carregando editor...
+                            </div>
                         )}
                         {!isPreview && (
                             <p className="mt-2 text-[11px] text-ink-faint">
