@@ -49,7 +49,7 @@
     },
     "ai": {
         "provider": "openai",
-        "apiKey": "REDACTED-OPENAI-KEY",
+        "apiKey": "",
         "pexelsApiKey": ""
     },
     "searchConsole": {
