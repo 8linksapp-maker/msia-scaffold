@@ -71,7 +71,7 @@ export default function DeployManager() {
             if (!r.ok) {
                 if (r.status === 401) return;
                 setUi('error');
-                setErrorMsg('Não foi possível verificar status do deploy.');
+                setErrorMsg('Não conseguimos verificar as alterações pendentes. Tente novamente em instantes.');
                 return;
             }
             const data = await r.json() as Status;
@@ -186,7 +186,7 @@ export default function DeployManager() {
             <div className="bg-elev border border-border rounded-md px-4 py-3 mb-6 flex items-center gap-3">
                 <AlertCircle className="w-5 h-5 text-ink-muted shrink-0" />
                 <p className="text-sm text-ink">
-                    Deploy manual ainda não está configurado neste site. Contate o suporte para ativar.
+                    Publicação automática ainda não está ativa neste blog. Fale com o suporte para habilitar.
                 </p>
             </div>
         );

@@ -1,5 +1,5 @@
 ﻿import React, { useState, useEffect, useRef } from 'react';
-import { AlertCircle, Loader2, Plus, Trash2, Tag, X, Edit2 } from 'lucide-react';
+import { AlertCircle, Loader2, Plus, Trash2, Tag, X, Edit2, Package } from 'lucide-react';
 import { triggerToast } from './CmsToaster';
 import { githubApi } from '../../lib/adminApi';
 import { normalizeCategories, slugifyCategory, type CategoryEntry } from '../../lib/categorySlug';
@@ -16,6 +16,7 @@ export default function CategoriesEditor() {
     const [tempSlug, setTempSlug] = useState('');
     const [slugTouched, setSlugTouched] = useState(false);
     const [tempDesc, setTempDesc] = useState('');
+    const [modalError, setModalError] = useState('');
 
     useEffect(() => {
         githubApi('read', 'src/data/categories.json')
@@ -49,7 +50,7 @@ export default function CategoriesEditor() {
         setIsModalOpen(true);
     };
     const modalRef = useRef<HTMLDivElement>(null);
-    const closeModal = () => setIsModalOpen(false);
+    const closeModal = () => { setIsModalOpen(false); setModalError(''); };
 
     // Focus trap + ESC para o modal
     useEffect(() => {
@@ -96,24 +97,25 @@ export default function CategoriesEditor() {
             setFileSha(data.sha);
             triggerToast('Categorias atualizadas!', 'success', 100);
         } catch (err: any) {
-            setError(err.message);
-            triggerToast(`Erro: ${err.message}`, 'error');
+            setError('Não foi possível salvar as categorias. Verifique sua conexão.');
+            triggerToast('Não foi possível salvar as categorias. Verifique sua conexão e tente novamente.', 'error');
         } finally {
             setSaving(false);
         }
     };
 
     const saveModalCategory = async () => {
+        setModalError('');
         const name = tempName.trim();
         const slug = (tempSlug.trim() || slugifyCategory(name)).replace(/^-|-$/g, '');
         const description = tempDesc.trim();
 
-        if (!name) { alert('O nome da categoria é obrigatório!'); return; }
-        if (!slug) { alert('O slug é obrigatório!'); return; }
+        if (!name) { setModalError('Digite o nome da categoria.'); return; }
+        if (!slug) { setModalError('A URL da categoria é obrigatória.'); return; }
 
         const collision = categories.find((c, i) => i !== editingIndex && (c.name === name || c.slug === slug));
         if (collision) {
-            alert(`Já existe categoria com ${collision.name === name ? 'esse nome' : 'esse slug'}: "${collision.name}" → /${collision.slug}`);
+            setModalError(`"${collision.name}" já existe. Escolha um nome ou URL diferente.`);
             return;
         }
 
@@ -174,8 +176,8 @@ export default function CategoriesEditor() {
             // Recarrega sha do categories.json
             githubApi('read', 'src/data/categories.json').then(d => setFileSha(d.sha)).catch(() => { });
         } catch (err: any) {
-            setError(err.message);
-            triggerToast(`Erro: ${err.message}`, 'error');
+            setError('Não foi possível renomear a categoria. Verifique sua conexão.');
+            triggerToast('Não foi possível renomear a categoria. Tente novamente.', 'error');
         } finally {
             setSaving(false);
         }
@@ -307,9 +309,17 @@ export default function CategoriesEditor() {
                                 />
                             </div>
                         </div>
+                        <div className="px-6 pb-2">
+                            {modalError && (
+                                <p role="alert" className="text-sm text-red-700 font-medium flex items-center gap-1.5 py-2">
+                                    <AlertCircle className="w-4 h-4 shrink-0" aria-hidden="true" />
+                                    {modalError}
+                                </p>
+                            )}
+                        </div>
                         <div className="p-6 border-t border-border flex gap-3 justify-end">
-                            <button onClick={closeModal} className="px-5 py-2.5 font-bold text-ink-muted hover:bg-elev rounded-md">Cancelar</button>
-                            <button onClick={saveModalCategory} className="px-6 py-2.5 font-bold bg-primary hover:bg-primary text-white rounded-md shadow-md transition-all">Salvar Categoria</button>
+                            <button onClick={closeModal} className="px-5 py-2.5 min-h-[44px] font-semibold text-ink-muted hover:bg-elev rounded transition-colors">Cancelar</button>
+                            <button onClick={saveModalCategory} className="px-6 py-2.5 min-h-[44px] font-semibold bg-primary hover:brightness-90 text-surface rounded transition-all">Salvar categoria</button>
                         </div>
                     </div>
                 </div>

@@ -91,10 +91,6 @@ export default function BackupManager({ siteName }: { siteName: string }) {
 
   async function handleApplyImport() {
     if (!selectedFile || !preview) return;
-    const conflicts = preview.posts.filter(p => p.exists).length + preview.images.filter(p => p.exists).length;
-    if (conflicts > 0 && conflictPolicy === 'overwrite') {
-      if (!confirm(`Tem ${conflicts} arquivo(s) com conflito. Eles serão SOBRESCRITOS. Confirma?`)) return;
-    }
     setImporting(true);
     try {
       const fd = new FormData();
@@ -175,7 +171,7 @@ export default function BackupManager({ siteName }: { siteName: string }) {
           </button>
           <div className="mt-4 p-3 bg-elev border border-border rounded-lg text-[11px] text-ink-muted leading-relaxed">
             <Info className="w-3 h-3 inline-block mr-1" />
-            Em produção, lê direto do GitHub do site (5000 req/h). Em dev, lê do filesystem local.
+            O download inclui todos os artigos e imagens publicados no seu blog.
           </div>
         </div>
 

@@ -1,5 +1,5 @@
 ﻿import React, { useState, useEffect } from 'react';
-import { FileText, Plus, Search, Loader2, Trash2, Edit3, AlertCircle, Save, ChevronUp, ChevronDown, Check, X } from 'lucide-react';
+import { FileText, Plus, Search, Loader2, Trash2, Edit3, AlertCircle, Save, ChevronUp, ChevronDown, Check, X, AlertTriangle } from 'lucide-react';
 import { triggerToast } from './CmsToaster';
 import { githubApi } from '../../lib/adminApi';
 import { normalizeCategories } from '../../lib/categorySlug';
@@ -20,6 +20,8 @@ export default function PostsManager() {
     const [sortField, setSortField] = useState<'title' | 'pubDate'>('pubDate');
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
     const [selectedPosts, setSelectedPosts] = useState<string[]>([]);
+    const [pendingDelete, setPendingDelete] = useState<{ path: string; sha: string; name: string } | null>(null);
+    const [quickEditError, setQuickEditError] = useState('');
     const itemsPerPage = 20;
 
     useEffect(() => { fetchInitialData(); }, []);
@@ -82,14 +84,20 @@ export default function PostsManager() {
         }
     };
 
-    const handleDelete = async (path: string, sha: string, name: string) => {
-        if (!confirm(`Excluir o post "${name}"?`)) return;
+    const handleDelete = (path: string, sha: string, name: string) => {
+        setPendingDelete({ path, sha, name });
+    };
+
+    const confirmDelete = async () => {
+        if (!pendingDelete) return;
+        const { path, sha, name } = pendingDelete;
+        setPendingDelete(null);
         try {
             await githubApi('delete', path, { sha, message: `CMS: Excluindo post ${name}` });
             setPosts(posts.filter(f => f.sha !== sha));
-            triggerToast(`Artigo "${name}" excluído!`, 'success');
+            triggerToast(`Artigo "${name}" excluído.`, 'success');
         } catch (err: any) {
-            triggerToast(`Erro: ${err.message}`, 'error');
+            triggerToast(`Não foi possível excluir "${name}". Verifique sua conexão e tente novamente.`, 'error');
         }
     };
 
@@ -130,14 +138,20 @@ export default function PostsManager() {
                 body: JSON.stringify(updated),
             });
         } catch (e) {
-            console.warn('createSlugRedirect failed (continuando sem redirect):', e);
+            // Redirect 301 não é crítico — o artigo foi salvo. Avisamos sem bloquear.
+            triggerToast('Artigo salvo. Redirecionamento da URL antiga não foi criado automaticamente.', 'info');
         }
     };
 
     const saveQuickEdit = async () => {
-        if (!quickEditData.title || !quickEditData.slug) return alert('Título e Slug não podem ser vazios.');
+        setQuickEditError('');
+        if (!quickEditData.title || !quickEditData.slug) {
+            setQuickEditError('Preencha o título e a URL do artigo. Ambos são obrigatórios.');
+            return;
+        }
         if (quickEditData.slug !== quickEditData._oldSlug && posts.some(p => p.slug === quickEditData.slug && p.sha !== quickEditData._sha)) {
-            return alert(`Já existe um post com o slug "${quickEditData.slug}". Escolha outro.`);
+            setQuickEditError('Essa URL já está em uso por outro artigo. Escolha uma diferente.');
+            return;
         }
         setSaving(true);
         try {
@@ -200,6 +214,31 @@ export default function PostsManager() {
 
     return (
         <div className="space-y-6 pb-32">
+
+            {/* Confirmação de exclusão — inline, sem confirm() nativo */}
+            {pendingDelete && (
+                <div role="alert" className="flex items-center gap-4 bg-red-50 border border-red-200 rounded-md px-5 py-4">
+                    <AlertTriangle className="w-5 h-5 text-red-600 shrink-0" aria-hidden="true" />
+                    <p className="text-sm text-red-800 font-medium flex-1">
+                        Excluir <strong>"{pendingDelete.name}"</strong>? Esta ação não pode ser desfeita.
+                    </p>
+                    <div className="flex gap-2 shrink-0">
+                        <button
+                            onClick={() => setPendingDelete(null)}
+                            className="px-4 py-2 min-h-[40px] text-sm font-semibold text-red-700 hover:bg-red-100 rounded transition-colors"
+                        >
+                            Cancelar
+                        </button>
+                        <button
+                            onClick={confirmDelete}
+                            className="px-4 py-2 min-h-[40px] text-sm font-semibold bg-red-600 hover:bg-red-700 text-white rounded transition-colors"
+                        >
+                            Sim, excluir
+                        </button>
+                    </div>
+                </div>
+            )}
+
             {/* Header */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-surface p-5 px-6 rounded-lg border border-border shadow-sm sticky top-0 z-40">
                 <div>
@@ -234,10 +273,28 @@ export default function PostsManager() {
 
             {/* Table */}
             {paginated.length === 0 ? (
-                <div className="bg-elev border-2 border-dashed border-border rounded-3xl p-16 flex flex-col items-center justify-center text-center">
-                    <FileText className="w-12 h-12 text-ink-faint mb-4" />
-                    <h3 className="text-xl font-bold text-ink mb-2">Nenhum artigo encontrado</h3>
-                    <a href="/admin/posts/new" className="mt-4 bg-primary text-white font-bold px-8 py-3 rounded-md shadow-md hover:bg-primary transition-colors">Criar primeiro artigo</a>
+                <div className="bg-surface border-2 border-dashed border-border rounded-lg p-16 flex flex-col items-center justify-center text-center">
+                    <FileText className="w-10 h-10 text-ink-faint mb-4" aria-hidden="true" />
+                    {search || statusFilter !== 'all' || categoryFilter !== 'all' ? (
+                        <>
+                            <h3 className="text-base font-semibold text-ink mb-2">Nenhum artigo encontrado</h3>
+                            <p className="text-sm text-ink-muted mb-5">Tente ajustar os filtros ou a busca.</p>
+                            <button
+                                onClick={() => { setSearch(''); setStatusFilter('all'); setCategoryFilter('all'); }}
+                                className="text-sm font-semibold text-primary hover:underline"
+                            >
+                                Limpar filtros
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            <h3 className="text-base font-semibold text-ink mb-2">Nenhum artigo ainda</h3>
+                            <p className="text-sm text-ink-muted mb-5 max-w-xs">Escreva o primeiro artigo para começar a publicar conteúdo no seu blog.</p>
+                            <a href="/admin/posts/new" className="inline-flex items-center gap-2 bg-primary hover:brightness-90 text-surface font-semibold px-6 py-2.5 rounded text-sm transition-all">
+                                Escrever primeiro artigo
+                            </a>
+                        </>
+                    )}
                 </div>
             ) : (
                 <div className="bg-surface rounded-lg border border-border overflow-hidden shadow-sm">
@@ -292,7 +349,7 @@ export default function PostsManager() {
                                                             <input type="text" value={quickEditData.title} onChange={e => setQuickEditData({ ...quickEditData, title: e.target.value })} className="w-full bg-surface border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/80" />
                                                         </div>
                                                         <div>
-                                                            <label className="block text-[10px] font-bold text-ink-muted uppercase tracking-wider mb-1">Slug (URL)</label>
+                                                            <label className="block text-[10px] font-bold text-ink-muted uppercase tracking-wider mb-1">URL do artigo</label>
                                                             <input type="text" value={quickEditData.slug} onChange={e => setQuickEditData({ ...quickEditData, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-') })} className="w-full bg-surface border border-border rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:border-primary/80" />
                                                         </div>
                                                         <div>
@@ -316,8 +373,14 @@ export default function PostsManager() {
                                                             </label>
                                                         </div>
                                                     </div>
+                                                    {quickEditError && (
+                                                        <p role="alert" className="mt-3 text-sm text-red-700 font-medium flex items-center gap-1.5">
+                                                            <AlertCircle className="w-4 h-4 shrink-0" aria-hidden="true" />
+                                                            {quickEditError}
+                                                        </p>
+                                                    )}
                                                     <div className="flex gap-3 mt-4 justify-end">
-                                                        <button onClick={() => setEditingSha(null)} className="flex items-center gap-1.5 px-4 py-2 text-sm font-bold text-ink-muted hover:bg-elev rounded-lg transition-colors"><X className="w-4 h-4" />Cancelar</button>
+                                                        <button onClick={() => { setEditingSha(null); setQuickEditError(''); }} className="flex items-center gap-1.5 px-4 py-2 text-sm font-bold text-ink-muted hover:bg-elev rounded-lg transition-colors"><X className="w-4 h-4" aria-hidden="true" />Cancelar</button>
                                                         <button onClick={saveQuickEdit} disabled={saving} className="flex items-center gap-1.5 px-5 py-2 text-sm font-bold bg-primary hover:bg-primary text-white rounded-lg shadow-sm transition-all disabled:opacity-60">
                                                             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                                                             {saving ? 'Salvando...' : 'Salvar'}
